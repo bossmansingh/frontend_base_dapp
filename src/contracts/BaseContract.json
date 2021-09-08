@@ -1,0 +1,1245 @@
+{
+  "contractName": "BaseContract",
+  "abi": [
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "previousOwner",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "OwnershipTransferred",
+      "type": "event"
+    },
+    {
+      "inputs": [],
+      "name": "owner",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "renounceOwnership",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "transferOwnership",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "newOwnerAddress",
+          "type": "address"
+        }
+      ],
+      "name": "setOwnership",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "metadata": "{\"compiler\":{\"version\":\"0.8.0+commit.c7dfd78e\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"previousOwner\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"OwnershipTransferred\",\"type\":\"event\"},{\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"renounceOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"newOwnerAddress\",\"type\":\"address\"}],\"name\":\"setOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"transferOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{\"owner()\":{\"details\":\"Returns the address of the current owner.\"},\"renounceOwnership()\":{\"details\":\"Leaves the contract without owner. It will not be possible to call `onlyOwner` functions anymore. Can only be called by the current owner. NOTE: Renouncing ownership will leave the contract without an owner, thereby removing any functionality that is only available to the owner.\"},\"setOwnership(address)\":{\"details\":\"Call this method to update ownership in future (if needed). This external  method can only be called by the owner of this contract. Since `transferOwnership()` already have this check it's not required for this method. \",\"params\":{\"newOwnerAddress\":\"address of new owner to which ownership is to be transfered.\"}},\"transferOwnership(address)\":{\"details\":\"Transfers ownership of the contract to a new account (`newOwner`). Can only be called by the current owner.\"}},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"project:/contracts/BaseContract.sol\":\"BaseContract\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"@openzeppelin/contracts/access/Ownable.sol\":{\"keccak256\":\"0x6bb804a310218875e89d12c053e94a13a4607cdf7cc2052f3e52bd32a0dc50a1\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://b2ebbbe6d0011175bd9e7268b83de3f9c2f9d8d4cbfbaef12aff977d7d727163\",\"dweb:/ipfs/Qmd5c7Vxtis9wzkDNhxwc6A2QT5H9xn9kfjhx7qx44vpro\"]},\"@openzeppelin/contracts/security/ReentrancyGuard.sol\":{\"keccak256\":\"0x842ccf9a6cd33e17b7acef8372ca42090755217b358fe0c44c98e951ea549d3a\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://6cc5f36034a77d105263ae6d8cc18b16260b4a0f6cdb1a26f21ba3670fdd06dd\",\"dweb:/ipfs/QmdJrJ2LoG546BkfyZPta96BNmaVBfqZoh8kq7PqHuQyPk\"]},\"@openzeppelin/contracts/utils/Context.sol\":{\"keccak256\":\"0x90565a39ae45c80f0468dc96c7b20d0afc3055f344c8203a0c9258239f350b9f\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://26e8b38a7ac8e7b4463af00cf7fff1bf48ae9875765bf4f7751e100124d0bc8c\",\"dweb:/ipfs/QmWcsmkVr24xmmjfnBQZoemFniXjj3vwT78Cz6uqZW1Hux\"]},\"@openzeppelin/contracts/utils/Counters.sol\":{\"keccak256\":\"0x78450f4e3b722cce467b21e285f72ce5eaf361e9ba9dd2241a413926246773cd\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://f103065051300cd995fd4599ba91188d4071b92175b52f26110e02db091617c0\",\"dweb:/ipfs/QmSyDz67R2HCypDE8Pacn3voVwxw9x17NM66q47YgBnGqc\"]},\"project:/contracts/BaseContract.sol\":{\"keccak256\":\"0xb8acdf3a17d947da69bae01a7f80210973113c124c9436cdfc2778fe5357e288\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://3ba6107de07fdd30422f820d9635b45ef18daba389b1904961c5301c4fe120cf\",\"dweb:/ipfs/QmTkZtWBZNpZN362H2juhFwDkc1jewUEuo2L46iqCeLbNm\"]}},\"version\":1}",
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "immutableReferences": {},
+  "generatedSources": [],
+  "deployedGeneratedSources": [],
+  "sourceMap": "",
+  "deployedSourceMap": "",
+  "source": "// SPDX-License-Identifier: MIT\n\npragma solidity ^0.8.0;\n\nimport \"@openzeppelin/contracts/security/ReentrancyGuard.sol\";\nimport \"@openzeppelin/contracts/utils/Counters.sol\";\nimport \"@openzeppelin/contracts/access/Ownable.sol\";\n\nabstract contract BaseContract is ReentrancyGuard, Ownable {\n    \n    using Counters for Counters.Counter;\n    \n    Counters.Counter private _counter = Counters.Counter(0);\n    \n    /**\n     * @dev Returns the current value of counter\n     *\n     * @return current counter value\n     */\n    function currentCounterValue() internal view returns (uint) {\n      return _counter.current();\n    }\n    \n    /**\n     * @dev Add this modifier to method which will increament the counter by one as the last operation.\n     */\n     modifier increment() {\n         _;\n         _counter.increment();\n     }\n    \n    /**\n     * @dev Call this method to update ownership in future (if needed). This external \n     * method can only be called by the owner of this contract. Since `transferOwnership()`\n     * already have this check it's not required for this method.\n     * \n     * @param newOwnerAddress address of new owner to which ownership is to be transfered.\n     */\n    function setOwnership(address newOwnerAddress) external {\n      transferOwnership(newOwnerAddress);\n    }\n}",
+  "sourcePath": "/Users/saurabh-macbook/Documents/dapps/chkmate/frontend_base_dapp/contracts/BaseContract.sol",
+  "ast": {
+    "absolutePath": "project:/contracts/BaseContract.sol",
+    "exportedSymbols": {
+      "BaseContract": [
+        2990
+      ],
+      "Context": [
+        2312
+      ],
+      "Counters": [
+        2386
+      ],
+      "Ownable": [
+        103
+      ],
+      "ReentrancyGuard": [
+        143
+      ]
+    },
+    "id": 2991,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 2939,
+        "literals": [
+          "solidity",
+          "^",
+          "0.8",
+          ".0"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "33:23:17"
+      },
+      {
+        "absolutePath": "@openzeppelin/contracts/security/ReentrancyGuard.sol",
+        "file": "@openzeppelin/contracts/security/ReentrancyGuard.sol",
+        "id": 2940,
+        "nodeType": "ImportDirective",
+        "scope": 2991,
+        "sourceUnit": 144,
+        "src": "58:62:17",
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "absolutePath": "@openzeppelin/contracts/utils/Counters.sol",
+        "file": "@openzeppelin/contracts/utils/Counters.sol",
+        "id": 2941,
+        "nodeType": "ImportDirective",
+        "scope": 2991,
+        "sourceUnit": 2387,
+        "src": "121:52:17",
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "absolutePath": "@openzeppelin/contracts/access/Ownable.sol",
+        "file": "@openzeppelin/contracts/access/Ownable.sol",
+        "id": 2942,
+        "nodeType": "ImportDirective",
+        "scope": 2991,
+        "sourceUnit": 104,
+        "src": "174:52:17",
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "abstract": true,
+        "baseContracts": [
+          {
+            "baseName": {
+              "id": 2943,
+              "name": "ReentrancyGuard",
+              "nodeType": "IdentifierPath",
+              "referencedDeclaration": 143,
+              "src": "262:15:17"
+            },
+            "id": 2944,
+            "nodeType": "InheritanceSpecifier",
+            "src": "262:15:17"
+          },
+          {
+            "baseName": {
+              "id": 2945,
+              "name": "Ownable",
+              "nodeType": "IdentifierPath",
+              "referencedDeclaration": 103,
+              "src": "279:7:17"
+            },
+            "id": 2946,
+            "nodeType": "InheritanceSpecifier",
+            "src": "279:7:17"
+          }
+        ],
+        "contractDependencies": [
+          103,
+          143,
+          2312
+        ],
+        "contractKind": "contract",
+        "fullyImplemented": true,
+        "id": 2990,
+        "linearizedBaseContracts": [
+          2990,
+          103,
+          2312,
+          143
+        ],
+        "name": "BaseContract",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "id": 2950,
+            "libraryName": {
+              "id": 2947,
+              "name": "Counters",
+              "nodeType": "IdentifierPath",
+              "referencedDeclaration": 2386,
+              "src": "304:8:17"
+            },
+            "nodeType": "UsingForDirective",
+            "src": "298:36:17",
+            "typeName": {
+              "id": 2949,
+              "nodeType": "UserDefinedTypeName",
+              "pathNode": {
+                "id": 2948,
+                "name": "Counters.Counter",
+                "nodeType": "IdentifierPath",
+                "referencedDeclaration": 2318,
+                "src": "317:16:17"
+              },
+              "referencedDeclaration": 2318,
+              "src": "317:16:17",
+              "typeDescriptions": {
+                "typeIdentifier": "t_struct$_Counter_$2318_storage_ptr",
+                "typeString": "struct Counters.Counter"
+              }
+            }
+          },
+          {
+            "constant": false,
+            "id": 2957,
+            "mutability": "mutable",
+            "name": "_counter",
+            "nodeType": "VariableDeclaration",
+            "scope": 2990,
+            "src": "344:55:17",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_struct$_Counter_$2318_storage",
+              "typeString": "struct Counters.Counter"
+            },
+            "typeName": {
+              "id": 2952,
+              "nodeType": "UserDefinedTypeName",
+              "pathNode": {
+                "id": 2951,
+                "name": "Counters.Counter",
+                "nodeType": "IdentifierPath",
+                "referencedDeclaration": 2318,
+                "src": "344:16:17"
+              },
+              "referencedDeclaration": 2318,
+              "src": "344:16:17",
+              "typeDescriptions": {
+                "typeIdentifier": "t_struct$_Counter_$2318_storage_ptr",
+                "typeString": "struct Counters.Counter"
+              }
+            },
+            "value": {
+              "arguments": [
+                {
+                  "hexValue": "30",
+                  "id": 2955,
+                  "isConstant": false,
+                  "isLValue": false,
+                  "isPure": true,
+                  "kind": "number",
+                  "lValueRequested": false,
+                  "nodeType": "Literal",
+                  "src": "397:1:17",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_rational_0_by_1",
+                    "typeString": "int_const 0"
+                  },
+                  "value": "0"
+                }
+              ],
+              "expression": {
+                "argumentTypes": [
+                  {
+                    "typeIdentifier": "t_rational_0_by_1",
+                    "typeString": "int_const 0"
+                  }
+                ],
+                "expression": {
+                  "id": 2953,
+                  "name": "Counters",
+                  "nodeType": "Identifier",
+                  "overloadedDeclarations": [],
+                  "referencedDeclaration": 2386,
+                  "src": "380:8:17",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_type$_t_contract$_Counters_$2386_$",
+                    "typeString": "type(library Counters)"
+                  }
+                },
+                "id": 2954,
+                "isConstant": false,
+                "isLValue": false,
+                "isPure": false,
+                "lValueRequested": false,
+                "memberName": "Counter",
+                "nodeType": "MemberAccess",
+                "referencedDeclaration": 2318,
+                "src": "380:16:17",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_type$_t_struct$_Counter_$2318_storage_ptr_$",
+                  "typeString": "type(struct Counters.Counter storage pointer)"
+                }
+              },
+              "id": 2956,
+              "isConstant": false,
+              "isLValue": false,
+              "isPure": true,
+              "kind": "structConstructorCall",
+              "lValueRequested": false,
+              "names": [],
+              "nodeType": "FunctionCall",
+              "src": "380:19:17",
+              "tryCall": false,
+              "typeDescriptions": {
+                "typeIdentifier": "t_struct$_Counter_$2318_memory_ptr",
+                "typeString": "struct Counters.Counter memory"
+              }
+            },
+            "visibility": "private"
+          },
+          {
+            "body": {
+              "id": 2967,
+              "nodeType": "Block",
+              "src": "579:40:17",
+              "statements": [
+                {
+                  "expression": {
+                    "arguments": [],
+                    "expression": {
+                      "argumentTypes": [],
+                      "expression": {
+                        "id": 2963,
+                        "name": "_counter",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 2957,
+                        "src": "594:8:17",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_struct$_Counter_$2318_storage",
+                          "typeString": "struct Counters.Counter storage ref"
+                        }
+                      },
+                      "id": 2964,
+                      "isConstant": false,
+                      "isLValue": true,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberName": "current",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 2330,
+                      "src": "594:16:17",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_internal_view$_t_struct$_Counter_$2318_storage_ptr_$returns$_t_uint256_$bound_to$_t_struct$_Counter_$2318_storage_ptr_$",
+                        "typeString": "function (struct Counters.Counter storage pointer) view returns (uint256)"
+                      }
+                    },
+                    "id": 2965,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "594:18:17",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "functionReturnParameters": 2962,
+                  "id": 2966,
+                  "nodeType": "Return",
+                  "src": "587:25:17"
+                }
+              ]
+            },
+            "documentation": {
+              "id": 2958,
+              "nodeType": "StructuredDocumentation",
+              "src": "410:104:17",
+              "text": " @dev Returns the current value of counter\n @return current counter value"
+            },
+            "id": 2968,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "currentCounterValue",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 2959,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "547:2:17"
+            },
+            "returnParameters": {
+              "id": 2962,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 2961,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2968,
+                  "src": "573:4:17",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 2960,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "573:4:17",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "572:6:17"
+            },
+            "scope": 2990,
+            "src": "519:100:17",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "internal"
+          },
+          {
+            "body": {
+              "id": 2977,
+              "nodeType": "Block",
+              "src": "771:51:17",
+              "statements": [
+                {
+                  "id": 2971,
+                  "nodeType": "PlaceholderStatement",
+                  "src": "782:1:17"
+                },
+                {
+                  "expression": {
+                    "arguments": [],
+                    "expression": {
+                      "argumentTypes": [],
+                      "expression": {
+                        "id": 2972,
+                        "name": "_counter",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 2957,
+                        "src": "794:8:17",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_struct$_Counter_$2318_storage",
+                          "typeString": "struct Counters.Counter storage ref"
+                        }
+                      },
+                      "id": 2974,
+                      "isConstant": false,
+                      "isLValue": true,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberName": "increment",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 2344,
+                      "src": "794:18:17",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_internal_nonpayable$_t_struct$_Counter_$2318_storage_ptr_$returns$__$bound_to$_t_struct$_Counter_$2318_storage_ptr_$",
+                        "typeString": "function (struct Counters.Counter storage pointer)"
+                      }
+                    },
+                    "id": 2975,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "794:20:17",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 2976,
+                  "nodeType": "ExpressionStatement",
+                  "src": "794:20:17"
+                }
+              ]
+            },
+            "documentation": {
+              "id": 2969,
+              "nodeType": "StructuredDocumentation",
+              "src": "629:115:17",
+              "text": " @dev Add this modifier to method which will increament the counter by one as the last operation."
+            },
+            "id": 2978,
+            "name": "increment",
+            "nodeType": "ModifierDefinition",
+            "parameters": {
+              "id": 2970,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "768:2:17"
+            },
+            "src": "750:72:17",
+            "virtual": false,
+            "visibility": "internal"
+          },
+          {
+            "body": {
+              "id": 2988,
+              "nodeType": "Block",
+              "src": "1248:49:17",
+              "statements": [
+                {
+                  "expression": {
+                    "arguments": [
+                      {
+                        "id": 2985,
+                        "name": "newOwnerAddress",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 2981,
+                        "src": "1274:15:17",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      ],
+                      "id": 2984,
+                      "name": "transferOwnership",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 83,
+                      "src": "1256:17:17",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_internal_nonpayable$_t_address_$returns$__$",
+                        "typeString": "function (address)"
+                      }
+                    },
+                    "id": 2986,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "1256:34:17",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 2987,
+                  "nodeType": "ExpressionStatement",
+                  "src": "1256:34:17"
+                }
+              ]
+            },
+            "documentation": {
+              "id": 2979,
+              "nodeType": "StructuredDocumentation",
+              "src": "832:355:17",
+              "text": " @dev Call this method to update ownership in future (if needed). This external \n method can only be called by the owner of this contract. Since `transferOwnership()`\n already have this check it's not required for this method.\n \n @param newOwnerAddress address of new owner to which ownership is to be transfered."
+            },
+            "functionSelector": "a7016023",
+            "id": 2989,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "setOwnership",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 2982,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 2981,
+                  "mutability": "mutable",
+                  "name": "newOwnerAddress",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2989,
+                  "src": "1214:23:17",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 2980,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1214:7:17",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1213:25:17"
+            },
+            "returnParameters": {
+              "id": 2983,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1248:0:17"
+            },
+            "scope": 2990,
+            "src": "1192:105:17",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 2991,
+        "src": "228:1071:17"
+      }
+    ],
+    "src": "33:1266:17"
+  },
+  "legacyAST": {
+    "absolutePath": "project:/contracts/BaseContract.sol",
+    "exportedSymbols": {
+      "BaseContract": [
+        2990
+      ],
+      "Context": [
+        2312
+      ],
+      "Counters": [
+        2386
+      ],
+      "Ownable": [
+        103
+      ],
+      "ReentrancyGuard": [
+        143
+      ]
+    },
+    "id": 2991,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 2939,
+        "literals": [
+          "solidity",
+          "^",
+          "0.8",
+          ".0"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "33:23:17"
+      },
+      {
+        "absolutePath": "@openzeppelin/contracts/security/ReentrancyGuard.sol",
+        "file": "@openzeppelin/contracts/security/ReentrancyGuard.sol",
+        "id": 2940,
+        "nodeType": "ImportDirective",
+        "scope": 2991,
+        "sourceUnit": 144,
+        "src": "58:62:17",
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "absolutePath": "@openzeppelin/contracts/utils/Counters.sol",
+        "file": "@openzeppelin/contracts/utils/Counters.sol",
+        "id": 2941,
+        "nodeType": "ImportDirective",
+        "scope": 2991,
+        "sourceUnit": 2387,
+        "src": "121:52:17",
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "absolutePath": "@openzeppelin/contracts/access/Ownable.sol",
+        "file": "@openzeppelin/contracts/access/Ownable.sol",
+        "id": 2942,
+        "nodeType": "ImportDirective",
+        "scope": 2991,
+        "sourceUnit": 104,
+        "src": "174:52:17",
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "abstract": true,
+        "baseContracts": [
+          {
+            "baseName": {
+              "id": 2943,
+              "name": "ReentrancyGuard",
+              "nodeType": "IdentifierPath",
+              "referencedDeclaration": 143,
+              "src": "262:15:17"
+            },
+            "id": 2944,
+            "nodeType": "InheritanceSpecifier",
+            "src": "262:15:17"
+          },
+          {
+            "baseName": {
+              "id": 2945,
+              "name": "Ownable",
+              "nodeType": "IdentifierPath",
+              "referencedDeclaration": 103,
+              "src": "279:7:17"
+            },
+            "id": 2946,
+            "nodeType": "InheritanceSpecifier",
+            "src": "279:7:17"
+          }
+        ],
+        "contractDependencies": [
+          103,
+          143,
+          2312
+        ],
+        "contractKind": "contract",
+        "fullyImplemented": true,
+        "id": 2990,
+        "linearizedBaseContracts": [
+          2990,
+          103,
+          2312,
+          143
+        ],
+        "name": "BaseContract",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "id": 2950,
+            "libraryName": {
+              "id": 2947,
+              "name": "Counters",
+              "nodeType": "IdentifierPath",
+              "referencedDeclaration": 2386,
+              "src": "304:8:17"
+            },
+            "nodeType": "UsingForDirective",
+            "src": "298:36:17",
+            "typeName": {
+              "id": 2949,
+              "nodeType": "UserDefinedTypeName",
+              "pathNode": {
+                "id": 2948,
+                "name": "Counters.Counter",
+                "nodeType": "IdentifierPath",
+                "referencedDeclaration": 2318,
+                "src": "317:16:17"
+              },
+              "referencedDeclaration": 2318,
+              "src": "317:16:17",
+              "typeDescriptions": {
+                "typeIdentifier": "t_struct$_Counter_$2318_storage_ptr",
+                "typeString": "struct Counters.Counter"
+              }
+            }
+          },
+          {
+            "constant": false,
+            "id": 2957,
+            "mutability": "mutable",
+            "name": "_counter",
+            "nodeType": "VariableDeclaration",
+            "scope": 2990,
+            "src": "344:55:17",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_struct$_Counter_$2318_storage",
+              "typeString": "struct Counters.Counter"
+            },
+            "typeName": {
+              "id": 2952,
+              "nodeType": "UserDefinedTypeName",
+              "pathNode": {
+                "id": 2951,
+                "name": "Counters.Counter",
+                "nodeType": "IdentifierPath",
+                "referencedDeclaration": 2318,
+                "src": "344:16:17"
+              },
+              "referencedDeclaration": 2318,
+              "src": "344:16:17",
+              "typeDescriptions": {
+                "typeIdentifier": "t_struct$_Counter_$2318_storage_ptr",
+                "typeString": "struct Counters.Counter"
+              }
+            },
+            "value": {
+              "arguments": [
+                {
+                  "hexValue": "30",
+                  "id": 2955,
+                  "isConstant": false,
+                  "isLValue": false,
+                  "isPure": true,
+                  "kind": "number",
+                  "lValueRequested": false,
+                  "nodeType": "Literal",
+                  "src": "397:1:17",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_rational_0_by_1",
+                    "typeString": "int_const 0"
+                  },
+                  "value": "0"
+                }
+              ],
+              "expression": {
+                "argumentTypes": [
+                  {
+                    "typeIdentifier": "t_rational_0_by_1",
+                    "typeString": "int_const 0"
+                  }
+                ],
+                "expression": {
+                  "id": 2953,
+                  "name": "Counters",
+                  "nodeType": "Identifier",
+                  "overloadedDeclarations": [],
+                  "referencedDeclaration": 2386,
+                  "src": "380:8:17",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_type$_t_contract$_Counters_$2386_$",
+                    "typeString": "type(library Counters)"
+                  }
+                },
+                "id": 2954,
+                "isConstant": false,
+                "isLValue": false,
+                "isPure": false,
+                "lValueRequested": false,
+                "memberName": "Counter",
+                "nodeType": "MemberAccess",
+                "referencedDeclaration": 2318,
+                "src": "380:16:17",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_type$_t_struct$_Counter_$2318_storage_ptr_$",
+                  "typeString": "type(struct Counters.Counter storage pointer)"
+                }
+              },
+              "id": 2956,
+              "isConstant": false,
+              "isLValue": false,
+              "isPure": true,
+              "kind": "structConstructorCall",
+              "lValueRequested": false,
+              "names": [],
+              "nodeType": "FunctionCall",
+              "src": "380:19:17",
+              "tryCall": false,
+              "typeDescriptions": {
+                "typeIdentifier": "t_struct$_Counter_$2318_memory_ptr",
+                "typeString": "struct Counters.Counter memory"
+              }
+            },
+            "visibility": "private"
+          },
+          {
+            "body": {
+              "id": 2967,
+              "nodeType": "Block",
+              "src": "579:40:17",
+              "statements": [
+                {
+                  "expression": {
+                    "arguments": [],
+                    "expression": {
+                      "argumentTypes": [],
+                      "expression": {
+                        "id": 2963,
+                        "name": "_counter",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 2957,
+                        "src": "594:8:17",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_struct$_Counter_$2318_storage",
+                          "typeString": "struct Counters.Counter storage ref"
+                        }
+                      },
+                      "id": 2964,
+                      "isConstant": false,
+                      "isLValue": true,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberName": "current",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 2330,
+                      "src": "594:16:17",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_internal_view$_t_struct$_Counter_$2318_storage_ptr_$returns$_t_uint256_$bound_to$_t_struct$_Counter_$2318_storage_ptr_$",
+                        "typeString": "function (struct Counters.Counter storage pointer) view returns (uint256)"
+                      }
+                    },
+                    "id": 2965,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "594:18:17",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "functionReturnParameters": 2962,
+                  "id": 2966,
+                  "nodeType": "Return",
+                  "src": "587:25:17"
+                }
+              ]
+            },
+            "documentation": {
+              "id": 2958,
+              "nodeType": "StructuredDocumentation",
+              "src": "410:104:17",
+              "text": " @dev Returns the current value of counter\n @return current counter value"
+            },
+            "id": 2968,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "currentCounterValue",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 2959,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "547:2:17"
+            },
+            "returnParameters": {
+              "id": 2962,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 2961,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2968,
+                  "src": "573:4:17",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 2960,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "573:4:17",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "572:6:17"
+            },
+            "scope": 2990,
+            "src": "519:100:17",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "internal"
+          },
+          {
+            "body": {
+              "id": 2977,
+              "nodeType": "Block",
+              "src": "771:51:17",
+              "statements": [
+                {
+                  "id": 2971,
+                  "nodeType": "PlaceholderStatement",
+                  "src": "782:1:17"
+                },
+                {
+                  "expression": {
+                    "arguments": [],
+                    "expression": {
+                      "argumentTypes": [],
+                      "expression": {
+                        "id": 2972,
+                        "name": "_counter",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 2957,
+                        "src": "794:8:17",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_struct$_Counter_$2318_storage",
+                          "typeString": "struct Counters.Counter storage ref"
+                        }
+                      },
+                      "id": 2974,
+                      "isConstant": false,
+                      "isLValue": true,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberName": "increment",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 2344,
+                      "src": "794:18:17",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_internal_nonpayable$_t_struct$_Counter_$2318_storage_ptr_$returns$__$bound_to$_t_struct$_Counter_$2318_storage_ptr_$",
+                        "typeString": "function (struct Counters.Counter storage pointer)"
+                      }
+                    },
+                    "id": 2975,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "794:20:17",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 2976,
+                  "nodeType": "ExpressionStatement",
+                  "src": "794:20:17"
+                }
+              ]
+            },
+            "documentation": {
+              "id": 2969,
+              "nodeType": "StructuredDocumentation",
+              "src": "629:115:17",
+              "text": " @dev Add this modifier to method which will increament the counter by one as the last operation."
+            },
+            "id": 2978,
+            "name": "increment",
+            "nodeType": "ModifierDefinition",
+            "parameters": {
+              "id": 2970,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "768:2:17"
+            },
+            "src": "750:72:17",
+            "virtual": false,
+            "visibility": "internal"
+          },
+          {
+            "body": {
+              "id": 2988,
+              "nodeType": "Block",
+              "src": "1248:49:17",
+              "statements": [
+                {
+                  "expression": {
+                    "arguments": [
+                      {
+                        "id": 2985,
+                        "name": "newOwnerAddress",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 2981,
+                        "src": "1274:15:17",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      ],
+                      "id": 2984,
+                      "name": "transferOwnership",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 83,
+                      "src": "1256:17:17",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_internal_nonpayable$_t_address_$returns$__$",
+                        "typeString": "function (address)"
+                      }
+                    },
+                    "id": 2986,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "1256:34:17",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 2987,
+                  "nodeType": "ExpressionStatement",
+                  "src": "1256:34:17"
+                }
+              ]
+            },
+            "documentation": {
+              "id": 2979,
+              "nodeType": "StructuredDocumentation",
+              "src": "832:355:17",
+              "text": " @dev Call this method to update ownership in future (if needed). This external \n method can only be called by the owner of this contract. Since `transferOwnership()`\n already have this check it's not required for this method.\n \n @param newOwnerAddress address of new owner to which ownership is to be transfered."
+            },
+            "functionSelector": "a7016023",
+            "id": 2989,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "setOwnership",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 2982,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 2981,
+                  "mutability": "mutable",
+                  "name": "newOwnerAddress",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2989,
+                  "src": "1214:23:17",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 2980,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1214:7:17",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1213:25:17"
+            },
+            "returnParameters": {
+              "id": 2983,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1248:0:17"
+            },
+            "scope": 2990,
+            "src": "1192:105:17",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 2991,
+        "src": "228:1071:17"
+      }
+    ],
+    "src": "33:1266:17"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.8.0+commit.c7dfd78e.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "3.4.3",
+  "updatedAt": "2021-09-08T20:46:47.719Z",
+  "devdoc": {
+    "kind": "dev",
+    "methods": {
+      "owner()": {
+        "details": "Returns the address of the current owner."
+      },
+      "renounceOwnership()": {
+        "details": "Leaves the contract without owner. It will not be possible to call `onlyOwner` functions anymore. Can only be called by the current owner. NOTE: Renouncing ownership will leave the contract without an owner, thereby removing any functionality that is only available to the owner."
+      },
+      "setOwnership(address)": {
+        "details": "Call this method to update ownership in future (if needed). This external  method can only be called by the owner of this contract. Since `transferOwnership()` already have this check it's not required for this method. ",
+        "params": {
+          "newOwnerAddress": "address of new owner to which ownership is to be transfered."
+        }
+      },
+      "transferOwnership(address)": {
+        "details": "Transfers ownership of the contract to a new account (`newOwner`). Can only be called by the current owner."
+      }
+    },
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {},
+    "version": 1
+  }
+}
