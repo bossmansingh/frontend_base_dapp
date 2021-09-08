@@ -23,7 +23,11 @@ function App() {
       console.log("Blockchain: " + blockchain);
       console.log("Contract Address: " + blockchain.gameContract.address);
     }
+<<<<<<< HEAD
   }, [blockchain.gameContract, dispatch]);
+=======
+  }, [blockchain.smartContract, dispatch]);
+>>>>>>> 894d5c47a54bf99eb188d3f948996214c95dda97
 
   return (
     <s.Screen>
@@ -46,7 +50,11 @@ function App() {
       ) : (
         <s.Container flex={1} ai={"center"} style={{ padding: 24 }}>
           <s.TextTitle style={{ textAlign: "center" }}>
+<<<<<<< HEAD
             Name: {data.name}
+=======
+            Name: {data.name}.
+>>>>>>> 894d5c47a54bf99eb188d3f948996214c95dda97
           </s.TextTitle>
         </s.Container>
       )}
