@@ -1,6 +1,6 @@
 // constants
 import Web3 from "web3";
-import SmartContract from "../../contracts/SmartContract.json";
+import GameContract from "../../contracts/GameContract.json";
 // log
 import { fetchData } from "../data/dataActions";
 
@@ -43,16 +43,17 @@ export const connect = () => {
         const networkId = await window.ethereum.request({
           method: "net_version",
         });
-        const NetworkData = await SmartContract.networks[networkId];
+        const NetworkData = await GameContract.networks[networkId];
         if (NetworkData) {
-          const SmartContractObj = new web3.eth.Contract(
-            SmartContract.abi,
+          console.log("Accounts: " + accounts.length);
+          const GameContractObj = new web3.eth.Contract(
+            GameContract.abi,
             NetworkData.address
           );
           dispatch(
             connectSuccess({
               account: accounts[0],
-              smartContract: SmartContractObj,
+              gameContract: GameContractObj,
               web3: web3,
             })
           );
@@ -65,7 +66,7 @@ export const connect = () => {
           });
           // Add listeners end
         } else {
-          dispatch(connectFailed("Change network to Polygon."));
+          dispatch(connectFailed("Change network to CHKMATE."));
         }
       } catch (err) {
         dispatch(connectFailed("Something went wrong."));

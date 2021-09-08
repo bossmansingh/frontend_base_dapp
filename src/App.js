@@ -17,14 +17,17 @@ function App() {
   const data = useSelector((state) => state.data);
 
   useEffect(() => {
-    if (blockchain.account !== "" && blockchain.smartContract !== null) {
+    if (blockchain.account !== "" && blockchain.gameContract !== null) {
       dispatch(fetchData(blockchain.account));
+      //console.log("Account 1: " + blockchain.account);
+      console.log("Blockchain: " + blockchain);
+      console.log("Contract Address: " + blockchain.gameContract.address);
     }
-  }, [blockchain.smartContract, dispatch]);
+  }, [blockchain.gameContract, dispatch]);
 
   return (
     <s.Screen>
-      {blockchain.account === "" || blockchain.smartContract === null ? (
+      {blockchain.account === "" || blockchain.gameContract === null ? (
         <s.Container flex={1} ai={"center"} jc={"center"}>
           <s.TextTitle>Connect to the Blockchain</s.TextTitle>
           <s.SpacerSmall />
@@ -32,8 +35,7 @@ function App() {
             onClick={(e) => {
               e.preventDefault();
               dispatch(connect());
-            }}
-          >
+            }}>
             CONNECT
           </StyledButton>
           <s.SpacerSmall />
@@ -44,7 +46,7 @@ function App() {
       ) : (
         <s.Container flex={1} ai={"center"} style={{ padding: 24 }}>
           <s.TextTitle style={{ textAlign: "center" }}>
-            Name: {data.name}.
+            Name: {data.name}
           </s.TextTitle>
         </s.Container>
       )}

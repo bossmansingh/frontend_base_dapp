@@ -25,16 +25,20 @@ export const fetchData = (account) => {
   return async (dispatch) => {
     dispatch(fetchDataRequest());
     try {
-      let name = await store
-        .getState()
-        .blockchain.smartContract.methods.name()
-        .call();
-
-      dispatch(
-        fetchDataSuccess({
-          name,
-        })
-      );
+      // await store
+      //   .getState()
+      //   .blockchain.gameContract.methods.setChallengerPlayer()
+      //   .call();
+      // let accountAddress = await store
+      //   .getState()
+      //   .blockchain.gameContract.methods.getPlayerAccountBalance()
+      //   .call();
+      // console.log("AccountAddress: " + accountAddress.toString());
+      // dispatch(
+      //   fetchDataSuccess({
+      //     accountBalance
+      //   })
+      // );
     } catch (err) {
       console.log(err);
       dispatch(fetchDataFailed("Could not load data from contract."));
