@@ -46,9 +46,9 @@ function App() {
         CHKMATE
       </s.TextTitle>
 
-      <s.Container width={"200px"} style={{ marginLeft: "auto" }} >
+      <s.Container style={{ marginLeft: "auto" }} >
         { walletConnected ? (
-          <s.Identicon />
+          <s.Identicon style={{ width: "100px", height: "50px" }} />
         ) : (
           <s.StyledButton
             onClick={(e) => {
