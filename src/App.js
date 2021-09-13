@@ -1,12 +1,13 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { connect, moralisAuthenticate } from "./redux/blockchain/blockchainActions";
+import { moralisAuthenticate } from "./redux/blockchain/blockchainActions";
 import { fetchData } from "./redux/data/dataActions";
 import * as s from "./styles/globalStyles";
-import styled from "styled-components";
-import { create } from "ipfs-http-client";
+// import styled from "styled-components";
+// import { create } from "ipfs-http-client";
 import Chessboard from "chessboardjsx";
 import logo from "./assets/chessboard_logo.png";
+import * as blockies from "./utils/Blockies";
 
 function App() {
   const dispatch = useDispatch();
@@ -19,7 +20,18 @@ function App() {
   console.table(blockchain);
   console.table(data);
   console.table(account);
-  
+  let identiconUrl;
+  if (walletConnected) {
+    const seed = account.get("ethAddress");
+    console.log("Address: ", seed);
+    identiconUrl = blockies.create({
+      seed: seed,
+      size: 5,
+      scale: 10
+    }).toDataURL();
+  } else {
+    identiconUrl = "";
+  }
   useEffect(() => {
     if (walletConnected && contractFetched !== null) {
       dispatch(fetchData(account));
@@ -48,7 +60,7 @@ function App() {
 
       <s.Container style={{ marginLeft: "auto" }} >
         { walletConnected ? (
-          <s.Identicon style={{ width: "40px", height: "40px" }} alt="identicon" src={logo} />
+          <s.Identicon alt="identicon" src={identiconUrl} />
         ) : (
           <s.StyledButton
             onClick={(e) => {

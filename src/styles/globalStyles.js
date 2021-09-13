@@ -111,12 +111,13 @@ export const StyledButton = styled.button`
 `;
 
 export const Identicon = styled.img`
-  width: 20px;
-  height: 20px;
+  width: 40px;
+  height: 40px;
   @media (min-width: 767px) {
     width: 350px;
     height: 350px;
   }
   transition: width 0.5s;
   transition: height 0.5s;
+  border-radius: 8px;
 `;
