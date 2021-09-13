@@ -6,7 +6,7 @@ import * as s from "./styles/globalStyles";
 import styled from "styled-components";
 import { create } from "ipfs-http-client";
 import Chessboard from "chessboardjsx";
-
+import logo from "./assets/chessboard_logo.png";
 
 function App() {
   const dispatch = useDispatch();
@@ -39,25 +39,16 @@ function App() {
       ai={"center"}
       fd={"row"}
     >
-      { walletConnected ? (
-        <s.TextTitle
-          ai={"center"}
-          style={{ color: "black", marginLeft: "auto", paddingLeft: "60px" }}
-        >
-          CHKMATE
-        </s.TextTitle>
-      ) : (
-        <s.TextTitle
-          ai={"center"}
-          style={{ color: "black", marginLeft: "auto", paddingLeft: "110px" }}
-        >
-          CHKMATE
-        </s.TextTitle>
-      )}
+      <s.TextTitle
+        ai={"center"}
+        style={{ color: "black", marginLeft: "auto", paddingLeft: (walletConnected ? "60px" : "110px") }}
+      >
+        CHKMATE
+      </s.TextTitle>
 
       <s.Container style={{ marginLeft: "auto" }} >
         { walletConnected ? (
-          <s.Identicon style={{ width: "50px", height: "50px" }} />
+          <s.Identicon style={{ width: "50px", height: "50px" }} alt="identicon" src={logo} />
         ) : (
           <s.StyledButton
             onClick={(e) => {
