@@ -35,20 +35,20 @@ function App() {
 
   function renderToolbar() {
     return <s.Container
-      style={{ backgroundColor: "white", padding: 14 }}
+      style={{ padding: 14 }}
       ai={"center"}
       fd={"row"}
     >
       <s.TextTitle
         ai={"center"}
-        style={{ color: "black", marginLeft: "auto", paddingLeft: (walletConnected ? "60px" : "110px") }}
+        style={{ color: "white", marginLeft: "auto", paddingLeft: (walletConnected ? "50px" : "110px") }}
       >
         CHKMATE
       </s.TextTitle>
 
       <s.Container style={{ marginLeft: "auto" }} >
         { walletConnected ? (
-          <s.Identicon style={{ width: "50px", height: "50px" }} alt="identicon" src={logo} />
+          <s.Identicon style={{ width: "40px", height: "40px" }} alt="identicon" src={logo} />
         ) : (
           <s.StyledButton
             onClick={(e) => {
