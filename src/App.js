@@ -6,8 +6,8 @@ import * as s from "./styles/globalStyles";
 // import styled from "styled-components";
 // import { create } from "ipfs-http-client";
 import Chessboard from "chessboardjsx";
-import logo from "./assets/chessboard_logo.png";
-import * as blockies from "./utils/Blockies";
+import logo from "./assets/chessboard_logo.jpg";
+
 
 function App() {
   const dispatch = useDispatch();
@@ -20,18 +20,7 @@ function App() {
   console.table(blockchain);
   console.table(data);
   console.table(account);
-  let identiconUrl;
-  if (walletConnected) {
-    const seed = account.get("ethAddress");
-    console.log("Address: ", seed);
-    identiconUrl = blockies.create({
-      seed: seed,
-      size: 5,
-      scale: 10
-    }).toDataURL();
-  } else {
-    identiconUrl = "";
-  }
+
   useEffect(() => {
     if (walletConnected && contractFetched !== null) {
       dispatch(fetchData(account));
@@ -59,8 +48,8 @@ function App() {
       </s.TextTitle>
 
       <s.Container style={{ marginLeft: "auto" }} >
-        { walletConnected ? (
-          <s.Identicon alt="identicon" src={identiconUrl} />
+        { walletConnected && blockchain.identiconUrl != null ? (
+          <s.Identicon alt="identicon" src={(blockchain.identiconUrl != null ? blockchain.identiconUrl : logo)} />
         ) : (
           <s.StyledButton
             onClick={(e) => {

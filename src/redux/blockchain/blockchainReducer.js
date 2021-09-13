@@ -1,6 +1,7 @@
 const initialState = {
   loading: false,
   account: null,
+  identiconUrl: null,
   gameContract: null,
   web3: null,
   errorMsg: "",
@@ -18,6 +19,7 @@ const blockchainReducer = (state = initialState, action) => {
         ...state,
         loading: false,
         account: action.payload.account,
+        identiconUrl: action.payload.identiconUrl,
         gameContract: action.payload.gameContract,
         web3: action.payload.web3,
       };

@@ -1,6 +1,7 @@
 // constants
 import Web3 from "web3";
 import GameContract from "../../contracts/GameContract.json";
+import blockies from "../../utils/Blockies";
 
 // log
 import { fetchData } from "../data/dataActions";
@@ -46,9 +47,17 @@ export const moralisAuthenticate = () => {
         user = await Moralis.Web3.authenticate();
       }
       console.log(user);
+      const seed = user.get("ethAddress");
+      console.log("Address: ", seed);
+      const identiconUrl = blockies.create({
+        seed: seed,
+        size: 5,
+        scale: 10
+      }).toDataURL();
       dispatch(
         connectSuccess({
-          account: user
+          account: user,
+          identiconUrl: identiconUrl
         })
       );
     } catch (error) {
