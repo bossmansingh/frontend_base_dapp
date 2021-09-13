@@ -123,6 +123,12 @@ table {
   border-spacing: 0;
 }
 
+@font-face {
+  font-family: "default-font";
+  src: local("Default Font"),
+    url(../assets/fonts/DefaultFont-Regular.ttf);
+}
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, "Roboto", "Oxygen", "Ubuntu",

@@ -1,6 +1,6 @@
 const initialState = {
   loading: false,
-  accountBalance: "",
+  address: "",
   error: false,
   errorMsg: "",
 };
@@ -16,7 +16,7 @@ const dataReducer = (state = initialState, action) => {
       return {
         ...initialState,
         loading: false,
-        accountBalance: action.payload.accountBalance,
+        accountBalance: action.payload.address,
       };
     case "CHECK_DATA_FAILED":
       return {

@@ -2,11 +2,12 @@ import styled from "styled-components";
 
 // Used for wrapping a page component
 export const Screen = styled.div`
-  background-color: var(--dark-grey);
+  background-color: var(--black);
   background-image: ${({ image }) => (image ? `url(${image})` : "none")};
   background-size: cover;
   background-position: center;
   width: 100%;
+  height: 100%;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -36,6 +37,18 @@ export const SpacerLarge = styled.div`
   width: 32px;
 `;
 
+export const ResponsiveWrapper = styled.div`
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: stretched;
+  align-items: stretched;
+  width: 100%;
+  @media (min-width: 767px) {
+    flex-direction: row;
+  }
+`;
+
 // Used for providing a wrapper around a component
 export const Container = styled.div`
   display: flex;
@@ -52,24 +65,58 @@ export const Container = styled.div`
 
 export const TextTitle = styled.p`
   color: var(--white);
-  font-size: 20px;
+  font-size: 34px;
   font-weight: 500;
+  font-family: default-font;
+  line-height: 1.6;
 `;
 
 export const TextSubTitle = styled.p`
   color: var(--white);
   font-size: 16px;
   font-weight: 500;
+  line-height: 1.6;
 `;
 
 export const TextDescription = styled.p`
   color: var(--white);
   font-size: 14px;
   font-weight: 600;
+  line-height: 1.6;
 `;
 
 export const StyledClickable = styled.div`
   :active {
     opacity: 0.6;
   }
+`;
+
+export const StyledButton = styled.button`
+  padding: 10px;
+  border-radius: 50px;
+  border: none;
+  background-color: #000000;
+  font-weight: bold;
+  color: #ffffff;
+  width: 100px;
+  cursor: pointer;
+  box-shadow: 0px 6px 0px -2px rgba(250, 250, 250, 0.3);
+  -webkit-box-shadow: 0px 6px 0px -2px rgba(250, 250, 250, 0.3);
+  -moz-box-shadow: 0px 6px 0px -2px rgba(250, 250, 250, 0.3);
+  :active {
+    box-shadow: none;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+  }
+`;
+
+export const Identicon = styled.img`
+  width: 20px;
+  height: 20px;
+  @media (min-width: 767px) {
+    width: 350px;
+    height: 350px;
+  }
+  transition: width 0.5s;
+  transition: height 0.5s;
 `;

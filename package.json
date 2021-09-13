@@ -1,5 +1,5 @@
 {
-  "name": "frontend_base_dapp",
+  "name": "chkmate-game",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -10,7 +10,10 @@
     "all": "^0.0.0",
     "chai": "^4.3.4",
     "chai-as-promised": "^7.1.1",
+    "chess.js": "^0.12.0",
+    "chessboardjsx": "^2.4.7",
     "ipfs-http-client": "^52.0.0",
+    "moralis": "^0.0.45",
     "react": "^17.0.2",
     "react-canvas-draw": "^1.1.1",
     "react-dom": "^17.0.2",
@@ -46,5 +49,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "prettier": "2.4.0"
   }
 }

@@ -1,8 +1,14 @@
 // constants
 import Web3 from "web3";
 import GameContract from "../../contracts/GameContract.json";
+
 // log
 import { fetchData } from "../data/dataActions";
+
+const Moralis = require('moralis');
+
+Moralis.initialize("1NlwHTGcv2MI4dC4T5Z0jpDQrXj2vaCj4Fnzs5ZQ");
+Moralis.serverURL = "https://hgqfneavzzl0.bigmoralis.com:2053/server";
 
 const connectRequest = () => {
   return {
@@ -31,6 +37,26 @@ const updateAccountRequest = (payload) => {
   };
 };
 
+export const moralisAuthenticate = () => {
+  return async (dispatch) => {
+    dispatch(connectRequest());
+    try {
+      let user = await Moralis.User.current();
+      if (!user) {
+        user = await Moralis.Web3.authenticate();
+      }
+      console.log(user);
+      dispatch(
+        connectSuccess({
+          account: user
+        })
+      );
+    } catch (error) {
+      console.log(error);
+    }
+  };
+};
+
 export const connect = () => {
   return async (dispatch) => {
     dispatch(connectRequest());
@@ -38,22 +64,22 @@ export const connect = () => {
       let web3 = new Web3(window.ethereum);
       try {
         const accounts = await window.ethereum.request({
-          method: "eth_accounts",
+          method: "eth_requestAccounts",
         });
         const networkId = await window.ethereum.request({
           method: "net_version",
         });
-        const NetworkData = await GameContract.networks[networkId];
-        if (NetworkData) {
-          console.log("Accounts: " + accounts.length);
-          const GameContractObj = new web3.eth.Contract(
+        console.log("NetworkId: " + networkId);
+        const networkData = await GameContract.networks[networkId];
+        if (networkData) {
+          const gameContractObj = new web3.eth.Contract(
             GameContract.abi,
-            NetworkData.address
+            networkData.address
           );
           dispatch(
             connectSuccess({
               account: accounts[0],
-              gameContract: GameContractObj,
+              gameContract: gameContractObj,
               web3: web3,
             })
           );
