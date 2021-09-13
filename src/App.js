@@ -39,16 +39,25 @@ function App() {
       ai={"center"}
       fd={"row"}
     >
-      <s.TextTitle
-        ai={"center"}
-        style={{ color: "black", marginLeft: "auto", paddingLeft: "110px" }}
-      >
-        CHKMATE
-      </s.TextTitle>
+      { walletConnected ? (
+        <s.TextTitle
+          ai={"center"}
+          style={{ color: "black", marginLeft: "auto", paddingLeft: "60px" }}
+        >
+          CHKMATE
+        </s.TextTitle>
+      ) : (
+        <s.TextTitle
+          ai={"center"}
+          style={{ color: "black", marginLeft: "auto", paddingLeft: "110px" }}
+        >
+          CHKMATE
+        </s.TextTitle>
+      )}
 
       <s.Container style={{ marginLeft: "auto" }} >
         { walletConnected ? (
-          <s.Identicon style={{ width: "100px", height: "50px" }} />
+          <s.Identicon style={{ width: "50px", height: "50px" }} />
         ) : (
           <s.StyledButton
             onClick={(e) => {
