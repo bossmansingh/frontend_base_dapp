@@ -7,6 +7,11 @@ import { Provider } from "react-redux";
 import "./styles/reset.css";
 import "./styles/theme.css";
 
+const Moralis = require('moralis');
+
+Moralis.initialize("1NlwHTGcv2MI4dC4T5Z0jpDQrXj2vaCj4Fnzs5ZQ");
+Moralis.serverURL = "https://hgqfneavzzl0.bigmoralis.com:2053/server";
+
 ReactDOM.render(
   <Provider store={store}>
     <App />

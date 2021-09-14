@@ -2,14 +2,9 @@
 import Web3 from "web3";
 import GameContract from "../../contracts/GameContract.json";
 import blockies from "../../utils/Blockies";
-
-// log
 import { fetchData } from "../data/dataActions";
 
 const Moralis = require('moralis');
-
-Moralis.initialize("1NlwHTGcv2MI4dC4T5Z0jpDQrXj2vaCj4Fnzs5ZQ");
-Moralis.serverURL = "https://hgqfneavzzl0.bigmoralis.com:2053/server";
 
 const connectRequest = () => {
   return {
@@ -38,7 +33,7 @@ const updateAccountRequest = (payload) => {
   };
 };
 
-export const moralisAuthenticate = () => {
+export const moralisAuthenticate = (createGameReq) => {
   return async (dispatch) => {
     dispatch(connectRequest());
     try {
@@ -51,8 +46,8 @@ export const moralisAuthenticate = () => {
       console.log("Address: ", seed);
       const identiconUrl = blockies.create({
         seed: seed,
-        size: 5,
-        scale: 10
+        size: 10,
+        scale: 16
       }).toDataURL();
       dispatch(
         connectSuccess({
@@ -60,8 +55,12 @@ export const moralisAuthenticate = () => {
           identiconUrl: identiconUrl
         })
       );
+      if (createGameReq) {
+        createGame();
+      }
     } catch (error) {
       console.log(error);
+      dispatch(connectFailed("Cannot connect to wallet. ", error));
     }
   };
 };
@@ -116,5 +115,15 @@ export const updateAccount = (account) => {
   return async (dispatch) => {
     dispatch(updateAccountRequest({ account: account }));
     dispatch(fetchData(account));
+  };
+};
+
+// Game functions
+export const createGame = () => {
+  return async (dispatch) => {
+    let user = await Moralis.User.current();
+    if (!user) {
+      moralisAuthenticate();
+    }
   };
 };

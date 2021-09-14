@@ -83,6 +83,7 @@ export const TextDescription = styled.p`
   font-size: 14px;
   font-weight: 600;
   line-height: 1.6;
+  font-family: default-font;
 `;
 
 export const StyledClickable = styled.div`
