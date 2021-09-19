@@ -94,6 +94,12 @@ export const TextDescription = styled.p`
   font-family: default-font;
 `;
 
+export const TextParagraph = styled.p`
+  color: var(--white);
+  font-size: 18px;
+  line-height: 2.0;
+`;
+
 export const StyledClickable = styled.div`
   :active {
     opacity: 0.6;
