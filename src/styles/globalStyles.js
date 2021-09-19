@@ -112,9 +112,9 @@ export const StyledButton = styled.button`
   padding: 10px;
   border-radius: 50px;
   border: none;
-  background-color: #ffffff;
+  background-color: ${({ bc }) => (bc ? bc : "#ffffff")};
   font-weight: bold;
-  color: #000000;
+  color: ${({ color }) => (color ? color : "#000000")}};
   width: 100px;
   cursor: pointer;
   box-shadow: 0px 6px 0px -2px rgba(250, 250, 250, 0.3);
@@ -152,4 +152,18 @@ export const Identicon = styled.img`
   transition: width 0.5s;
   transition: height 0.5s;
   border-radius: 20px;
+`;
+
+export const InputContainer = styled.input`
+  display: flex;
+  padding: 10px;
+  width: 25vw;
+  justify-content: flex-start;
+  align-items: center;
+  border-style: solid;
+  border-width: 3px;
+  border-color: black;
+  border-radius: 10px;
+  color: black;
+  
 `;

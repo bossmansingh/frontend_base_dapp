@@ -3,6 +3,9 @@ const initialState = {
   address: "",
   error: false,
   errorMsg: "",
+  showInfoDialog: false,
+  showJoinGameDialog: false,
+  gameCode: ""
 };
 
 const dataReducer = (state = initialState, action) => {
@@ -24,6 +27,21 @@ const dataReducer = (state = initialState, action) => {
         loading: false,
         error: true,
         errorMsg: action.payload,
+      };
+    case "TOGGLE_INFO_DIALOG":
+      return {
+        ...initialState,
+        showInfoDialog: action.payload
+      };
+    case "TOGGLE_JOIN_GAME_DIALOG":
+      return {
+        ...initialState,
+        showJoinGameDialog: action.payload
+      };
+    case "SET_GAME_CODE":
+      return {
+        ...initialState,
+        gameCode: action.payload
       };
     default:
       return state;

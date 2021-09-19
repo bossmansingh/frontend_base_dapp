@@ -1,17 +1,13 @@
 import React, { useEffect, useState, useRef } from "react";
-import Flippy, { FrontSide, BackSide } from 'react-flippy';
 import { useDispatch, useSelector } from "react-redux";
 
 import Dialog from "@material-ui/core/Dialog";
-import DialogContentText from "@material-ui/core/DialogContentText";
-import DialogTitle from "@material-ui/core/DialogTitle";
-import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 
 import Chessboard from "chessboardjsx";
 
 import { moralisAuthenticate, createGame } from "./redux/blockchain/blockchainActions";
-import { fetchData } from "./redux/data/dataActions";
+import { fetchData, setGameCode, toggleInfoDialog, toggleJoinGameDialog } from "./redux/data/dataActions";
 import * as s from "./styles/globalStyles";
 // import styled from "styled-components";
 // import { create } from "ipfs-http-client";
@@ -56,15 +52,6 @@ function getRandomNumber(min, max) {
 
 function App() {
   const ref = useRef();
-  const [open, setOpen] = React.useState(false);
-  
-  const handleClickToOpen = () => {
-    setOpen(true);
-  };
-  
-  const handleToClose = () => {
-    setOpen(false);
-  };
   const dispatch = useDispatch();
   const blockchain = useSelector((state) => state.blockchain);
   const data = useSelector((state) => state.data);
@@ -75,6 +62,29 @@ function App() {
   console.table(blockchain);
   console.table(data);
   console.table(account);
+
+  const showInformationDialog = () => {
+    dispatch(toggleInfoDialog(true));
+  };
+  
+  const hideInformationDialog = () => {
+    dispatch(toggleInfoDialog(false));
+  };
+
+  const showJoinGameDialog = () => {
+    dispatch(toggleJoinGameDialog(true));
+  };
+
+  const hideJoinGameDialog = () => {
+    dispatch(toggleJoinGameDialog(false));
+  };
+
+  const [gameCode, _setGameCode] = useState("");
+
+  const handleInput = (event) => {
+    console.log("Text: ", event.target.value);
+    _setGameCode(event.target.value);
+  };
 
   useState(() => {
     console.log("UseState");
@@ -99,6 +109,7 @@ function App() {
     */}
       {renderWelcomePage()}
       {renderHelpPopup()}
+      {renderJoinGamePopup()}
     </s.Screen>
   );
 
@@ -115,7 +126,7 @@ function App() {
           onClick={(e) => {
             e.preventDefault();
             // TODO: Show instructions dialog
-            handleClickToOpen();
+            showInformationDialog();
           } 
         }>?</s.HelpButton>
         <s.TextPageTitle
@@ -169,7 +180,7 @@ function App() {
           <s.StyledButton style={{width:"130px", height:"40px"}}
             onClick={(e) => {
               e.preventDefault();
-              // Show join game dialog
+              showJoinGameDialog();
             }}>Join Game</s.StyledButton>
         </s.Container>
         <s.SpacerMedium />
@@ -194,28 +205,174 @@ function App() {
 
   function renderHelpPopup() {
     return(
-      <Dialog open={open} onClose={handleToClose}>  
-        <s.Container ai={"center"} style={{padding: "20px"}}>
-          <s.TextTitle style={{color: "black", textAlign: "center"}}>Welcome to the world of CHKMATE!</s.TextTitle>
-          <s.SpacerXSmall/>
-          <s.TextParagraph style={{color: "black"}}>{gameInstructions}</s.TextParagraph>
-          <s.SpacerMedium/>
-          <s.Container>
-            <s.TextSubTitle style={{color: "black"}}>Game rules:</s.TextSubTitle>
-            <s.TextParagraph style={{padding: "12px", color: "black"}}>{rule1}</s.TextParagraph>
-            <s.TextParagraph style={{padding: "12px", color: "black"}}>{rule2}</s.TextParagraph>
-            <s.TextParagraph style={{padding: "12px", color: "black"}}>{rule3}</s.TextParagraph>
-            <s.TextParagraph style={{padding: "12px", color: "black"}}>{rule4}</s.TextParagraph>
-            <s.TextParagraph style={{padding: "12px", color: "black"}}>{rule5}</s.TextParagraph>
-            <s.SpacerSmall />
-            <s.TextParagraph style={{fontWeight: "600", color:"black"}}>* Minus the gas fees</s.TextParagraph>
-            <s.TextParagraph style={{fontWeight: "600", color:"black"}}>** The winning NFT card will not include a winning piece</s.TextParagraph>
+      <Dialog open={data.showInfoDialog} onClose={hideInformationDialog}>  
+        <DialogContent>
+          <s.Container 
+            ai={"center"} 
+            style={{
+              paddingBottom: "20px"
+            }}>
+            <s.TextTitle 
+              style={{
+                color: "black", 
+                textAlign: "center"
+              }}
+            >
+              Welcome to the world of CHKMATE!
+            </s.TextTitle>
+            <s.SpacerXSmall/>
+            <s.TextParagraph 
+              style={{
+                color: "black"
+              }}
+            >
+              {gameInstructions}
+            </s.TextParagraph>
+            <s.SpacerMedium/>
+            <s.Container>
+              <s.TextSubTitle 
+                style={{
+                  color: "black"
+                }}
+              >
+                Game rules:
+              </s.TextSubTitle>
+              <s.TextParagraph 
+                style={{
+                  padding: "12px", 
+                  color: "black"
+                }}
+              >
+                {rule1}
+              </s.TextParagraph>
+              <s.TextParagraph 
+                style={{
+                  padding: "12px", 
+                  color: "black"
+                }}
+                >
+                  {rule2}
+                </s.TextParagraph>
+              <s.TextParagraph 
+                style={{
+                  padding: "12px", 
+                  color: "black"
+                }}
+              >
+                {rule3}
+              </s.TextParagraph>
+              <s.TextParagraph 
+                style={{
+                  padding: "12px", 
+                  color: "black"
+                }}
+              >
+                {rule4}
+              </s.TextParagraph>
+              <s.TextParagraph 
+                style={{
+                  padding: "12px", 
+                  color: "black"
+                }}
+              >
+                {rule5}
+              </s.TextParagraph>
+              <s.SpacerSmall />
+              <s.TextParagraph 
+                style={{
+                  fontWeight: "600", 
+                  color:"black"
+                }}
+              >
+                * Minus the gas fees
+              </s.TextParagraph>
+              <s.TextParagraph 
+                style={{
+                  fontWeight: "600", 
+                  color:"black"
+                }}
+              >
+                ** The winning NFT card will not include a winning piece
+              </s.TextParagraph>
+            </s.Container>
+            <s.SpacerMedium/>
+            <s.StyledButton 
+              bc={"black"}
+              color={"white"}
+              style={{
+                fontSize: "20px"
+              }} 
+              onClick={
+                hideInformationDialog
+              }
+            >
+              Close
+            </s.StyledButton>
           </s.Container>
-          <s.SpacerMedium/>
-          <s.StyledButton style={{fontSize: "20px"}} onClick={handleToClose}>Close</s.StyledButton>
-        </s.Container>
+        </DialogContent>
       </Dialog>
     );
+  }
+
+  function renderJoinGamePopup() {
+    return(
+      <Dialog open={data.showJoinGameDialog} onClose={hideJoinGameDialog}>
+        <DialogContent>
+          <s.Container 
+            ai={"center"} 
+            style={{
+              paddingBottom: "20px",
+              paddingLeft: "10px",
+              paddingRight: "10px"
+            }}
+          >
+            <s.TextTitle 
+              style={{
+                color: "black", 
+                textAlign: "center"
+              }}
+            >
+              Enter the game code
+            </s.TextTitle>
+            <s.SpacerSmall />
+            <s.InputContainer 
+              placeholder={"Game Code"} 
+              onChange={handleInput} />
+            <s.SpacerLarge />
+            <s.Container 
+              fd={"row"}
+              jc={"center"}>
+              <s.StyledButton 
+                flex={1}
+                bc={"black"}
+                color={"white"}
+                style={{
+                  fontSize: "20px",
+                  width: "200px"
+                }} 
+                onClick={ () => {
+                  dispatch(setGameCode(gameCode));
+                  hideJoinGameDialog();
+                }}
+              >
+                Join Game
+              </s.StyledButton>
+              <s.SpacerMedium />
+              <s.StyledButton 
+                flex={1}
+                style={{
+                  fontSize: "20px"
+                }} onClick={
+                  hideJoinGameDialog
+                }
+              >
+                Cancel
+              </s.StyledButton>
+            </s.Container>
+          </s.Container>
+        </DialogContent>
+      </Dialog>
+    )
   }
 }
 

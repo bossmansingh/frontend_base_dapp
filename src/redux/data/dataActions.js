@@ -21,19 +21,40 @@ const fetchDataFailed = (payload) => {
   };
 };
 
+export const toggleInfoDialog = (payload) => {
+  return {
+    type: "TOGGLE_INFO_DIALOG",
+    payload: payload
+  };
+};
+
+export const toggleJoinGameDialog = (payload) => {
+  return {
+    type: "TOGGLE_JOIN_GAME_DIALOG",
+    payload: payload
+  };
+};
+
+export const setGameCode = (payload) => {
+  return {
+    type: "SET_GAME_CODE",
+    payload: payload
+  };
+};
+
 export const fetchData = (account) => {
   return async (dispatch) => {
     dispatch(fetchDataRequest());
     try {
-      const contractBalance = await store
-        .getState()
-        .blockchain.gameContract.methods.getContractBalance()
-        .call();
-      dispatch(
-        fetchDataSuccess({
-          contractBalance
-        })
-      );
+      // const contractBalance = await store
+      //   .getState()
+      //   .blockchain.gameContract.methods.getContractBalance()
+      //   .call();
+      // dispatch(
+      //   fetchDataSuccess({
+      //     contractBalance
+      //   })
+      // );
     } catch (err) {
       console.log(err);
       dispatch(fetchDataFailed("Could not load data from contract."));
