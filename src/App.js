@@ -44,31 +44,41 @@ function App() {
 
   function renderToolbar() {
     return <s.Container
-      style={{ padding: 14 }}
+      style={{ 
+        padding: 14 
+      }}
       ai={"center"}
-      fd={"row"}>
-      <s.TextTitle
-        ai={"center"}
-        jc={"center"}
-        style={{ color: "white", marginLeft: "auto", paddingLeft: (walletConnected ? "5px" : "65px") }}>
-        CHKMATE
-      </s.TextTitle>
-
-      <s.Container style={{ marginLeft: "auto" }} >
-        { walletConnected && blockchain.identiconUrl != null ? (
-          <s.Identicon alt="identicon" src={(blockchain.identiconUrl != null ? blockchain.identiconUrl : logo)} />
-        ) : (
-          <s.StyledButton
-            onClick={(e) => {
-              e.preventDefault();
-              // dispatch(connect());
-              dispatch(moralisAuthenticate());
-            } 
-          }>
-            CONNECT
-          </s.StyledButton>
-        )}
-      </s.Container>
+      fd={"row"}
+      >
+        <s.TextPageTitle
+          style={{ 
+            color: "white", 
+            marginLeft: "auto", 
+            paddingLeft: (walletConnected ? "10px" : "70px") 
+          }}
+        >
+          CHKMATE
+        </s.TextPageTitle>
+        
+        <s.Container 
+          style={{ 
+            marginLeft: "auto" 
+          }}
+        >
+          { walletConnected && blockchain.identiconUrl != null ? (
+            <s.Identicon alt="identicon" src={(blockchain.identiconUrl != null ? blockchain.identiconUrl : logo)} />
+          ) : (
+            <s.StyledButton
+              onClick={(e) => {
+                e.preventDefault();
+                // dispatch(connect());
+                dispatch(moralisAuthenticate());
+              } 
+            }>
+              CONNECT
+            </s.StyledButton>
+          )}
+        </s.Container>
     </s.Container>;
   }
 
@@ -81,9 +91,11 @@ function App() {
       <s.Container ai={"center"} jc={"center"} style={{paddingTop: "50px"}}>
         <Flippy 
           flipDirection="horizontal"
+          flipOnClick={false} 
           ref={ref}
+          style={{}}
         >
-          <FrontSide>
+          <FrontSide animationDuration={"300"}>
             <s.Container ai={"center"} jc={"center"} fd={"row"}>
               <s.StyledButton style={{width:"130px", height:"40px"}}
                 onClick={(e) => {
@@ -109,7 +121,7 @@ function App() {
             <s.SpacerMedium />
             <Chessboard position="start" />
           </FrontSide>
-          <BackSide>
+          <BackSide animationDuration={"300"}>
             <s.Container ai={"center"}>
               <s.TextDescription>There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text. All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet. It uses a dictionary of over 200 Latin words, combined with a handful of model sentence structures, to generate Lorem Ipsum which looks reasonable. The generated Lorem Ipsum is therefore always free from repetition, injected humour, or non-characteristic words etc.</s.TextDescription>
               <s.StyledButton style={{marginTop:"50px"}} onClick={() => {

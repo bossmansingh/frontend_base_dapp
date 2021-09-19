@@ -63,6 +63,14 @@ export const Container = styled.div`
   background-position: center;
 `;
 
+export const TextPageTitle = styled.p`
+  color: var(--white);
+  font-size: 44px;
+  font-weight: 500;
+  font-family: default-font;
+  line-height: 1.6;
+`;
+
 export const TextTitle = styled.p`
   color: var(--white);
   font-size: 34px;
