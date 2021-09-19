@@ -9,7 +9,21 @@ import * as s from "./styles/globalStyles";
 import Chessboard from "chessboardjsx";
 import logo from "./assets/chessboard_logo.jpg";
 
-const gameInstructions = "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text. All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet. It uses a dictionary of over 200 Latin words, combined with a handful of model sentence structures, to generate Lorem Ipsum which looks reasonable. The generated Lorem Ipsum is therefore always free from repetition, injected humour, or non-characteristic words etc.";
+const gameInstructions = `Welcome to the world of CHKMATE!\n
+It is a NFT based game of chess where every player have a chance to mint a unique CHKMATE NFT win card, in half the price. Rules are simple here, to create a new game or to join an existing game it would cost you 0.05 ETH. Each player has to deposits the same amount into the contract and the winner receives the deposited ETH* in form of CHKMATE NFT. Each card has unique characteristics about the game which includes winning piece, winning board, winning time and total kills.
+
+Game Rules:
+1. To create a new game a fee of 0.05 ETH is to be deposited into the contract. 
+2. Once a game is created a unique code will be generated that you can share with the other player for them to join the game. The other player will have 30 minutes to join before it auto-forfeits. In that case, the deposited ETH will be returned to your wallet *.
+3. Once a game is started each player will have a two minute window to make a move. If no move is made within the given timeframe the turn will skip to the next player.
+4. If any player for any reason disconnects from the game, it will be considered as a forfeit and the other player will win CHKMATE NFT card **.
+5. As per the rules of chess, a game finishes when check-and-mate happens. The piece that makes the final check-mate move will be considered as the winning piece.
+
+
+
+* Minus the gas fees
+** this card will not include a winning piece`;
+
 // The random color should be generated when the game starts, before 
 // that some default color should be used
 const lightSquareColor = getLightSquareColor();
@@ -19,14 +33,20 @@ const darkSquareColor = getDarkSquareColor();
 function getLightSquareColor() {
   const min = 160;
   const max = 255;
-  return `${getRandomNumber(min, max)},${getRandomNumber(min, max)},${getRandomNumber(min, max)}`;
+  const r = getRandomNumber(min, max);
+  const g = getRandomNumber(min, max);
+  const b = getRandomNumber(min, max);
+  return `${r},${g},${b}`;
 }
 
 // Function to generate and return dark square color
 function getDarkSquareColor() {
   const min = 50;
   const max = 140;
-  return `${getRandomNumber(min, max)},${getRandomNumber(min, max)},${getRandomNumber(min, max)}`;
+  const r = getRandomNumber(min, max);
+  const g = getRandomNumber(min, max);
+  const b = getRandomNumber(min, max);
+  return `${r},${g},${b}`;
 }
 
 // Function to generate random number 
@@ -148,11 +168,7 @@ function App() {
               <s.TextDescription>{blockchain.errorMsg}</s.TextDescription>
             ) : null}
             <s.SpacerMedium />
-            <Chessboard 
-              position="start" 
-              draggable={false}
-              lightSquareStyle={{ backgroundColor: `rgb(${lightSquareColor})` }}
-              darkSquareStyle={{ backgroundColor: `rgb(${darkSquareColor})` }} />
+            {setChessboard()}
           </FrontSide>
           <BackSide animationDuration={"300"}>
             <s.Container ai={"center"}>
@@ -169,6 +185,16 @@ function App() {
           </BackSide>
         </Flippy>
       </s.Container>
+    );
+  }
+
+  function setChessboard() {
+    return(
+      <Chessboard
+        position="start" 
+        draggable={false}
+        lightSquareStyle={{ backgroundColor: `rgb(${lightSquareColor})` }}
+        darkSquareStyle={{ backgroundColor: `rgb(${darkSquareColor})` }} />
     );
   }
 }

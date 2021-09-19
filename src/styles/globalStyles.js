@@ -8,7 +8,6 @@ export const Screen = styled.div`
   background-position: center;
   width: 100%;
   height: 100%;
-  min-height: 100vh;
   display: flex;
   flex-direction: column;
 `;
@@ -96,8 +95,9 @@ export const TextDescription = styled.p`
 
 export const TextParagraph = styled.p`
   color: var(--white);
-  font-size: 18px;
-  line-height: 2.0;
+  font-size: 20px;
+  
+  line-height: 1.8;
 `;
 
 export const StyledClickable = styled.div`
