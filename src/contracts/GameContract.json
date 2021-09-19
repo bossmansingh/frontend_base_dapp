@@ -94,7 +94,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [],
@@ -182,7 +183,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [],
@@ -195,7 +197,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [
@@ -215,7 +218,8 @@
       "name": "createGame",
       "outputs": [],
       "stateMutability": "payable",
-      "type": "function"
+      "type": "function",
+      "payable": true
     },
     {
       "inputs": [
@@ -228,7 +232,8 @@
       "name": "joinGame",
       "outputs": [],
       "stateMutability": "payable",
-      "type": "function"
+      "type": "function",
+      "payable": true
     },
     {
       "inputs": [
@@ -25803,14 +25808,98 @@
   },
   "networks": {
     "5777": {
-      "events": {},
+      "events": {
+        "0x306841c3fce8498c2d9b7194b8da4c04d03847394e237b625ce6d029b107f077": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "challengerAddress",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "gameId",
+              "type": "uint256"
+            }
+          ],
+          "name": "GameCreated",
+          "type": "event"
+        },
+        "0xc7f886847371dba98b78e0d0d59e29f4abfaf6e953d6897a761992cb2627e687": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "challengeAcceptorAddress",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "gameId",
+              "type": "uint256"
+            }
+          ],
+          "name": "GameJoined",
+          "type": "event"
+        },
+        "0x3de783f9d670d5639f2acef925c39a874e41e3aa39966962eb1b3aaa6177c0c4": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "winnerAddress",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "gameId",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "bool",
+              "name": "isRare",
+              "type": "bool"
+            }
+          ],
+          "name": "NFTCreated",
+          "type": "event"
+        },
+        "0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "previousOwner",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "newOwner",
+              "type": "address"
+            }
+          ],
+          "name": "OwnershipTransferred",
+          "type": "event"
+        }
+      },
       "links": {},
-      "address": "0x77Be0c68e888AC07E0117DD30EE2BA2E1862765b",
-      "transactionHash": "0xafe3793a78ea596bd8b4c0695159de4042312f741737d983a2213f3786f375fe"
+      "address": "0xD052810D2728638F38f594Eb6305dB6Ef909cba0",
+      "transactionHash": "0x4919b97eea3ce1f04397d97edee721fdad8c7340b352d220a995c13125ced8eb"
     }
   },
   "schemaVersion": "3.4.3",
-  "updatedAt": "2021-09-10T06:09:40.748Z",
+  "updatedAt": "2021-09-19T20:19:07.135Z",
+  "networkType": "ethereum",
   "devdoc": {
     "kind": "dev",
     "methods": {

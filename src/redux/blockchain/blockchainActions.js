@@ -38,6 +38,7 @@ export const moralisAuthenticate = (createGameReq) => {
     dispatch(connectRequest());
     try {
       let user = await Moralis.User.current();
+      let web3 = new Web3(window.ethereum);
       if (!user) {
         user = await Moralis.Web3.authenticate();
       }
@@ -49,10 +50,21 @@ export const moralisAuthenticate = (createGameReq) => {
         size: 10,
         scale: 16
       }).toDataURL();
+      const networkId = await window.ethereum.request({
+        method: "net_version",
+      });
+      console.log("NetworkId: " + networkId);
+      const networkData = await GameContract.networks[networkId];
+      const gameContractObj = new web3.eth.Contract(
+        GameContract.abi,
+        networkData.address
+      );
       dispatch(
         connectSuccess({
           account: user,
-          identiconUrl: identiconUrl
+          identiconUrl: identiconUrl,
+          gameContract: gameContractObj,
+          web3: web3,
         })
       );
       if (createGameReq) {

@@ -35,10 +35,23 @@ export const toggleJoinGameDialog = (payload) => {
   };
 };
 
-export const setGameCode = (payload) => {
-  return {
-    type: "SET_GAME_CODE",
-    payload: payload
+export const joinGame = (payload) => {
+  return async (dispatch) => {
+    try {
+      const success = await store
+          .getState()
+          .blockchain.gameContract.methods.joinGame(payload)
+          .call();
+      dispatch(
+        fetchDataSuccess({
+          success
+        })
+      );
+    } catch (err) {
+      console.log(err);
+      dispatch(fetchDataFailed("Error joing the game"));
+      dispatch(toggleJoinGameDialog(true));
+    }
   };
 };
 

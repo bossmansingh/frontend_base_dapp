@@ -7,7 +7,7 @@ import DialogContent from "@material-ui/core/DialogContent";
 import Chessboard from "chessboardjsx";
 
 import { moralisAuthenticate, createGame } from "./redux/blockchain/blockchainActions";
-import { fetchData, setGameCode, toggleInfoDialog, toggleJoinGameDialog } from "./redux/data/dataActions";
+import { fetchData, joinGame, toggleInfoDialog, toggleJoinGameDialog } from "./redux/data/dataActions";
 import * as s from "./styles/globalStyles";
 // import styled from "styled-components";
 // import { create } from "ipfs-http-client";
@@ -170,7 +170,7 @@ function App() {
           <s.StyledButton style={{width:"130px", height:"40px"}}
             onClick={(e) => {
               e.preventDefault();
-              if (walletConnected && contractFetched) {
+              if (walletConnected) {
                 dispatch(createGame());
               } else {
                 dispatch(moralisAuthenticate(true));
@@ -180,8 +180,15 @@ function App() {
           <s.StyledButton style={{width:"130px", height:"40px"}}
             onClick={(e) => {
               e.preventDefault();
-              showJoinGameDialog();
-            }}>Join Game</s.StyledButton>
+              if (walletConnected) {
+                showJoinGameDialog();
+              } else {
+                dispatch(moralisAuthenticate(true));
+              }
+            }}
+          >
+            Join Game
+          </s.StyledButton>
         </s.Container>
         <s.SpacerMedium />
         {blockchain.errorMsg !== "" ? (
@@ -338,6 +345,18 @@ function App() {
             <s.InputContainer 
               placeholder={"Game Code"} 
               onChange={handleInput} />
+            {
+              data.errorMsg ? 
+              (
+                <s.TextDescription
+                  style={{color: "red", paddingTop: "10px"}}
+                >
+                  {data.errorMsg}
+                </s.TextDescription>
+              ) : (
+                null
+              )
+            }
             <s.SpacerLarge />
             <s.Container 
               fd={"row"}
@@ -350,9 +369,13 @@ function App() {
                   fontSize: "20px",
                   width: "200px"
                 }} 
-                onClick={ () => {
-                  dispatch(setGameCode(gameCode));
-                  hideJoinGameDialog();
+                onClick={(e) => {
+                  if (walletConnected) {
+                    dispatch(joinGame(gameCode));
+                  } else {
+                    dispatch(moralisAuthenticate(true));
+                  }
+                  e.preventDefault();
                 }}
               >
                 Join Game
