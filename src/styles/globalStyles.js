@@ -83,8 +83,8 @@ export const TextTitle = styled.p`
 
 export const TextSubTitle = styled.p`
   color: var(--white);
-  font-size: 16px;
-  font-weight: 500;
+  font-size: 26px;
+  font-weight: bold;
   line-height: 1.6;
 `;
 
@@ -98,8 +98,8 @@ export const TextDescription = styled.p`
 
 export const TextParagraph = styled.p`
   color: var(--white);
-  font-size: 22px;
-  line-height: 1.8;
+  font-size: 18px;
+  line-height: 1.6;
 `;
 
 export const StyledClickable = styled.div`
