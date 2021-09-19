@@ -67,7 +67,7 @@ export const Container = styled.div`
 
 export const TextPageTitle = styled.p`
   color: var(--white);
-  font-size: 44px;
+  font-size: 48px;
   font-weight: 500;
   font-family: default-font;
   line-height: 1.6;
@@ -127,10 +127,29 @@ export const StyledButton = styled.button`
   }
 `;
 
+export const HelpButton = styled.button`
+  border-radius: 20px;
+  border: none;
+  background-color: #ffffff;
+  font-weight: bold;
+  font-size: 20px;
+  color: #000000;
+  width: 100px;
+  cursor: pointer;
+  box-shadow: 0px 6px 0px -2px rgba(250, 250, 250, 0.3);
+  -webkit-box-shadow: 0px 6px 0px -2px rgba(250, 250, 250, 0.3);
+  -moz-box-shadow: 0px 6px 0px -2px rgba(250, 250, 250, 0.3);
+  :active {
+    box-shadow: none;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+  }
+`;
+
 export const Identicon = styled.img`
   width: 40px;
   height: 40px;
   transition: width 0.5s;
   transition: height 0.5s;
-  border-radius: 5px;
+  border-radius: 20px;
 `;

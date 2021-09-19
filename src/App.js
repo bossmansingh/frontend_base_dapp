@@ -85,6 +85,11 @@ function App() {
   return (
     <s.Screen>
       {renderToolbar()}
+    {/* 
+      If account connected or not-connected and no NFTs minted show the chessboard with start game button
+      If account connected or not-connected and NFTs minted show minted NFTs with start game button
+      TODO: Show minted NFTs (in carousel) 
+    */}
       {renderWelcomePage()}
     </s.Screen>
   );
@@ -92,16 +97,24 @@ function App() {
   function renderToolbar() {
     return <s.Container
       style={{ 
-        padding: 14 
+        padding: 8 
       }}
       ai={"center"}
       fd={"row"}
       >
+        <s.HelpButton style={{width:"40px", height:"40px"}}
+              onClick={(e) => {
+                e.preventDefault();
+                // TODO: Show instructions dialog
+              } 
+            }>
+              ?
+            </s.HelpButton>
         <s.TextPageTitle
           style={{ 
             color: "white", 
             marginLeft: "auto", 
-            paddingLeft: (walletConnected ? "40px" : "100px") 
+            paddingLeft: (walletConnected ? "0px" : "60px") 
           }}
         >
           CHKMATE
@@ -132,58 +145,31 @@ function App() {
   }
 
   function renderWelcomePage() {
-    // If account connected or not-connected and no NFTs minted show the chessboard with start game button
-    
-    // If account connected or not-connected and NFTs minted show minted NFTs with start game button
-    // TODO: Show minted NFTs (in carousel)
     return (
       <s.Container ai={"center"} jc={"center"} style={{paddingTop: "50px"}}>
-        <Flippy 
-          flipDirection="horizontal"
-          flipOnClick={false} 
-          ref={ref}
-          style={{}}
-        >
-          <FrontSide >
-            <s.Container ai={"center"} jc={"center"} fd={"row"}>
-              <s.StyledButton style={{width:"130px", height:"40px"}}
-                onClick={(e) => {
-                  e.preventDefault();
-                  if (walletConnected && contractFetched) {
-                    dispatch(createGame());
-                  } else {
-                    dispatch(moralisAuthenticate(true));
-                  }
-                  
-                }}>Create Game</s.StyledButton>
-              <s.SpacerMedium />
-              <s.StyledButton style={{width:"130px", height:"40px"}}
-                onClick={(e) => {
-                  e.preventDefault();
-                  ref.current.toggle();
-                }}>How to play?</s.StyledButton>
-            </s.Container>
-            <s.SpacerMedium />
-            {blockchain.errorMsg !== "" ? (
-              <s.TextDescription>{blockchain.errorMsg}</s.TextDescription>
-            ) : null}
-            <s.SpacerMedium />
-            {setChessboard()}
-          </FrontSide>
-          <BackSide >
-            <s.Container ai={"center"}>
-              <s.TextTitle>
-                Game instructions
-              </s.TextTitle>
-              <s.SpacerMedium />
-              <s.TextParagraph>{gameInstructions}</s.TextParagraph>
-              <s.SpacerMedium />
-              <s.StyledButton onClick={() => {
-                ref.current.toggle();
-              }}>Go back</s.StyledButton>
-            </s.Container>
-          </BackSide>
-        </Flippy>
+        <s.Container ai={"center"} jc={"center"} fd={"row"}>
+          <s.StyledButton style={{width:"130px", height:"40px"}}
+            onClick={(e) => {
+              e.preventDefault();
+              if (walletConnected && contractFetched) {
+                dispatch(createGame());
+              } else {
+                dispatch(moralisAuthenticate(true));
+              }
+            }}>Create Game</s.StyledButton>
+          <s.SpacerMedium />
+          <s.StyledButton style={{width:"130px", height:"40px"}}
+            onClick={(e) => {
+              e.preventDefault();
+              // Show join game dialog
+            }}>Join Game</s.StyledButton>
+        </s.Container>
+        <s.SpacerMedium />
+        {blockchain.errorMsg !== "" ? (
+          <s.TextDescription>{blockchain.errorMsg}</s.TextDescription>
+        ) : null}
+        <s.SpacerMedium />
+        {setChessboard()}
       </s.Container>
     );
   }
