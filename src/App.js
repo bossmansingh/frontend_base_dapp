@@ -63,8 +63,6 @@ function App() {
   const contract = blockchain.gameContract;
   const walletConnected = account !== null && account !== "";
   const contractFetched = contract != null;
-  console.log("lightSquareColor: ", lightSquareColor);
-  console.log("darkSquareColor: ", darkSquareColor);
   console.table(blockchain);
   console.table(data);
   console.table(account);
@@ -102,14 +100,13 @@ function App() {
       ai={"center"}
       fd={"row"}
       >
-        <s.HelpButton style={{width:"40px", height:"40px"}}
-              onClick={(e) => {
-                e.preventDefault();
-                // TODO: Show instructions dialog
-              } 
-            }>
-              ?
-            </s.HelpButton>
+        <s.HelpButton 
+          style={{width:"40px", height:"40px"}}
+          onClick={(e) => {
+            e.preventDefault();
+            // TODO: Show instructions dialog
+          } 
+        }>?</s.HelpButton>
         <s.TextPageTitle
           style={{ 
             color: "white", 
