@@ -130,5 +130,5 @@ export const Identicon = styled.img`
   height: 40px;
   transition: width 0.5s;
   transition: height 0.5s;
-  border-radius: 8px;
+  border-radius: 5px;
 `;

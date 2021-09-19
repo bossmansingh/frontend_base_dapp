@@ -18,6 +18,12 @@ function App() {
   const contract = blockchain.gameContract;
   const walletConnected = account !== null && account !== "";
   const contractFetched = contract != null;
+  // The random color should be generated when the game starts, before 
+  // that some default color should be used
+  const lightSquareColor = getLightSquareColor();
+  const darkSquareColor = getDarkSquareColor();
+  console.log("lightSquareColor: ", lightSquareColor);
+  console.log("darkSquareColor: ", darkSquareColor);
   console.table(blockchain);
   console.table(data);
   console.table(account);
@@ -42,6 +48,25 @@ function App() {
     </s.Screen>
   );
 
+  // Function to generate and return light square color
+  function getLightSquareColor() {
+    const min = 160
+    const max = 255
+    return `${getRandomNumber(min, max)},${getRandomNumber(min, max)},${getRandomNumber(min, max)}`;
+  }
+
+  // Function to generate and return dark square color
+  function getDarkSquareColor() {
+    const min = 50
+    const max = 140
+    return `${getRandomNumber(min, max)},${getRandomNumber(min, max)},${getRandomNumber(min, max)}`;
+  }
+
+  // Function to generate random number 
+  function getRandomNumber(min, max) { 
+    return Math.floor(Math.random() * (max - min) + min);
+  }
+
   function renderToolbar() {
     return <s.Container
       style={{ 
@@ -54,7 +79,7 @@ function App() {
           style={{ 
             color: "white", 
             marginLeft: "auto", 
-            paddingLeft: (walletConnected ? "10px" : "70px") 
+            paddingLeft: (walletConnected ? "40px" : "100px") 
           }}
         >
           CHKMATE
@@ -119,7 +144,11 @@ function App() {
               <s.TextDescription>{blockchain.errorMsg}</s.TextDescription>
             ) : null}
             <s.SpacerMedium />
-            <Chessboard position="start" />
+            <Chessboard 
+              position="start" 
+              draggable={false}
+              lightSquareStyle={{ backgroundColor: `rgb(${lightSquareColor})` }}
+              darkSquareStyle={{ backgroundColor: `rgb(${darkSquareColor})` }} />
           </FrontSide>
           <BackSide animationDuration={"300"}>
             <s.Container ai={"center"}>
