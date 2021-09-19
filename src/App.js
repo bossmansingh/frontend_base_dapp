@@ -9,7 +9,7 @@ import * as s from "./styles/globalStyles";
 import Chessboard from "chessboardjsx";
 import logo from "./assets/chessboard_logo.jpg";
 
-const gameInstructions = `Welcome to the world of CHKMATE!\n
+const gameInstructions = `Welcome to the world of CHKMATE!
 It is a NFT based game of chess where every player have a chance to mint a unique CHKMATE NFT win card, in half the price. Rules are simple here, to create a new game or to join an existing game it would cost you 0.05 ETH. Each player has to deposits the same amount into the contract and the winner receives the deposited ETH* in form of CHKMATE NFT. Each card has unique characteristics about the game which includes winning piece, winning board, winning time and total kills.
 
 Game Rules:
@@ -144,7 +144,7 @@ function App() {
           ref={ref}
           style={{}}
         >
-          <FrontSide animationDuration={"300"}>
+          <FrontSide >
             <s.Container ai={"center"} jc={"center"} fd={"row"}>
               <s.StyledButton style={{width:"130px", height:"40px"}}
                 onClick={(e) => {
@@ -170,7 +170,7 @@ function App() {
             <s.SpacerMedium />
             {setChessboard()}
           </FrontSide>
-          <BackSide animationDuration={"300"}>
+          <BackSide >
             <s.Container ai={"center"}>
               <s.TextTitle>
                 Game instructions

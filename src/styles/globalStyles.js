@@ -8,8 +8,11 @@ export const Screen = styled.div`
   background-position: center;
   width: 100%;
   height: 100%;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
+  scroll-behaviour: smooth;
+  overflow-y: scroll
 `;
 
 // Used for providing space between components
@@ -95,8 +98,7 @@ export const TextDescription = styled.p`
 
 export const TextParagraph = styled.p`
   color: var(--white);
-  font-size: 20px;
-  
+  font-size: 22px;
   line-height: 1.8;
 `;
 
