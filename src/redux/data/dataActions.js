@@ -35,13 +35,31 @@ export const toggleJoinGameDialog = (payload) => {
   };
 };
 
+export const createGame = (payload) => {
+  return async (dispatch) => {
+    try {
+      console.log("Create game");
+      const success = await store
+            .getState()
+            .blockchain.gameContract.methods.createGame()
+            .send();
+      console.log("Success", success);
+    } catch (err) {
+      console.log(err);
+      dispatch(fetchDataFailed("Error creating a new game"));
+    }
+  };
+};
+
 export const joinGame = (payload) => {
   return async (dispatch) => {
     try {
+      console.log("Join game request");
       const success = await store
           .getState()
           .blockchain.gameContract.methods.joinGame(payload)
-          .call();
+          .send();
+      console.log("Success", success);
       dispatch(
         fetchDataSuccess({
           success
@@ -49,7 +67,7 @@ export const joinGame = (payload) => {
       );
     } catch (err) {
       console.log(err);
-      dispatch(fetchDataFailed("Error joing the game"));
+      dispatch(fetchDataFailed("Error joining the game"));
       dispatch(toggleJoinGameDialog(true));
     }
   };
@@ -59,10 +77,11 @@ export const fetchData = (account) => {
   return async (dispatch) => {
     dispatch(fetchDataRequest());
     try {
-      // const contractBalance = await store
-      //   .getState()
-      //   .blockchain.gameContract.methods.getContractBalance()
-      //   .call();
+      const contractBalance = await store
+        .getState()
+        .blockchain.gameContract.methods.getContractBalance()
+        .call();
+      console.log("Contract balance: ", contractBalance);
       // dispatch(
       //   fetchDataSuccess({
       //     contractBalance

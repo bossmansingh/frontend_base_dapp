@@ -157,7 +157,7 @@ contract GameContract is BaseContract {
         // Emit event
         emit GameJoined(msg.sender, gameId);
         // Safe increase allowance for this contract to spend `msg.value` after the game is finished
-        //SafeERC20.safeIncreaseAllowance(_token, address(this), msg.value);
+        SafeERC20.safeIncreaseAllowance(_token, address(this), msg.value);
     }
     
     /**

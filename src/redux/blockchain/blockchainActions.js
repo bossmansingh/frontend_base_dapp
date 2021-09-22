@@ -33,87 +33,64 @@ const updateAccountRequest = (payload) => {
   };
 };
 
-export const moralisAuthenticate = (createGameReq) => {
+const updateIdenticon = (account, web3) => {
   return async (dispatch) => {
-    dispatch(connectRequest());
-    try {
-      let user = await Moralis.User.current();
-      let web3 = new Web3(window.ethereum);
-      if (!user) {
-        user = await Moralis.Web3.authenticate();
-      }
-      console.log(user);
-      const seed = user.get("ethAddress");
-      console.log("Address: ", seed);
-      const identiconUrl = blockies.create({
-        seed: seed,
-        size: 10,
-        scale: 16
-      }).toDataURL();
-      const networkId = await window.ethereum.request({
-        method: "net_version",
-      });
-      console.log("NetworkId: " + networkId);
-      const networkData = await GameContract.networks[networkId];
+    const seed = account.get("ethAddress");
+    const identiconUrl = blockies.create({
+      seed: seed,
+      size: 10,
+      scale: 16
+    }).toDataURL();
+    const networkId = await window.ethereum.request({
+      method: "net_version",
+    });
+    const networkData = await GameContract.networks[networkId];
+    if (networkData) {
       const gameContractObj = new web3.eth.Contract(
         GameContract.abi,
         networkData.address
       );
       dispatch(
         connectSuccess({
-          account: user,
+          account: account,
           identiconUrl: identiconUrl,
           gameContract: gameContractObj,
           web3: web3,
         })
       );
-      if (createGameReq) {
-        createGame();
-      }
-    } catch (error) {
-      console.log(error);
-      dispatch(connectFailed("Cannot connect to wallet. ", error));
+      // Add listeners start
+      window.ethereum.on("accountsChanged", (accounts) => {
+        dispatch(updateAccount(accounts[0]));
+      });
+      window.ethereum.on("chainChanged", () => {
+        window.location.reload();
+      });
+      // Add listeners end
+    } else {
+      dispatch(connectFailed("Change network to CHKMATE."));
     }
   };
 };
 
+export const initAccount = () => {
+  return async (dispatch) => {
+    if (window.ethereum) {
+      const web3 = new Web3(window.ethereum);
+      let userAccount = await Moralis.User.current();
+      if (userAccount) {
+        dispatch(updateIdenticon(userAccount, web3));
+      }
+    }
+  };
+};
 export const connect = () => {
   return async (dispatch) => {
     dispatch(connectRequest());
     if (window.ethereum) {
-      let web3 = new Web3(window.ethereum);
+      const web3 = new Web3(window.ethereum);
       try {
-        const accounts = await window.ethereum.request({
-          method: "eth_requestAccounts",
-        });
-        const networkId = await window.ethereum.request({
-          method: "net_version",
-        });
-        console.log("NetworkId: " + networkId);
-        const networkData = await GameContract.networks[networkId];
-        if (networkData) {
-          const gameContractObj = new web3.eth.Contract(
-            GameContract.abi,
-            networkData.address
-          );
-          dispatch(
-            connectSuccess({
-              account: accounts[0],
-              gameContract: gameContractObj,
-              web3: web3,
-            })
-          );
-          // Add listeners start
-          window.ethereum.on("accountsChanged", (accounts) => {
-            dispatch(updateAccount(accounts[0]));
-          });
-          window.ethereum.on("chainChanged", () => {
-            window.location.reload();
-          });
-          // Add listeners end
-        } else {
-          dispatch(connectFailed("Change network to CHKMATE."));
-        }
+        const userAccount = await Moralis.Web3.authenticate();
+        dispatch(updateIdenticon(userAccount, web3));
       } catch (err) {
         dispatch(connectFailed("Something went wrong."));
       }
@@ -131,11 +108,4 @@ export const updateAccount = (account) => {
 };
 
 // Game functions
-export const createGame = () => {
-  return async (dispatch) => {
-    let user = await Moralis.User.current();
-    if (!user) {
-      moralisAuthenticate();
-    }
-  };
-};
+

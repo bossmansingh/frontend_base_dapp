@@ -6,19 +6,19 @@ import DialogContent from "@material-ui/core/DialogContent";
 
 import Chessboard from "chessboardjsx";
 
-import { moralisAuthenticate, createGame } from "./redux/blockchain/blockchainActions";
-import { fetchData, joinGame, toggleInfoDialog, toggleJoinGameDialog } from "./redux/data/dataActions";
+import { connect, initAccount } from "./redux/blockchain/blockchainActions";
+import { fetchData, createGame, joinGame, toggleInfoDialog, toggleJoinGameDialog } from "./redux/data/dataActions";
 import * as s from "./styles/globalStyles";
 // import styled from "styled-components";
 // import { create } from "ipfs-http-client";
 import logo from "./assets/chessboard_logo.jpg";
 
-const gameInstructions = "It is a NFT based game of chess where every player have a chance to mint a unique CHKMATE NFT win card, in half the price. Rules are simple here, to create a new game or to join an existing game it would cost you 0.05 eth. Each player has to deposits the same amount into the contract and the winner receives the deposited eth* in form of CHKMATE NFT. Each card has unique characteristics about the game which includes winning piece, winning board, winning time and total kills.";
+const gameInstructions = "It is a NFT based game of chess where every player have a chance to mint a unique CHKMATE NFT win card, in half the price. Rules are simple here, to create a new game or to join an existing game it would cost you 0.05 eth. Each player has to deposits the same amount into the contract and the winner receives the CHKMATE NFT. Each card has unique characteristics about the game which includes winning piece, winning board, winning time and total kills.";
 const rule1 = "1. To create a new game a fee of 0.05 eth is to be deposited into the contract."; 
-const rule2 = "2. Once a game is created a unique code will be generated that you can share with the other player for them to join the game. The other player will have 30 minutes to join before it auto-forfeits. In that case, the deposited eth will be returned to your wallet *.";
+const rule2 = "2. Once a game is created a unique code will be generated that you can share with the other player for them to join. The other player will have 30 minutes to join before the game auto-forfeits. In that case, the deposited eth will be returned to your wallet[1].";
 const rule3 = "3. Once a game is started each player will have a two minute window to make a move. If no move is made within the given timeframe the turn will skip to the next player.";
-const rule4 = "4. If any player for any reason disconnects from the game, it will be considered as a forfeit and the other player will win CHKMATE NFT card **.";
-const rule5 = "5. As per the rules of chess, a game finishes when check-and-mate happens. The piece that makes the final check-mate move will be considered as the winning piece.";
+const rule4 = "4. If any player for any reason disconnects from the game, it will be considered as a forfeit and the other player will win CHKMATE NFT card[2].";
+const rule5 = "5. A game finishes when one of the player plays a check-mate move. The piece that makes the final move will be considered as the winning piece.";
 
 // The random color should be generated when the game starts, before 
 // that some default color should be used
@@ -59,9 +59,10 @@ function App() {
   const contract = blockchain.gameContract;
   const walletConnected = account !== null && account !== "";
   const contractFetched = contract != null;
-  console.table(blockchain);
-  console.table(data);
-  console.table(account);
+  const gameConnected = walletConnected && contractFetched !== null;
+  console.table("Blockchain", blockchain);
+  console.table("Data", data);
+  console.table("Account", account);
 
   const showInformationDialog = () => {
     dispatch(toggleInfoDialog(true));
@@ -86,27 +87,22 @@ function App() {
     _setGameCode(event.target.value);
   };
 
-  useState(() => {
-    console.log("UseState");
-  });
-  useRef(() => {
-    console.log("UseRef");
-  });
   useEffect(() => {
-    console.log("UseEffect");
-    if (walletConnected && contractFetched !== null) {
+    if (gameConnected) {
       dispatch(fetchData(account));
     }
-  }, [account, walletConnected, contractFetched, dispatch]);
+  }, [account, gameConnected, dispatch]);
 
+  // Init account from cache
+  dispatch(initAccount());
   return (
     <s.Screen>
       {renderToolbar()}
-    {/* 
-      If account connected or not-connected and no NFTs minted show the chessboard with start game button
-      If account connected or not-connected and NFTs minted show minted NFTs with start game button
-      TODO: Show minted NFTs (in carousel) 
-    */}
+      {/* 
+        If account connected or not-connected and no NFTs minted show the chessboard with start game button
+        If account connected or not-connected and NFTs minted show minted NFTs with start game button
+        TODO: Show minted NFTs (in carousel) 
+      */}
       {renderWelcomePage()}
       {renderHelpPopup()}
       {renderJoinGamePopup()}
@@ -124,9 +120,8 @@ function App() {
         <s.HelpButton id="help_button"
           style={{width:"40px", height:"40px"}}
           onClick={(e) => {
-            e.preventDefault();
-            // TODO: Show instructions dialog
             showInformationDialog();
+            e.preventDefault();
           } 
         }>?</s.HelpButton>
         <s.TextPageTitle
@@ -151,9 +146,8 @@ function App() {
           ) : (
             <s.StyledButton
               onClick={(e) => {
+                dispatch(connect());
                 e.preventDefault();
-                // dispatch(connect());
-                dispatch(moralisAuthenticate());
               } 
             }>
               CONNECT
@@ -169,22 +163,16 @@ function App() {
         <s.Container ai={"center"} jc={"center"} fd={"row"}>
           <s.StyledButton style={{width:"130px", height:"40px"}}
             onClick={(e) => {
-              e.preventDefault();
-              if (walletConnected) {
+              if (gameConnected) {
                 dispatch(createGame());
-              } else {
-                dispatch(moralisAuthenticate(true));
               }
+              e.preventDefault();
             }}>Create Game</s.StyledButton>
           <s.SpacerMedium />
           <s.StyledButton style={{width:"130px", height:"40px"}}
             onClick={(e) => {
+              showJoinGameDialog();
               e.preventDefault();
-              if (walletConnected) {
-                showJoinGameDialog();
-              } else {
-                dispatch(moralisAuthenticate(true));
-              }
             }}
           >
             Join Game
@@ -270,7 +258,7 @@ function App() {
               </s.TextParagraph>
               <s.TextParagraph 
                 style={{
-                  padding: "12px", 
+                  padding: "12px",
                   color: "black"
                 }}
               >
@@ -287,19 +275,21 @@ function App() {
               <s.SpacerSmall />
               <s.TextParagraph 
                 style={{
-                  fontWeight: "600", 
-                  color:"black"
+                  color:"black",
+                  paddingLeft:"12px",
+                  fontSize: "14px"
                 }}
               >
-                * Minus the gas fees
+                [1]Minus the gas fees
               </s.TextParagraph>
               <s.TextParagraph 
                 style={{
-                  fontWeight: "600", 
-                  color:"black"
+                  color:"black",
+                  paddingLeft:"12px",
+                  fontSize: "14px"
                 }}
               >
-                ** The winning NFT card will not include a winning piece
+                [2]The winning NFT card will not include a winning piece
               </s.TextParagraph>
             </s.Container>
             <s.SpacerMedium/>
@@ -309,9 +299,10 @@ function App() {
               style={{
                 fontSize: "20px"
               }} 
-              onClick={
-                hideInformationDialog
-              }
+              onClick={(e)=> {
+                hideInformationDialog();
+                e.preventDefault();
+              }}
             >
               Close
             </s.StyledButton>
@@ -323,10 +314,19 @@ function App() {
 
   function renderJoinGamePopup() {
     return(
-      <Dialog open={data.showJoinGameDialog} onClose={hideJoinGameDialog}>
+      <Dialog 
+        open={
+          data.showJoinGameDialog
+        } 
+        onClose={(e) => {
+          hideJoinGameDialog();
+          e.preventDefault();
+        }}
+      >
         <DialogContent>
           <s.Container 
             ai={"center"} 
+            jc={"center"}
             style={{
               paddingBottom: "20px",
               paddingLeft: "10px",
@@ -339,12 +339,16 @@ function App() {
                 textAlign: "center"
               }}
             >
-              Enter the game code
+              ENTER GAME CODE
             </s.TextTitle>
             <s.SpacerSmall />
             <s.InputContainer 
+              style={{textAlign: "center"}}
               placeholder={"Game Code"} 
-              onChange={handleInput} />
+              onChange={(e) => {
+                handleInput();
+                e.preventDefault();
+              }} />
             {
               data.errorMsg ? 
               (
@@ -370,24 +374,22 @@ function App() {
                   width: "200px"
                 }} 
                 onClick={(e) => {
-                  if (walletConnected) {
-                    dispatch(joinGame(gameCode));
-                  } else {
-                    dispatch(moralisAuthenticate(true));
-                  }
+                  dispatch(joinGame(gameCode));
                   e.preventDefault();
                 }}
               >
                 Join Game
               </s.StyledButton>
-              <s.SpacerMedium />
+              <s.SpacerSmall />
               <s.StyledButton 
                 flex={1}
                 style={{
-                  fontSize: "20px"
-                }} onClick={
-                  hideJoinGameDialog
-                }
+                  fontSize: "20px",
+                  width: "200px"
+                }} onClick={(e) => {
+                  hideJoinGameDialog();
+                  e.preventDefault();
+                }}
               >
                 Cancel
               </s.StyledButton>

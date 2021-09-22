@@ -11,8 +11,6 @@ export const Screen = styled.div`
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  scroll-behaviour: smooth;
-  overflow-y: scroll
 `;
 
 // Used for providing space between components
@@ -158,6 +156,8 @@ export const InputContainer = styled.input`
   display: flex;
   padding: 10px;
   width: 25vw;
+  font-weight: bold;
+  font-size: 18px;
   justify-content: flex-start;
   align-items: center;
   border-style: solid;
