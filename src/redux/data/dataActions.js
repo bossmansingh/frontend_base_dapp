@@ -83,7 +83,7 @@ export const joinGame = (address, gameId) => {
             value: web3.utils.toWei("0.05", "ether")
           }).once("error", (err) => {
             console.log(err);
-            dispatch(fetchDataFailed("Error joining game with gameId: ", gameId));
+            dispatch(fetchDataFailed("Error joining game with gameId: " + gameId));
           }).then((receipt) => {
             console.log("Game Joined Success", receipt);
             //dispatch(gameJoined(""));

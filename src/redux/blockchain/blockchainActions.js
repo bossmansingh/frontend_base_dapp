@@ -33,8 +33,9 @@ const updateAccountRequest = (payload) => {
   };
 };
 
-const updateIdenticon = (account, web3) => {
+const updateIdenticon = (account) => {
   return async (dispatch) => {
+    const web3 = new Web3(window.ethereum);
     const address = account.get("ethAddress");
     const identiconUrl = blockies.create({
       seed: address,
@@ -75,10 +76,9 @@ const updateIdenticon = (account, web3) => {
 export const initAccount = () => {
   return async (dispatch) => {
     if (window.ethereum) {
-      const web3 = new Web3(window.ethereum);
       let userAccount = await Moralis.User.current();
       if (userAccount) {
-        dispatch(updateIdenticon(userAccount, web3));
+        dispatch(updateIdenticon(userAccount));
       }
     }
   };
@@ -87,10 +87,9 @@ export const connect = () => {
   return async (dispatch) => {
     dispatch(connectRequest());
     if (window.ethereum) {
-      const web3 = new Web3(window.ethereum);
       try {
         const userAccount = await Moralis.Web3.authenticate();
-        dispatch(updateIdenticon(userAccount, web3));
+        dispatch(updateIdenticon(userAccount));
       } catch (err) {
         dispatch(connectFailed("Something went wrong."));
       }
@@ -106,6 +105,3 @@ export const updateAccount = (account) => {
     dispatch(fetchData(account));
   };
 };
-
-// Game functions
-

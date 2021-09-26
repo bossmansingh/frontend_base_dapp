@@ -354,11 +354,11 @@ function App() {
             {
               data.errorMsg ? 
               (
-                <s.TextDescription
-                  style={{color: "red", paddingTop: "10px"}}
+                <s.TextParagraph
+                  style={{color: "red", paddingTop: "10px", textAlign: "center"}}
                 >
                   {data.errorMsg}
-                </s.TextDescription>
+                </s.TextParagraph>
               ) : (
                 null
               )

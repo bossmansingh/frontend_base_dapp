@@ -23,7 +23,7 @@ const dataReducer = (state = initialState, action) => {
       };
     case "CHECK_DATA_FAILED":
       return {
-        ...initialState,
+        ...state,
         loading: false,
         error: true,
         errorMsg: action.payload,

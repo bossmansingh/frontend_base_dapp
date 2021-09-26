@@ -93,6 +93,7 @@ html,body{
     box-shadow: 0 0 2px rgba(0,0,0,.2);
     transform-origin: 1px 110px;
     transition: .5s;
+    animation: rotate-second 60s linear infinite;
     -webkit-animation: rotate-second 60s linear infinite;
     -moz-animation: rotate-second 60s linear infinite;
 }
