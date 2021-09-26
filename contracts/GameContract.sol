@@ -144,10 +144,13 @@ contract GameContract is BaseContract {
         // Check and verify if a game with specified ID  already exists.
         require(gameExists, "A game with specified ID does not exist");
         // Check and verify if a value equal to or greater than `_baseGameFee` was sent along with the transaction.
-        require(msg.value == _baseGameFee, "Sent value should be equal to game fee");
-        bool challengeAcceptorExists = _playersMap[challengerAddress] != Helpers.nullAddress();
+        require(msg.value >= _baseGameFee, "Sent value should be equal to game fee");
+        address challengeAcceptorAddress = _playersMap[challengerAddress];
+        bool challengeAcceptorExists = challengeAcceptorAddress != Helpers.nullAddress();
         // Check and verify if the challenge acceptor address exist
         require(!challengeAcceptorExists, "Challenge acceptor address is already set");
+        // Check and verify if both player address are unique
+        require(challengerAddress != msg.sender, "Both player address should be unique");
         bool winnerExists = _winnersMap[gameId] != Helpers.nullAddress();
         // Check and verify if the winner address is not set.
         require(!winnerExists, "Winner address cannot be set before the game starts");

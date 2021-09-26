@@ -348,7 +348,7 @@ function App() {
               style={{textAlign: "center"}}
               placeholder={"Game Code"} 
               onChange={(e) => {
-                handleInput();
+                handleInput(e);
                 e.preventDefault();
               }} />
             {
@@ -376,7 +376,7 @@ function App() {
                   width: "200px"
                 }} 
                 onClick={(e) => {
-                  dispatch(joinGame({address: address, gameId: gameCode}));
+                  dispatch(joinGame(address, gameCode));
                   e.preventDefault();
                 }}
               >
