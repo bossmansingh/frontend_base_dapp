@@ -51,18 +51,18 @@ function getRandomNumber(min, max) {
 }
 
 function App() {
-  const ref = useRef();
+  // const ref = useRef();
   const dispatch = useDispatch();
   const blockchain = useSelector((state) => state.blockchain);
   const data = useSelector((state) => state.data);
-  const account = blockchain.account;
+  const address = blockchain.address;
   const contract = blockchain.gameContract;
-  const walletConnected = account !== null && account !== "";
+  const walletConnected = address !== null && address !== "";
   const contractFetched = contract != null;
   const gameConnected = walletConnected && contractFetched !== null;
-  console.table("Blockchain", blockchain);
-  console.table("Data", data);
-  console.table("Account", account);
+  console.table("Blockchain: ", blockchain);
+  console.table("Data: ", data);
+  console.table("Account address: ", address);
 
   const showInformationDialog = () => {
     dispatch(toggleInfoDialog(true));
@@ -89,12 +89,14 @@ function App() {
 
   useEffect(() => {
     if (gameConnected) {
-      dispatch(fetchData(account));
+      dispatch(fetchData(address));
     }
-  }, [account, gameConnected, dispatch]);
+  }, [address, gameConnected, dispatch]);
 
   // Init account from cache
-  dispatch(initAccount());
+  if (!gameConnected) {
+    dispatch(initAccount());
+  }
   return (
     <s.Screen>
       {renderToolbar()}
@@ -164,7 +166,7 @@ function App() {
           <s.StyledButton style={{width:"130px", height:"40px"}}
             onClick={(e) => {
               if (gameConnected) {
-                dispatch(createGame());
+                dispatch(createGame(address));
               }
               e.preventDefault();
             }}>Create Game</s.StyledButton>
@@ -374,7 +376,7 @@ function App() {
                   width: "200px"
                 }} 
                 onClick={(e) => {
-                  dispatch(joinGame(gameCode));
+                  dispatch(joinGame({address: address, gameId: gameCode}));
                   e.preventDefault();
                 }}
               >

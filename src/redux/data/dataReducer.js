@@ -38,9 +38,9 @@ const dataReducer = (state = initialState, action) => {
         ...initialState,
         showJoinGameDialog: action.payload
       };
-    case "SET_GAME_CODE":
+    case "INIT_NEW_GAME":
       return {
-        ...initialState,
+        ...state,
         gameCode: action.payload
       };
     default:

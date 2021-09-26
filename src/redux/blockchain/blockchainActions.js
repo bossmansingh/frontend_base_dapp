@@ -35,9 +35,9 @@ const updateAccountRequest = (payload) => {
 
 const updateIdenticon = (account, web3) => {
   return async (dispatch) => {
-    const seed = account.get("ethAddress");
+    const address = account.get("ethAddress");
     const identiconUrl = blockies.create({
-      seed: seed,
+      seed: address,
       size: 10,
       scale: 16
     }).toDataURL();
@@ -52,7 +52,7 @@ const updateIdenticon = (account, web3) => {
       );
       dispatch(
         connectSuccess({
-          account: account,
+          address: address,
           identiconUrl: identiconUrl,
           gameContract: gameContractObj,
           web3: web3,

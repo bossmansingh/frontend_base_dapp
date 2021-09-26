@@ -1,4 +1,4 @@
-// log
+import web3 from "web3";
 import store from "../store";
 
 const fetchDataRequest = () => {
@@ -21,6 +21,13 @@ const fetchDataFailed = (payload) => {
   };
 };
 
+const initNewGame = (payload) => {
+  return {
+    type: "INIT_NEW_GAME",
+    payload: payload
+  };
+};
+
 export const toggleInfoDialog = (payload) => {
   return {
     type: "TOGGLE_INFO_DIALOG",
@@ -35,15 +42,26 @@ export const toggleJoinGameDialog = (payload) => {
   };
 };
 
-export const createGame = (payload) => {
+export const createGame = (address) => {
   return async (dispatch) => {
     try {
       console.log("Create game");
-      const success = await store
+      console.log("Challenger Address: ", address);
+      await store
             .getState()
             .blockchain.gameContract.methods.createGame()
-            .send();
-      console.log("Success", success);
+            .send({
+              from: address,
+              value: web3.utils.toWei("0.05", "ether")
+            }).once("error", (err) => {
+              console.log(err);
+              dispatch(fetchDataFailed("Error creating a new game"));
+            }).then((receipt) => {
+              console.log("Game Create Success", receipt);
+              const gameId = receipt.events["GameCreated"]["returnValues"]["gameId"];
+              console.log("GameId: ", gameId);
+              //dispatch(initNewGame(""));
+            });
     } catch (err) {
       console.log(err);
       dispatch(fetchDataFailed("Error creating a new game"));
@@ -51,20 +69,25 @@ export const createGame = (payload) => {
   };
 };
 
-export const joinGame = (payload) => {
+export const joinGame = (address, gameId) => {
   return async (dispatch) => {
     try {
       console.log("Join game request");
-      const success = await store
+      console.log("Challenge acceptor address: ", address);
+      console.log("GameId: ", gameId);
+      await store
           .getState()
-          .blockchain.gameContract.methods.joinGame(payload)
-          .send();
-      console.log("Success", success);
-      dispatch(
-        fetchDataSuccess({
-          success
-        })
-      );
+          .blockchain.gameContract.methods.joinGame(gameId)
+          .send({
+            from: address,
+            value: web3.utils.toWei("0.05", "ether")
+          }).once("error", (err) => {
+            console.log(err);
+            dispatch(fetchDataFailed("Error joining game with gameId: ", gameId));
+          }).then((receipt) => {
+            console.log("Game Joined Success", receipt);
+            //dispatch(gameJoined(""));
+          });
     } catch (err) {
       console.log(err);
       dispatch(fetchDataFailed("Error joining the game"));
@@ -81,7 +104,7 @@ export const fetchData = (account) => {
         .getState()
         .blockchain.gameContract.methods.getContractBalance()
         .call();
-      console.log("Contract balance: ", contractBalance);
+      console.log("Contract balance: ", web3.utils.fromWei(contractBalance, "ether"));
       // dispatch(
       //   fetchDataSuccess({
       //     contractBalance

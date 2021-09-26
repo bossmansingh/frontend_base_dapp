@@ -1,6 +1,7 @@
 {
-  "name": "chkmate-game",
+  "name": "chkmate",
   "version": "0.1.0",
+  "author": "BossManSingh",
   "private": true,
   "dependencies": {
     "@material-ui/core": "^4.12.3",

@@ -1,6 +1,6 @@
 const initialState = {
   loading: false,
-  account: null,
+  address: null,
   identiconUrl: null,
   gameContract: null,
   web3: null,
@@ -16,9 +16,9 @@ const blockchainReducer = (state = initialState, action) => {
       };
     case "CONNECTION_SUCCESS":
       return {
-        ...state,
+        ...initialState,
         loading: false,
-        account: action.payload.account,
+        address: action.payload.address,
         identiconUrl: action.payload.identiconUrl,
         gameContract: action.payload.gameContract,
         web3: action.payload.web3,
