@@ -60,7 +60,7 @@ export const createGame = (address) => {
               console.log("Game Create Success", receipt);
               const gameId = receipt.events["GameCreated"]["returnValues"]["gameId"];
               console.log("GameId: ", gameId);
-              //dispatch(initNewGame(""));
+              dispatch(initNewGame(gameId));
             });
     } catch (err) {
       console.log(err);

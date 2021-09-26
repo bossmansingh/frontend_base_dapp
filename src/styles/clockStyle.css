@@ -1,132 +1,119 @@
-html,body{
-    height: 100%;
-    margin: 0;
-    padding: 0;
-    background-image:linear-gradient(#e7e7e7,#d7d7d7);
-}
+
 .clock-wrapper{
-    position: absolute;
-    top: 50%;
-    right: 0;
-    bottom: 50%;
-    left: 0;
-    width: 250px;
-    height: 250px;
-    margin: auto;
-    padding: 5px;
-    background-image: linear-gradient(#f7f7f7,#e0e0e0);
-    border-radius: 50%;
-    box-shadow: 0 10px 15px rgba(0,0,0,.15),0 2px 2px rgba(0,0,0,.2);
+  position: relative;
+  width: 150px;
+  height: 150px;
+  background-image: linear-gradient(#f7f7f7,#e0e0e0);
+  border-radius: 50%;
+  box-shadow: 0 10px 15px rgba(0,0,0,.15),0 2px 2px rgba(0,0,0,.2);
 
 }
 .clock-base{
-    width: 250px;
-    height: 250px;
-    background-color: #eee;
-    border-radius: 50%;
-    box-shadow: 0 0 5px #eee;
+  width: 150px;
+  height: 150px;
+  background-color: #eee;
+  border-radius: 50%;
+  box-shadow: 0 0 5px #eee;
 }
 .clock-dial {
-    position: absolute;
-    z-index: 1;
-    top: 15px;
-    left: 15px;
-    width: 230px;
-    height: 230px;
+  position: relative;
+  z-index: 2;
 }
 .clock-dial .clock-indicator {
-    position: absolute;
-    width: 2px;
-    height: 4px;
-    margin: 113px 114px;
-    background-color: #ddd;
+  position: absolute;
+  width: 2px;
+  height: 10px;
+  margin: 75.5px 73px;
+  background-color: rgb(73, 73, 75);
 }
 .clock-indicator:nth-child(1) {
-    transform: rotate(30deg) translateY(-113px);
+  transform: rotate(30deg) translateY(-75px);
 }
 .clock-indicator:nth-child(2) {
-    transform: rotate(60deg) translateY(-113px);
+  transform: rotate(60deg) translateY(-73px);
 }
 .clock-indicator:nth-child(3) {
-    transform: rotate(90deg) translateY(-113px);
-    background-color: #aaa;
+  transform: rotate(90deg) translateY(-71px);
+  background-color: rgb(6, 148, 42);
 }
 .clock-indicator:nth-child(4) {
-    transform: rotate(120deg) translateY(-113px);
+  transform: rotate(120deg) translateY(-68px);
 }
 .clock-indicator:nth-child(5) {
-    transform: rotate(150deg) translateY(-113px);
+  transform: rotate(150deg) translateY(-66px);
 }
 .clock-indicator:nth-child(6) {
-    transform: rotate(180deg) translateY(-113px);
-    background-color: #aaa;
+  transform: rotate(180deg) translateY(-65px);
+  background-color: rgb(21, 5, 252);
 }
 .clock-indicator:nth-child(7) {
-    transform: rotate(210deg) translateY(-113px);
+  transform: rotate(210deg) translateY(-66px);
 }
 .clock-indicator:nth-child(8) {
-    transform: rotate(240deg) translateY(-113px);
+  transform: rotate(240deg) translateY(-67px);
 }
 .clock-indicator:nth-child(9) {
-    transform: rotate(270deg) translateY(-113px);
-    background-color: #aaa;
+  transform: rotate(270deg) translateY(-68.5px);
+  background-color: rgb(209, 4, 250);
 }
 .clock-indicator:nth-child(10) {
-    transform: rotate(300deg) translateY(-113px);
+  transform: rotate(300deg) translateY(-72px);
 }
 .clock-indicator:nth-child(11) {
-    transform: rotate(330deg) translateY(-113px);
+  transform: rotate(330deg) translateY(-74px);
 }
 .clock-indicator:nth-child(12) {
-    transform: rotate(360deg) translateY(-113px);
-    background-color: #c00;
+  transform: rotate(360deg) translateY(-75px);
+  background-color: #c00;
 }
-
 .clock-second{
-    position: absolute;
-    z-index: 4;
-    top: 20px;
-    left: 129px;
-    width: 2px;
-    height: 130px;
-    background-color: #a00;
-    box-shadow: 0 0 2px rgba(0,0,0,.2);
-    transform-origin: 1px 110px;
-    transition: .5s;
-    animation: rotate-second 60s linear infinite;
-    -webkit-animation: rotate-second 60s linear infinite;
-    -moz-animation: rotate-second 60s linear infinite;
+  position: absolute;
+  z-index: 4;
+  top: 10px;
+  left: 73px;
+  width: 2px;
+  height: 78px;
+  background-color: #a00;
+  box-shadow: 0 0 2px rgba(0,0,0,.2);
+  transform-origin: 1px 110px;
+  transition: .5s;
+  animation: rotate-second 60s linear infinite;
+  -webkit-animation: rotate-second 60s linear infinite;
+  -moz-animation: rotate-second 60s linear infinite;
 }
 .clock-second:after{
-    content: "";
-    display: block;
-    position: absolute;
-    left: -5px;
-    bottom: 14px;
-    width: 8px;
-    height: 8px;
-    background-color: #a00;
-    border: solid 2px #a00;
-    border-radius: 50%;
-    box-shadow: 0 0 3px rgba(0,0,0,.2);
+  content: "";
+  display: block;
+  position: absolute;
+  left: -5px;
+  bottom: 7px;
+  width: 8px;
+  height: 8px;
+  background-color: #a00;
+  border: solid 2px #a00;
+  border-radius: 50%;
+  box-shadow: 0 0 3px rgba(0,0,0,.2);
 }
 .clock-center{
-    position: absolute;
-    z-index: 1;
-    width: 150px;
-    height: 150px;
-    top: 55px;
-    left: 55px;
-    background-image: linear-gradient(#e3e3e3,#f7f7f7);
-    border-radius: 50%;
-    box-shadow: inset 0 -1px 0 #fafafa, inset 0 1px 0 #e3e3e3;
+  position: absolute;
+  z-index: 1;
+  width: 75px;
+  height: 75px;
+  top: 37.5px;
+  left: 36.5px;
+  background-image: linear-gradient(#e3e3e3,#f7f7f7);
+  border-radius: 50%;
+  box-shadow: inset 0 -1px 0 #fafafa, inset 0 1px 0 #e3e3e3;
 }
 .clock-center:after{
-    content: "";
-    display: block;
-    width: 20px;
-    height: 20px;
-    margin: 65px;
-    background-color: #ddd;
-    border-radius: 50%;
+  position: relative;
+  content: "";
+  display: block;
+  width: 20px;
+  height: 20px;
+  top: 27.5px;
+  left: 27.5px;
+  border-radius: 50%;
+  background-color: #ddd;
+  
 }

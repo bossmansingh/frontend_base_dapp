@@ -9,6 +9,8 @@ import Chessboard from "chessboardjsx";
 import { connect, initAccount } from "./redux/blockchain/blockchainActions";
 import { fetchData, createGame, joinGame, toggleInfoDialog, toggleJoinGameDialog } from "./redux/data/dataActions";
 import * as s from "./styles/globalStyles";
+import "./styles/clockStyle.css";
+
 // import styled from "styled-components";
 // import { create } from "ipfs-http-client";
 import logo from "./assets/chessboard_logo.jpg";
@@ -60,9 +62,11 @@ function App() {
   const walletConnected = address !== null && address !== "";
   const contractFetched = contract != null;
   const gameConnected = walletConnected && contractFetched !== null;
-  console.table("Blockchain: ", blockchain);
-  console.table("Data: ", data);
-  console.table("Account address: ", address);
+  const gameStarted = data.gameCode !== null && data.gameCode !== "";
+  console.log("walletConnected: " + walletConnected);
+  console.log("contractFetched: " + contractFetched);
+  console.log("gameConnected: " + gameConnected);
+  console.log("gameStarted: " + gameStarted);
 
   const showInformationDialog = () => {
     dispatch(toggleInfoDialog(true));
@@ -105,9 +109,9 @@ function App() {
         If account connected or not-connected and NFTs minted show minted NFTs with start game button
         TODO: Show minted NFTs (in carousel) 
       */}
-      {renderWelcomePage()}
       {renderHelpPopup()}
       {renderJoinGamePopup()}
+      {!gameStarted ? renderGameBoard() : renderWelcomePage()}
     </s.Screen>
   );
 
@@ -400,6 +404,61 @@ function App() {
         </DialogContent>
       </Dialog>
     )
+  }
+
+  function renderGameBoard() {
+    return(
+      <s.Container
+        flex={1}
+        fd={"row"}
+        jc={"stretched"}
+      >
+        {setChessboard()}
+        <s.SpacerLarge/>
+        {addClock(false)}
+        <s.SpacerLarge/>
+        {addClock(false)}
+  
+      </s.Container>
+    );
+  }
+
+  function addClock(isEnabled) {
+    <style id="clock-animations"></style>
+    return(
+      <s.ClockContainer className="clock-wrapper">
+        <s.ClockContainer className="clock-base">
+          <s.ClockContainer className="clock-dial">
+            <s.ClockContainer className="clock-indicator"/>
+            <s.ClockContainer className="clock-indicator"/>
+            <s.ClockContainer className="clock-indicator"/>
+            <s.ClockContainer className="clock-indicator"/>
+            <s.ClockContainer className="clock-indicator"/>
+            <s.ClockContainer className="clock-indicator"/>
+            <s.ClockContainer className="clock-indicator"/>
+            <s.ClockContainer className="clock-indicator"/>
+            <s.ClockContainer className="clock-indicator"/>
+            <s.ClockContainer className="clock-indicator"/>
+            <s.ClockContainer className="clock-indicator"/>
+            <s.ClockContainer className="clock-indicator"/>
+          </s.ClockContainer>
+          <s.ClockContainer className="clock-second"/>
+          <s.ClockContainer className="clock-center"/>
+        </s.ClockContainer>
+      </s.ClockContainer>
+    );
+  }
+
+  function some() {
+    //generate clock animations
+    var now       = new Date(),
+        secondDeg = now.getSeconds() / 60 * 360,
+        stylesDeg = [
+            
+            "@-webkit-keyframes rotate-second{from{transform:rotate(" + secondDeg + "deg);}to{transform:rotate(" + (secondDeg + 360) + "deg);}}",
+            "@-moz-keyframes rotate-second{from{transform:rotate(" + secondDeg + "deg);}to{transform:rotate(" + (secondDeg + 360) + "deg);}}"
+        ].join("");
+    document.getElementById("clock-animations").innerHTML = stylesDeg;
   }
 }
 

@@ -9,6 +9,7 @@ export const Screen = styled.div`
   width: 100%;
   height: 100%;
   min-height: 100vh;
+  min-width: 100vw;
   display: flex;
   flex-direction: column;
 `;
@@ -44,9 +45,6 @@ export const ResponsiveWrapper = styled.div`
   justify-content: stretched;
   align-items: stretched;
   width: 100%;
-  @media (min-width: 767px) {
-    flex-direction: row;
-  }
 `;
 
 // Used for providing a wrapper around a component
@@ -61,6 +59,10 @@ export const Container = styled.div`
   background-image: ${({ image }) => (image ? `url(${image})` : "none")};
   background-size: cover;
   background-position: center;
+`;
+
+export const ClockContainer = styled.div`
+  
 `;
 
 export const TextPageTitle = styled.p`
@@ -165,5 +167,4 @@ export const InputContainer = styled.input`
   border-color: black;
   border-radius: 10px;
   color: black;
-  
 `;
