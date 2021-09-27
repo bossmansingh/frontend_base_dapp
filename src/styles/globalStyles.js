@@ -38,6 +38,18 @@ export const SpacerLarge = styled.div`
   width: 32px;
 `;
 
+// Used for providing space between components
+export const SpacerXLarge = styled.div`
+  height: 48px;
+  width: 48px;
+`;
+
+// Used for providing space between components
+export const SpacerXXLarge = styled.div`
+  height: 64px;
+  width: 64px;
+`;
+
 export const ResponsiveWrapper = styled.div`
   display: flex;
   flex: 1;
@@ -59,6 +71,7 @@ export const Container = styled.div`
   background-image: ${({ image }) => (image ? `url(${image})` : "none")};
   background-size: cover;
   background-position: center;
+  background-color: var(--black);
 `;
 
 export const ClockContainer = styled.div`

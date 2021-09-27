@@ -409,6 +409,8 @@ function App() {
 
   function renderGameBoard() {
     const gameStarted = data.gameStarted;
+    const playerTurn = false;
+    const opponentTurn = true;
     return(
       <s.Container
         fd={"row"}
@@ -417,10 +419,36 @@ function App() {
         style={{paddingTop: "138px"}}
       >
         {setChessboard(gameStarted)}
+        <s.SpacerXXLarge/>
+        <s.Container
+          ai={"center"}
+          jd={"center"}
+          style={{opacity: playerTurn ? "1" : "0.25"}}
+        >
+          {addClock(playerTurn)}
+          <s.SpacerMedium/>
+          <s.TextSubTitle
+            style={{
+              textAlign: "center", 
+              fontFamily: "default-font"
+            }}
+          >You</s.TextSubTitle>
+        </s.Container>
         <s.SpacerLarge/>
-        {addClock(true)}
-        <s.SpacerLarge/>
-        {addClock(false)}
+        <s.Container
+          ai={"center"}
+          jd={"center"}
+          style={{opacity: opponentTurn ? "1" : "0.25"}}
+        >
+          {addClock(opponentTurn)}
+          <s.SpacerMedium/>
+          <s.TextSubTitle
+            style={{
+              textAlign: "center", 
+              fontFamily: "default-font"
+            }}
+          >Opponent</s.TextSubTitle>
+        </s.Container>
       </s.Container>
     );
   }
@@ -431,7 +459,7 @@ function App() {
       clockIndicators[i] = <s.ClockContainer className="clock-indicator"/>
     }
     return(
-      <s.ClockContainer className="clock-wrapper" style={{opacity: isEnabled ? "1" : "0.25"}}>
+      <s.ClockContainer className="clock-wrapper">
         <s.ClockContainer className="clock-base">
           <s.ClockContainer className="clock-dial">
             {clockIndicators}
@@ -441,16 +469,6 @@ function App() {
         </s.ClockContainer>
       </s.ClockContainer>
     );
-  }
-
-  function startTimer() {
-    //generate clock animations
-    var stylesDeg = [
-      "@-webkit-keyframes rotate-second{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}",
-      "@-moz-keyframes rotate-second{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}"
-    ].join("");
-    
-    ref.clockAnimation.innerHTML = stylesDeg;
   }
 }
 
