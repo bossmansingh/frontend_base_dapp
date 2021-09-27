@@ -1,4 +1,3 @@
-
 .clock-wrapper{
   position: relative;
   width: 150px;
@@ -394,7 +393,7 @@
   height: 78px;
   border-radius: 2.5px;
   background-color: #a00;
-  box-shadow: 0 0 2px rgba(0,0,0,.2);
+  box-shadow: 0 0 2px #a00;
   transform-origin: 1px 65px;
 }
 .clock-second[rotate='1'] {
@@ -421,7 +420,7 @@
   background-color: #a00;
   border: solid 2px #a00;
   border-radius: 50%;
-  box-shadow: 0 0 3px rgba(0,0,0,.2);
+  box-shadow: 0 0 3px #a00;
 }
 .clock-center{
   position: absolute;
@@ -443,6 +442,6 @@
   top: 27.5px;
   left: 27.5px;
   border-radius: 50%;
-  background-color: #ddd;
+  background-color: #a00;
   
 }
