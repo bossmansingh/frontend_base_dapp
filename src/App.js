@@ -14,7 +14,6 @@ import "./styles/clockStyle.css";
 // import styled from "styled-components";
 // import { create } from "ipfs-http-client";
 import logo from "./assets/chessboard_logo.jpg";
-import { keyframes } from "styled-components";
 
 const gameInstructions = "It is a NFT based game of chess where every player have a chance to mint a unique CHKMATE NFT win card, in half the price. Rules are simple here, to create a new game or to join an existing game it would cost you 0.05 eth. Each player has to deposits the same amount into the contract and the winner receives the CHKMATE NFT. Each card has unique characteristics about the game which includes winning piece, winning board, winning time and total kills.";
 const rule1 = "1. To create a new game a fee of 0.05 eth is to be deposited into the contract."; 
@@ -54,7 +53,7 @@ function getRandomNumber(min, max) {
 }
 
 function App() {
-  const ref = useRef();
+  //const ref = useRef();
   const dispatch = useDispatch();
   const blockchain = useSelector((state) => state.blockchain);
   const data = useSelector((state) => state.data);
