@@ -14,6 +14,7 @@ import "./styles/clockStyle.css";
 // import styled from "styled-components";
 // import { create } from "ipfs-http-client";
 import logo from "./assets/chessboard_logo.jpg";
+import { keyframes } from "styled-components";
 
 const gameInstructions = "It is a NFT based game of chess where every player have a chance to mint a unique CHKMATE NFT win card, in half the price. Rules are simple here, to create a new game or to join an existing game it would cost you 0.05 eth. Each player has to deposits the same amount into the contract and the winner receives the CHKMATE NFT. Each card has unique characteristics about the game which includes winning piece, winning board, winning time and total kills.";
 const rule1 = "1. To create a new game a fee of 0.05 eth is to be deposited into the contract."; 
@@ -53,7 +54,7 @@ function getRandomNumber(min, max) {
 }
 
 function App() {
-  // const ref = useRef();
+  const ref = useRef();
   const dispatch = useDispatch();
   const blockchain = useSelector((state) => state.blockchain);
   const data = useSelector((state) => state.data);
@@ -185,20 +186,20 @@ function App() {
           </s.StyledButton>
         </s.Container>
         <s.SpacerMedium />
-        {blockchain.errorMsg !== "" ? (
-          <s.TextDescription>{blockchain.errorMsg}</s.TextDescription>
-        ) : null}
+        <s.TextDescription>{blockchain.errorMsg}</s.TextDescription>
+        {/* {blockchain.errorMsg !== "" ? (
+        ) : null} */}
         <s.SpacerMedium />
-        {setChessboard()}
+        {setChessboard(false)}
       </s.Container>
     );
   }
 
-  function setChessboard() {
+  function setChessboard(isEnable) {
     return(
       <Chessboard
         position="start" 
-        draggable={false}
+        draggable={isEnable}
         lightSquareStyle={{ backgroundColor: `rgb(${lightSquareColor})` }}
         darkSquareStyle={{ backgroundColor: `rgb(${darkSquareColor})` }} />
     );
@@ -407,58 +408,49 @@ function App() {
   }
 
   function renderGameBoard() {
+    const gameStarted = data.gameStarted;
     return(
       <s.Container
-        flex={1}
         fd={"row"}
-        jc={"stretched"}
+        jc={"center"}
+        ai={"center"}
+        style={{paddingTop: "138px"}}
       >
-        {setChessboard()}
+        {setChessboard(gameStarted)}
+        <s.SpacerLarge/>
+        {addClock(true)}
         <s.SpacerLarge/>
         {addClock(false)}
-        <s.SpacerLarge/>
-        {addClock(false)}
-  
       </s.Container>
     );
   }
 
   function addClock(isEnabled) {
-    <style id="clock-animations"></style>
+    const clockIndicators = []
+    for (let i = 0; i < 90; i++) {
+      clockIndicators[i] = <s.ClockContainer className="clock-indicator"/>
+    }
     return(
-      <s.ClockContainer className="clock-wrapper">
+      <s.ClockContainer className="clock-wrapper" style={{opacity: isEnabled ? "1" : "0.25"}}>
         <s.ClockContainer className="clock-base">
           <s.ClockContainer className="clock-dial">
-            <s.ClockContainer className="clock-indicator"/>
-            <s.ClockContainer className="clock-indicator"/>
-            <s.ClockContainer className="clock-indicator"/>
-            <s.ClockContainer className="clock-indicator"/>
-            <s.ClockContainer className="clock-indicator"/>
-            <s.ClockContainer className="clock-indicator"/>
-            <s.ClockContainer className="clock-indicator"/>
-            <s.ClockContainer className="clock-indicator"/>
-            <s.ClockContainer className="clock-indicator"/>
-            <s.ClockContainer className="clock-indicator"/>
-            <s.ClockContainer className="clock-indicator"/>
-            <s.ClockContainer className="clock-indicator"/>
+            {clockIndicators}
           </s.ClockContainer>
-          <s.ClockContainer className="clock-second"/>
+          <s.ClockContainer className="clock-second" rotate={isEnabled ? 1 : 0}/>
           <s.ClockContainer className="clock-center"/>
         </s.ClockContainer>
       </s.ClockContainer>
     );
   }
 
-  function some() {
+  function startTimer() {
     //generate clock animations
-    var now       = new Date(),
-        secondDeg = now.getSeconds() / 60 * 360,
-        stylesDeg = [
-            
-            "@-webkit-keyframes rotate-second{from{transform:rotate(" + secondDeg + "deg);}to{transform:rotate(" + (secondDeg + 360) + "deg);}}",
-            "@-moz-keyframes rotate-second{from{transform:rotate(" + secondDeg + "deg);}to{transform:rotate(" + (secondDeg + 360) + "deg);}}"
-        ].join("");
-    document.getElementById("clock-animations").innerHTML = stylesDeg;
+    var stylesDeg = [
+      "@-webkit-keyframes rotate-second{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}",
+      "@-moz-keyframes rotate-second{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}"
+    ].join("");
+    
+    ref.clockAnimation.innerHTML = stylesDeg;
   }
 }
 

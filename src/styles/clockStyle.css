@@ -3,10 +3,9 @@
   position: relative;
   width: 150px;
   height: 150px;
-  background-image: linear-gradient(#f7f7f7,#e0e0e0);
+  background-image: linear-gradient(#000000,#e0e0e0);
   border-radius: 50%;
   box-shadow: 0 10px 15px rgba(0,0,0,.15),0 2px 2px rgba(0,0,0,.2);
-
 }
 .clock-base{
   width: 150px;
@@ -24,62 +23,392 @@
   width: 2px;
   height: 10px;
   margin: 75.5px 73px;
-  background-color: rgb(73, 73, 75);
+  border-radius: 0px 0px 2.5px 2.5px;
 }
 .clock-indicator:nth-child(1) {
-  transform: rotate(30deg) translateY(-75px);
+  transform: rotate(4deg) translateY(-75.4px);
+  background-color: rgb(0, 255, 0);
 }
 .clock-indicator:nth-child(2) {
-  transform: rotate(60deg) translateY(-73px);
+  transform: rotate(8deg) translateY(-75.2px);
+  background-color: rgb(8, 255, 65);
 }
 .clock-indicator:nth-child(3) {
-  transform: rotate(90deg) translateY(-71px);
-  background-color: rgb(6, 148, 42);
+  transform: rotate(12deg) translateY(-75.2px);
+  background-color: rgb(16, 255, 65);
 }
 .clock-indicator:nth-child(4) {
-  transform: rotate(120deg) translateY(-68px);
+  transform: rotate(16deg) translateY(-75.2px);
+  background-color: rgb(24, 255, 65);
 }
 .clock-indicator:nth-child(5) {
-  transform: rotate(150deg) translateY(-66px);
+  transform: rotate(20deg) translateY(-75.2px);
+  background-color: rgb(32, 255, 65);
 }
 .clock-indicator:nth-child(6) {
-  transform: rotate(180deg) translateY(-65px);
-  background-color: rgb(21, 5, 252);
+  transform: rotate(24deg) translateY(-75.2px);
+  background-color: rgb(40, 255, 65);
 }
 .clock-indicator:nth-child(7) {
-  transform: rotate(210deg) translateY(-66px);
+  transform: rotate(28deg) translateY(-75.0px);
+  background-color: rgb(48, 255, 65);
 }
 .clock-indicator:nth-child(8) {
-  transform: rotate(240deg) translateY(-67px);
+  transform: rotate(32deg) translateY(-74.9px);
+  background-color: rgb(56, 255, 65);
 }
 .clock-indicator:nth-child(9) {
-  transform: rotate(270deg) translateY(-68.5px);
-  background-color: rgb(209, 4, 250);
+  transform: rotate(36deg) translateY(-74.8px);
+  background-color: rgb(64, 255, 65);
 }
 .clock-indicator:nth-child(10) {
-  transform: rotate(300deg) translateY(-72px);
+  transform: rotate(40deg) translateY(-74.7px);
+  background-color: rgb(72, 255, 65);
 }
 .clock-indicator:nth-child(11) {
-  transform: rotate(330deg) translateY(-74px);
+  transform: rotate(44deg) translateY(-74.6px);
+  background-color: rgb(80, 255, 65);
 }
 .clock-indicator:nth-child(12) {
-  transform: rotate(360deg) translateY(-75px);
-  background-color: #c00;
+  transform: rotate(48deg) translateY(-74.3px);
+  background-color: rgb(88, 255, 65);
+}
+.clock-indicator:nth-child(13) {
+  transform: rotate(52deg) translateY(-74.0px);
+  background-color: rgb(96, 255, 65);
+}
+.clock-indicator:nth-child(14) {
+  transform: rotate(56deg) translateY(-73.6px);
+  background-color: rgb(104, 255, 65);
+}
+.clock-indicator:nth-child(15) {
+  transform: rotate(60deg) translateY(-73.4px);
+  background-color: rgb(112, 255, 65);
+}
+.clock-indicator:nth-child(16) {
+  transform: rotate(64deg) translateY(-73.1px);
+  background-color: rgb(120, 255, 65);
+}
+.clock-indicator:nth-child(17) {
+  transform: rotate(68deg) translateY(-72.6px);
+  background-color: rgb(128, 255, 65);
+}
+.clock-indicator:nth-child(18) {
+  transform: rotate(72deg) translateY(-72.3px);
+  background-color: rgb(136, 255, 65);
+}
+.clock-indicator:nth-child(19) {
+  transform: rotate(76deg) translateY(-71.9px);
+  background-color: rgb(144, 255, 65);
+}
+.clock-indicator:nth-child(20) {
+  transform: rotate(80deg) translateY(-71.6px);
+  background-color: rgb(152, 255, 65);
+}
+.clock-indicator:nth-child(21) {
+  transform: rotate(84deg) translateY(-71.3px);
+  background-color: rgb(160, 255, 65);
+}
+.clock-indicator:nth-child(22) {
+  transform: rotate(88deg) translateY(-70.9px);
+  background-color: rgb(168, 255, 65);
+}
+.clock-indicator:nth-child(23) {
+  transform: rotate(92deg) translateY(-70.6px);
+  background-color: rgb(176, 255, 65);
+}
+.clock-indicator:nth-child(24) {
+  transform: rotate(96deg) translateY(-70.1px);
+  background-color: rgb(184, 255, 65);
+}
+.clock-indicator:nth-child(25) {
+  transform: rotate(100deg) translateY(-69.6px);
+  background-color: rgb(192, 255, 0);
+}
+.clock-indicator:nth-child(26) {
+  transform: rotate(104deg) translateY(-69.2px);
+  background-color: rgb(200, 255, 65);
+}
+.clock-indicator:nth-child(27) {
+  transform: rotate(108deg) translateY(-68.8px);
+  background-color: rgb(208, 255, 65);
+}
+.clock-indicator:nth-child(28) {
+  transform: rotate(112deg) translateY(-68.4px);
+  background-color: rgb(216, 255, 65);
+}
+.clock-indicator:nth-child(29) {
+  transform: rotate(116deg) translateY(-68.0px);
+  background-color: rgb(224, 255, 65);
+}
+.clock-indicator:nth-child(30) {
+  transform: rotate(120deg) translateY(-67.6px);
+  background-color: rgb(232, 255, 65);
+}
+.clock-indicator:nth-child(31) {
+  transform: rotate(124deg) translateY(-67.2px);
+  background-color: rgb(240, 255, 65);
+}
+.clock-indicator:nth-child(32) {
+  transform: rotate(128deg) translateY(-67.0px);
+  background-color: rgb(248, 255, 65);
+}
+.clock-indicator:nth-child(33) {
+  transform: rotate(132deg) translateY(-66.8px);
+  background-color: rgb(255, 255, 65);
+}
+.clock-indicator:nth-child(34) {
+  transform: rotate(136deg) translateY(-66.6px);
+  background-color: rgb(255, 255, 65);
+}
+.clock-indicator:nth-child(35) {  
+  transform: rotate(140deg) translateY(-66.4px);
+  background-color: rgb(255, 255, 65);
+}
+.clock-indicator:nth-child(36) {
+  transform: rotate(144deg) translateY(-66.2px);
+  background-color: rgb(255, 255, 65);
+}
+.clock-indicator:nth-child(37) {
+  transform: rotate(148deg) translateY(-66.0px);
+  background-color: rgb(255, 255, 65);
+}
+.clock-indicator:nth-child(38) {
+  transform: rotate(152deg) translateY(-65.8px);
+  background-color: rgb(255, 255, 65);
+}
+.clock-indicator:nth-child(39) {
+  transform: rotate(156deg) translateY(-65.6px);
+  background-color: rgb(255, 255, 65);
+}
+.clock-indicator:nth-child(40) {
+  transform: rotate(160deg) translateY(-65.4px);
+  background-color: rgb(255, 255, 65);
+}
+.clock-indicator:nth-child(41) {
+  transform: rotate(164deg) translateY(-65.2px);
+  background-color: rgb(255, 240, 65);
+}
+.clock-indicator:nth-child(42) {
+  transform: rotate(168deg) translateY(-65.0px);
+  background-color: rgb(255, 232, 65);
+}
+.clock-indicator:nth-child(43) {
+  transform: rotate(172deg) translateY(-64.9px);
+  background-color: rgb(255, 224, 65);
+}
+.clock-indicator:nth-child(44) {
+  transform: rotate(176deg) translateY(-64.8px);
+  background-color: rgb(255, 216, 65);
+}
+.clock-indicator:nth-child(45) {
+  transform: rotate(180deg) translateY(-64.6px);
+  background-color: rgb(255, 208, 65);
+}
+.clock-indicator:nth-child(46) {
+  transform: rotate(184deg) translateY(-64.6px);
+  background-color: rgb(255, 200, 65);
+}
+.clock-indicator:nth-child(47) {
+  transform: rotate(188deg) translateY(-64.6px);
+  background-color: rgb(255, 192, 65);
+}
+.clock-indicator:nth-child(48) {
+  transform: rotate(192deg) translateY(-64.6px);
+  background-color: rgb(255, 184, 65);
+}
+.clock-indicator:nth-child(49) {
+  transform: rotate(196deg) translateY(-64.6px);
+  background-color: rgb(255, 176, 65);
+}
+.clock-indicator:nth-child(50) {
+  transform: rotate(200deg) translateY(-64.7px);
+  background-color: rgb(255, 168, 65);
+}
+.clock-indicator:nth-child(51) {
+  transform: rotate(204deg) translateY(-64.7px);
+  background-color: rgb(255, 160, 65);
+}
+.clock-indicator:nth-child(52) {
+  transform: rotate(208deg) translateY(-64.8px);
+  background-color: rgb(255, 152, 65);
+}
+.clock-indicator:nth-child(53) {
+  transform: rotate(212deg) translateY(-64.9px);
+  background-color: rgb(255, 144, 65);
+}
+.clock-indicator:nth-child(54) {
+  transform: rotate(216deg) translateY(-65.0px);
+  background-color: rgb(255, 136, 65);
+}
+.clock-indicator:nth-child(55) {
+  transform: rotate(220deg) translateY(-65.2px);
+  background-color: rgb(255, 128, 65);
+}
+.clock-indicator:nth-child(56) {
+  transform: rotate(224deg) translateY(-65.4px);
+  background-color: rgb(255, 120, 65);
+}
+.clock-indicator:nth-child(57) {
+  transform: rotate(228deg) translateY(-65.6px);
+  background-color: rgb(255, 112, 65);
+}
+.clock-indicator:nth-child(58) {
+  transform: rotate(232deg) translateY(-65.8px);
+  background-color: rgb(255, 104, 65);
+}
+.clock-indicator:nth-child(59) {
+  transform: rotate(236deg) translateY(-66.0px);
+  background-color: rgb(255, 96, 65);
+}
+.clock-indicator:nth-child(60) {
+  transform: rotate(240deg) translateY(-66.2px);
+  background-color: rgb(255, 88, 65);
+}
+.clock-indicator:nth-child(61) {
+  transform: rotate(244deg) translateY(-66.6px);
+  background-color: rgb(255, 80, 65);
+}
+.clock-indicator:nth-child(62) {
+  transform: rotate(248deg) translateY(-66.9px);
+  background-color: rgb(255, 72, 65);
+}
+.clock-indicator:nth-child(63) {
+  transform: rotate(252deg) translateY(-67.2px);
+  background-color: rgb(255, 64, 65);
+}
+.clock-indicator:nth-child(64) {
+  transform: rotate(256deg) translateY(-67.5px);
+  background-color: rgb(255, 56, 65);
+}
+.clock-indicator:nth-child(65) {
+  transform: rotate(260deg) translateY(-67.8px);
+  background-color: rgb(255, 48, 65);
+}
+.clock-indicator:nth-child(66) {
+  transform: rotate(264deg) translateY(-68.1px);
+  background-color: rgb(255, 40, 65);
+}
+.clock-indicator:nth-child(67) {
+  transform: rotate(268deg) translateY(-68.5px);
+  background-color: rgb(255, 32, 65);
+}
+.clock-indicator:nth-child(68) {
+  transform: rotate(272deg) translateY(-68.9px);
+  background-color: rgb(255, 24, 65);
+}
+.clock-indicator:nth-child(69) {
+  transform: rotate(276deg) translateY(-69.3px);
+  background-color: rgb(255, 16, 65);
+}
+.clock-indicator:nth-child(70) {
+  transform: rotate(280deg) translateY(-69.8px);
+  background-color: rgb(255, 8, 65);
+}
+.clock-indicator:nth-child(71) {
+  transform: rotate(284deg) translateY(-70.1px);
+  background-color: rgb(255, 0, 65);
+}
+.clock-indicator:nth-child(72) {
+  transform: rotate(288deg) translateY(-70.5px);
+  background-color: rgb(255, 0, 60);
+}
+.clock-indicator:nth-child(73) {
+  transform: rotate(292deg) translateY(-70.9px);
+  background-color: rgb(255, 0, 55);
+}
+.clock-indicator:nth-child(74) {
+  transform: rotate(296deg) translateY(-71.3px);
+  background-color: rgb(255, 0, 50);
+}
+.clock-indicator:nth-child(75) {
+  transform: rotate(300deg) translateY(-71.7px);
+  background-color: rgb(255, 0, 45);
+}
+.clock-indicator:nth-child(76) {
+  transform: rotate(304deg) translateY(-72.1px);
+  background-color: rgb(255, 0, 40);
+}
+.clock-indicator:nth-child(77) {
+  transform: rotate(308deg) translateY(-72.5px);
+  background-color: rgb(255, 0, 35);
+}
+.clock-indicator:nth-child(78) {
+  transform: rotate(312deg) translateY(-72.9px);
+  background-color: rgb(255, 0, 30);
+}
+.clock-indicator:nth-child(79) {
+  transform: rotate(316deg) translateY(-73.3px);
+  background-color: rgb(255, 0, 25);
+}
+.clock-indicator:nth-child(80) {
+  transform: rotate(320deg) translateY(-73.5px);
+  background-color: rgb(255, 0, 20);
+}
+.clock-indicator:nth-child(81) {
+  transform: rotate(324deg) translateY(-73.7px);
+  background-color: rgb(255, 0, 15);
+}
+.clock-indicator:nth-child(82) {
+  transform: rotate(328deg) translateY(-73.9px);
+  background-color: rgb(255, 0, 10);
+}
+.clock-indicator:nth-child(83) {
+  transform: rotate(332deg) translateY(-74.1px);
+  background-color: rgb(255, 0, 5);
+}
+.clock-indicator:nth-child(84) {
+  transform: rotate(336deg) translateY(-74.3px);
+  background-color: rgb(255, 0, 0);
+}
+.clock-indicator:nth-child(85) {
+  transform: rotate(340deg) translateY(-74.6px);
+  background-color: rgb(255, 0, 0);
+}
+.clock-indicator:nth-child(86) {
+  transform: rotate(344deg) translateY(-74.9px);
+  background-color: rgb(255, 0, 0);
+}
+.clock-indicator:nth-child(87) {
+  transform: rotate(348deg) translateY(-75.2px);
+  background-color: rgb(255, 0, 0);
+}
+.clock-indicator:nth-child(88) {
+  transform: rotate(352deg) translateY(-75.5px);
+  background-color: rgb(255, 0, 0);
+}
+.clock-indicator:nth-child(89) {
+  transform: rotate(356deg) translateY(-75.8px);
+  background-color: rgb(255, 0, 0);
+}
+.clock-indicator:nth-child(90) {
+  transform: rotate(360deg) translateY(-76.0px);
+  background-color: rgb(255, 0, 0);
 }
 .clock-second{
-  position: absolute;
+  position: relative;
   z-index: 4;
   top: 10px;
   left: 73px;
   width: 2px;
   height: 78px;
+  border-radius: 2.5px;
   background-color: #a00;
   box-shadow: 0 0 2px rgba(0,0,0,.2);
-  transform-origin: 1px 110px;
-  transition: .5s;
-  animation: rotate-second 60s linear infinite;
-  -webkit-animation: rotate-second 60s linear infinite;
-  -moz-animation: rotate-second 60s linear infinite;
+  transform-origin: 1px 65px;
+}
+.clock-second[rotate='1'] {
+  animation: rotateSecond 120s linear;
+  -webkit-animation: rotateSecond 120s linear;
+  -moz-animation: rotateSecond 120s linear;
+}
+@keyframes rotateSecond {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 .clock-second:after{
   content: "";

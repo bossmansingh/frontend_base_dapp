@@ -5,7 +5,8 @@ const initialState = {
   errorMsg: "",
   showInfoDialog: false,
   showJoinGameDialog: false,
-  gameCode: ""
+  gameCode: "",
+  gameStarted: false,
 };
 
 const dataReducer = (state = initialState, action) => {

@@ -62,7 +62,7 @@ export const Container = styled.div`
 `;
 
 export const ClockContainer = styled.div`
-  
+  rotateSecond: ${({ ra }) => (ra ? ra : 0)}
 `;
 
 export const TextPageTitle = styled.p`
