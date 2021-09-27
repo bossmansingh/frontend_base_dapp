@@ -30,95 +30,95 @@
 }
 .clock-indicator:nth-child(2) {
   transform: rotate(8deg) translateY(-75.2px);
-  background-color: rgb(8, 255, 65);
+  background-color: rgb(8, 255, 0);
 }
 .clock-indicator:nth-child(3) {
   transform: rotate(12deg) translateY(-75.2px);
-  background-color: rgb(16, 255, 65);
+  background-color: rgb(16, 255, 0);
 }
 .clock-indicator:nth-child(4) {
   transform: rotate(16deg) translateY(-75.2px);
-  background-color: rgb(24, 255, 65);
+  background-color: rgb(24, 255, 0);
 }
 .clock-indicator:nth-child(5) {
   transform: rotate(20deg) translateY(-75.2px);
-  background-color: rgb(32, 255, 65);
+  background-color: rgb(32, 255, 0);
 }
 .clock-indicator:nth-child(6) {
   transform: rotate(24deg) translateY(-75.2px);
-  background-color: rgb(40, 255, 65);
+  background-color: rgb(40, 255, 0);
 }
 .clock-indicator:nth-child(7) {
   transform: rotate(28deg) translateY(-75.0px);
-  background-color: rgb(48, 255, 65);
+  background-color: rgb(48, 255, 0);
 }
 .clock-indicator:nth-child(8) {
   transform: rotate(32deg) translateY(-74.9px);
-  background-color: rgb(56, 255, 65);
+  background-color: rgb(56, 255, 0);
 }
 .clock-indicator:nth-child(9) {
   transform: rotate(36deg) translateY(-74.8px);
-  background-color: rgb(64, 255, 65);
+  background-color: rgb(64, 255, 0);
 }
 .clock-indicator:nth-child(10) {
   transform: rotate(40deg) translateY(-74.7px);
-  background-color: rgb(72, 255, 65);
+  background-color: rgb(72, 255, 0);
 }
 .clock-indicator:nth-child(11) {
   transform: rotate(44deg) translateY(-74.6px);
-  background-color: rgb(80, 255, 65);
+  background-color: rgb(80, 255, 0);
 }
 .clock-indicator:nth-child(12) {
   transform: rotate(48deg) translateY(-74.3px);
-  background-color: rgb(88, 255, 65);
+  background-color: rgb(88, 255, 0);
 }
 .clock-indicator:nth-child(13) {
   transform: rotate(52deg) translateY(-74.0px);
-  background-color: rgb(96, 255, 65);
+  background-color: rgb(96, 255, 0);
 }
 .clock-indicator:nth-child(14) {
   transform: rotate(56deg) translateY(-73.6px);
-  background-color: rgb(104, 255, 65);
+  background-color: rgb(104, 255, 0);
 }
 .clock-indicator:nth-child(15) {
   transform: rotate(60deg) translateY(-73.4px);
-  background-color: rgb(112, 255, 65);
+  background-color: rgb(112, 255, 0);
 }
 .clock-indicator:nth-child(16) {
   transform: rotate(64deg) translateY(-73.1px);
-  background-color: rgb(120, 255, 65);
+  background-color: rgb(120, 255, 0);
 }
 .clock-indicator:nth-child(17) {
   transform: rotate(68deg) translateY(-72.6px);
-  background-color: rgb(128, 255, 65);
+  background-color: rgb(128, 255, 0);
 }
 .clock-indicator:nth-child(18) {
   transform: rotate(72deg) translateY(-72.3px);
-  background-color: rgb(136, 255, 65);
+  background-color: rgb(136, 255, 0);
 }
 .clock-indicator:nth-child(19) {
   transform: rotate(76deg) translateY(-71.9px);
-  background-color: rgb(144, 255, 65);
+  background-color: rgb(144, 255, 0);
 }
 .clock-indicator:nth-child(20) {
   transform: rotate(80deg) translateY(-71.6px);
-  background-color: rgb(152, 255, 65);
+  background-color: rgb(152, 255, 0);
 }
 .clock-indicator:nth-child(21) {
   transform: rotate(84deg) translateY(-71.3px);
-  background-color: rgb(160, 255, 65);
+  background-color: rgb(160, 255, 0);
 }
 .clock-indicator:nth-child(22) {
   transform: rotate(88deg) translateY(-70.9px);
-  background-color: rgb(168, 255, 65);
+  background-color: rgb(168, 255, 0);
 }
 .clock-indicator:nth-child(23) {
   transform: rotate(92deg) translateY(-70.6px);
-  background-color: rgb(176, 255, 65);
+  background-color: rgb(176, 255, 0);
 }
 .clock-indicator:nth-child(24) {
   transform: rotate(96deg) translateY(-70.1px);
-  background-color: rgb(184, 255, 65);
+  background-color: rgb(184, 255, 0);
 }
 .clock-indicator:nth-child(25) {
   transform: rotate(100deg) translateY(-69.6px);
@@ -126,187 +126,187 @@
 }
 .clock-indicator:nth-child(26) {
   transform: rotate(104deg) translateY(-69.2px);
-  background-color: rgb(200, 255, 65);
+  background-color: rgb(200, 255, 0);
 }
 .clock-indicator:nth-child(27) {
   transform: rotate(108deg) translateY(-68.8px);
-  background-color: rgb(208, 255, 65);
+  background-color: rgb(208, 255, 0);
 }
 .clock-indicator:nth-child(28) {
   transform: rotate(112deg) translateY(-68.4px);
-  background-color: rgb(216, 255, 65);
+  background-color: rgb(216, 255, 0);
 }
 .clock-indicator:nth-child(29) {
   transform: rotate(116deg) translateY(-68.0px);
-  background-color: rgb(224, 255, 65);
+  background-color: rgb(224, 255, 0);
 }
 .clock-indicator:nth-child(30) {
   transform: rotate(120deg) translateY(-67.6px);
-  background-color: rgb(232, 255, 65);
+  background-color: rgb(232, 255, 0);
 }
 .clock-indicator:nth-child(31) {
   transform: rotate(124deg) translateY(-67.2px);
-  background-color: rgb(240, 255, 65);
+  background-color: rgb(240, 255, 0);
 }
 .clock-indicator:nth-child(32) {
   transform: rotate(128deg) translateY(-67.0px);
-  background-color: rgb(248, 255, 65);
+  background-color: rgb(248, 255, 0);
 }
 .clock-indicator:nth-child(33) {
   transform: rotate(132deg) translateY(-66.8px);
-  background-color: rgb(255, 255, 65);
+  background-color: rgb(255, 255, 0);
 }
 .clock-indicator:nth-child(34) {
   transform: rotate(136deg) translateY(-66.6px);
-  background-color: rgb(255, 255, 65);
+  background-color: rgb(255, 255, 0);
 }
 .clock-indicator:nth-child(35) {  
   transform: rotate(140deg) translateY(-66.4px);
-  background-color: rgb(255, 255, 65);
+  background-color: rgb(255, 255, 0);
 }
 .clock-indicator:nth-child(36) {
   transform: rotate(144deg) translateY(-66.2px);
-  background-color: rgb(255, 255, 65);
+  background-color: rgb(255, 255, 0);
 }
 .clock-indicator:nth-child(37) {
   transform: rotate(148deg) translateY(-66.0px);
-  background-color: rgb(255, 255, 65);
+  background-color: rgb(255, 255, 0);
 }
 .clock-indicator:nth-child(38) {
   transform: rotate(152deg) translateY(-65.8px);
-  background-color: rgb(255, 255, 65);
+  background-color: rgb(255, 255, 0);
 }
 .clock-indicator:nth-child(39) {
   transform: rotate(156deg) translateY(-65.6px);
-  background-color: rgb(255, 255, 65);
+  background-color: rgb(255, 255, 0);
 }
 .clock-indicator:nth-child(40) {
   transform: rotate(160deg) translateY(-65.4px);
-  background-color: rgb(255, 255, 65);
+  background-color: rgb(255, 255, 0);
 }
 .clock-indicator:nth-child(41) {
   transform: rotate(164deg) translateY(-65.2px);
-  background-color: rgb(255, 240, 65);
+  background-color: rgb(255, 240, 0);
 }
 .clock-indicator:nth-child(42) {
   transform: rotate(168deg) translateY(-65.0px);
-  background-color: rgb(255, 232, 65);
+  background-color: rgb(255, 232, 0);
 }
 .clock-indicator:nth-child(43) {
   transform: rotate(172deg) translateY(-64.9px);
-  background-color: rgb(255, 224, 65);
+  background-color: rgb(255, 224, 0);
 }
 .clock-indicator:nth-child(44) {
   transform: rotate(176deg) translateY(-64.8px);
-  background-color: rgb(255, 216, 65);
+  background-color: rgb(255, 216, 0);
 }
 .clock-indicator:nth-child(45) {
-  transform: rotate(180deg) translateY(-64.6px);
-  background-color: rgb(255, 208, 65);
+  transform: rotate(180deg) translateY(-64.4px);
+  background-color: rgb(255, 208, 0);
 }
 .clock-indicator:nth-child(46) {
   transform: rotate(184deg) translateY(-64.6px);
-  background-color: rgb(255, 200, 65);
+  background-color: rgb(255, 200, 0);
 }
 .clock-indicator:nth-child(47) {
   transform: rotate(188deg) translateY(-64.6px);
-  background-color: rgb(255, 192, 65);
+  background-color: rgb(255, 192, 0);
 }
 .clock-indicator:nth-child(48) {
   transform: rotate(192deg) translateY(-64.6px);
-  background-color: rgb(255, 184, 65);
+  background-color: rgb(255, 184, 0);
 }
 .clock-indicator:nth-child(49) {
   transform: rotate(196deg) translateY(-64.6px);
-  background-color: rgb(255, 176, 65);
+  background-color: rgb(255, 176, 0);
 }
 .clock-indicator:nth-child(50) {
   transform: rotate(200deg) translateY(-64.7px);
-  background-color: rgb(255, 168, 65);
+  background-color: rgb(255, 168, 0);
 }
 .clock-indicator:nth-child(51) {
   transform: rotate(204deg) translateY(-64.7px);
-  background-color: rgb(255, 160, 65);
+  background-color: rgb(255, 160, 0);
 }
 .clock-indicator:nth-child(52) {
   transform: rotate(208deg) translateY(-64.8px);
-  background-color: rgb(255, 152, 65);
+  background-color: rgb(255, 152, 0);
 }
 .clock-indicator:nth-child(53) {
   transform: rotate(212deg) translateY(-64.9px);
-  background-color: rgb(255, 144, 65);
+  background-color: rgb(255, 144, 0);
 }
 .clock-indicator:nth-child(54) {
   transform: rotate(216deg) translateY(-65.0px);
-  background-color: rgb(255, 136, 65);
+  background-color: rgb(255, 136, 0);
 }
 .clock-indicator:nth-child(55) {
   transform: rotate(220deg) translateY(-65.2px);
-  background-color: rgb(255, 128, 65);
+  background-color: rgb(255, 128, 0);
 }
 .clock-indicator:nth-child(56) {
   transform: rotate(224deg) translateY(-65.4px);
-  background-color: rgb(255, 120, 65);
+  background-color: rgb(255, 120, 0);
 }
 .clock-indicator:nth-child(57) {
   transform: rotate(228deg) translateY(-65.6px);
-  background-color: rgb(255, 112, 65);
+  background-color: rgb(255, 112, 0);
 }
 .clock-indicator:nth-child(58) {
   transform: rotate(232deg) translateY(-65.8px);
-  background-color: rgb(255, 104, 65);
+  background-color: rgb(255, 104, 0);
 }
 .clock-indicator:nth-child(59) {
   transform: rotate(236deg) translateY(-66.0px);
-  background-color: rgb(255, 96, 65);
+  background-color: rgb(255, 96, 0);
 }
 .clock-indicator:nth-child(60) {
   transform: rotate(240deg) translateY(-66.2px);
-  background-color: rgb(255, 88, 65);
+  background-color: rgb(255, 88, 0);
 }
 .clock-indicator:nth-child(61) {
   transform: rotate(244deg) translateY(-66.6px);
-  background-color: rgb(255, 80, 65);
+  background-color: rgb(255, 80, 0);
 }
 .clock-indicator:nth-child(62) {
   transform: rotate(248deg) translateY(-66.9px);
-  background-color: rgb(255, 72, 65);
+  background-color: rgb(255, 72, 0);
 }
 .clock-indicator:nth-child(63) {
   transform: rotate(252deg) translateY(-67.2px);
-  background-color: rgb(255, 64, 65);
+  background-color: rgb(255, 64, 0);
 }
 .clock-indicator:nth-child(64) {
   transform: rotate(256deg) translateY(-67.5px);
-  background-color: rgb(255, 56, 65);
+  background-color: rgb(255, 56, 0);
 }
 .clock-indicator:nth-child(65) {
   transform: rotate(260deg) translateY(-67.8px);
-  background-color: rgb(255, 48, 65);
+  background-color: rgb(255, 48, 0);
 }
 .clock-indicator:nth-child(66) {
   transform: rotate(264deg) translateY(-68.1px);
-  background-color: rgb(255, 40, 65);
+  background-color: rgb(255, 40, 0);
 }
 .clock-indicator:nth-child(67) {
   transform: rotate(268deg) translateY(-68.5px);
-  background-color: rgb(255, 32, 65);
+  background-color: rgb(255, 32, 0);
 }
 .clock-indicator:nth-child(68) {
   transform: rotate(272deg) translateY(-68.9px);
-  background-color: rgb(255, 24, 65);
+  background-color: rgb(255, 24, 0);
 }
 .clock-indicator:nth-child(69) {
   transform: rotate(276deg) translateY(-69.3px);
-  background-color: rgb(255, 16, 65);
+  background-color: rgb(255, 16, 0);
 }
 .clock-indicator:nth-child(70) {
   transform: rotate(280deg) translateY(-69.8px);
-  background-color: rgb(255, 8, 65);
+  background-color: rgb(255, 8, 0);
 }
 .clock-indicator:nth-child(71) {
   transform: rotate(284deg) translateY(-70.1px);
-  background-color: rgb(255, 0, 65);
+  background-color: rgb(255, 0, 0);
 }
 .clock-indicator:nth-child(72) {
   transform: rotate(288deg) translateY(-70.5px);
