@@ -69,6 +69,9 @@ function App() {
   console.log("gameConnected: " + gameConnected);
   console.log("gameStarted: " + gameStarted);
 
+  const [player, _setPlayer] = useState(true);
+  const [opponent, _setOpponent] = useState(false);
+
   const showInformationDialog = () => {
     dispatch(toggleInfoDialog(true));
   };
@@ -409,8 +412,6 @@ function App() {
 
   function renderGameBoard() {
     const gameStarted = data.gameStarted;
-    const playerTurn = false;
-    const opponentTurn = true;
     return(
       <s.Container
         fd={"row"}
@@ -423,9 +424,9 @@ function App() {
         <s.Container
           ai={"center"}
           jd={"center"}
-          style={{opacity: playerTurn ? "1" : "0.25"}}
+          style={{opacity: player ? "1" : "0.25"}}
         >
-          {addClock(playerTurn)}
+          {addClock(player)}
           <s.SpacerMedium/>
           <s.TextSubTitle
             style={{
@@ -438,9 +439,9 @@ function App() {
         <s.Container
           ai={"center"}
           jd={"center"}
-          style={{opacity: opponentTurn ? "1" : "0.25"}}
+          style={{opacity: opponent ? "1" : "0.25"}}
         >
-          {addClock(opponentTurn)}
+          {addClock(opponent)}
           <s.SpacerMedium/>
           <s.TextSubTitle
             style={{
@@ -464,11 +465,16 @@ function App() {
           <s.ClockContainer className="clock-dial">
             {clockIndicators}
           </s.ClockContainer>
-          <s.ClockContainer className="clock-second" rotate={isEnabled ? 1 : 0}/>
+          <s.ClockContainer className="clock-second" rotate={isEnabled ? 1 : 0} onAnimationEnd={() => togglePlayerState()} />
           <s.ClockContainer className="clock-center"/>
         </s.ClockContainer>
       </s.ClockContainer>
     );
+  }
+
+  function togglePlayerState() {
+    _setPlayer(!player);
+    _setOpponent(!opponent);
   }
 }
 
