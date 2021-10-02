@@ -18,7 +18,7 @@ contract GameContract is BaseContract {
     using Address for address;
     
     event GameCreated(address indexed challengerAddress, uint gameId);
-    event GameJoined(address indexed challengeAcceptorAddress, uint gameId);
+    event GameJoined(address indexed challengerAddress, address indexed challengeAcceptorAddress, uint gameId);
     event GameEnd(address indexed winnerAddress, uint gameId);
     event NFTCreated(address indexed winnerAddress, uint gameId, bool isRare);
     
@@ -117,11 +117,14 @@ contract GameContract is BaseContract {
         bool gameExists = challengerAddress != Helpers.nullAddress();
         // Check and verify if a game with specified ID  already exists.
         require(!gameExists, "A game with specified ID already exists");
+        // Check and verify if a challenger address does not already exists.
+        bool challengerExists = challengerAddress != Helpers.nullAddress();
+        require(!challengerExists, "Challenger address already exists");
         // Check and verify if a value equal to or greater than `_baseGameFee` was sent along with the transaction.
         require(msg.value >= _baseGameFee, "Sent value should be equal to game fee");
         bool challengeAcceptorExists = _playersMap[challengerAddress] != Helpers.nullAddress();
         // Check and verify if the challenge acceptor address exist
-        require(!challengeAcceptorExists, "Challenge acceptor address is already set");
+        require(!challengeAcceptorExists, "Challenge acceptor address already exists");
         bool winnerExists = _winnersMap[currentCounter] != Helpers.nullAddress();
         // Check and verify if the winner address is not set.
         require(!winnerExists, "Winner address cannot be set before the game starts");
@@ -143,12 +146,15 @@ contract GameContract is BaseContract {
         bool gameExists = challengerAddress != Helpers.nullAddress();
         // Check and verify if a game with specified ID  already exists.
         require(gameExists, "A game with specified ID does not exist");
+        // Check and verify if a challenger address exists.
+        bool challengerExists = challengerAddress != Helpers.nullAddress();
+        require(challengerExists, "Challenger address does not exists");
         // Check and verify if a value equal to or greater than `_baseGameFee` was sent along with the transaction.
         require(msg.value >= _baseGameFee, "Sent value should be equal to game fee");
         address challengeAcceptorAddress = _playersMap[challengerAddress];
         bool challengeAcceptorExists = challengeAcceptorAddress != Helpers.nullAddress();
         // Check and verify if the challenge acceptor address exist
-        require(!challengeAcceptorExists, "Challenge acceptor address is already set");
+        require(!challengeAcceptorExists, "Challenge acceptor address already exists");
         // Check and verify if both player address are unique
         require(challengerAddress != msg.sender, "Both player address should be unique");
         bool winnerExists = _winnersMap[gameId] != Helpers.nullAddress();
@@ -159,7 +165,7 @@ contract GameContract is BaseContract {
         // Safe increase allowance for this contract to spend `msg.value` after the game is finished
         SafeERC20.safeIncreaseAllowance(_token, address(this), msg.value);
         // Emit game joined event
-        emit GameJoined(msg.sender, gameId);
+        emit GameJoined(challengerAddress, msg.sender, gameId);
     }
     
     /**

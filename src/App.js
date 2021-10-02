@@ -71,9 +71,23 @@ function App() {
   console.log("App() | contractFetched: " + contractFetched);
   console.log("App() | gameConnected: " + gameConnected);
   console.log("App() | gameStarted: " + gameStarted);
+  console.log("App() | challenger: " + data.challenger);
+  console.log("App() | challengAcceptor: " + data.challengAcceptor);
 
-  const [player, _setPlayer] = useState(true);
+  const [player, _setPlayer] = useState(false);
   const [opponent, _setOpponent] = useState(false);
+
+  if (data.challenger != null && data.challenger !== "" && data.challenger.toLowerCase() == address.toLowerCase() && !player) {
+    console.log("App() | challenger equal: " + data.challenger.toLowerCase() == address.toLowerCase());
+    console.log("App() | set player");
+    _setPlayer(true);
+    _setOpponent(false);
+  } else if (data.challengAcceptor != null && data.challengAcceptor !== "" && data.challengAcceptor.toLowerCase() == address.toLowerCase() && !opponent) {
+    console.log("App() | challengAcceptor equal: " + data.challengAcceptor.toLowerCase() == address.toLowerCase());
+    console.log("App() | set opponent");
+    _setPlayer(false);
+    _setOpponent(true);
+  }
 
   const showInformationDialog = () => {
     dispatch(toggleInfoDialog(true));
@@ -180,12 +194,12 @@ function App() {
         <s.Container ai={"center"} jc={"center"} fd={"row"}>
           <s.StyledButton style={{width:"130px", height:"40px"}}
             onClick={(e) => {
+              e.preventDefault();
               if (gameConnected) {
                 dispatch(createGame(address));
               } else {
-                dispatch(connectWallet({createGameRequest: true}));
+                dispatch(connectWallet(true, false, ""));
               }
-              e.preventDefault();
             }}>Create Game</s.StyledButton>
           <s.SpacerMedium />
           <s.StyledButton style={{width:"130px", height:"40px"}}
@@ -413,7 +427,7 @@ function App() {
                   if (gameConnected) {
                     dispatch(joinGame(address, gameCode));
                   } else {
-                    dispatch(connectWallet({joinGameRequest: true, gameId: gameCode}));
+                    dispatch(connectWallet(false, true, gameCode));
                   }
                   e.preventDefault();
                 }}
@@ -496,7 +510,9 @@ function App() {
           <s.ClockContainer className="clock-dial">
             {clockIndicators}
           </s.ClockContainer>
-          <s.ClockContainer className="clock-second" rotate={isEnabled ? 1 : 0} onAnimationEnd={() => togglePlayerState()} />
+          <s.ClockContainer className="clock-second" rotate={isEnabled ? 1 : 0} 
+            onAnimationEnd={() => togglePlayerState()} 
+          />
           <s.ClockContainer className="clock-center"/>
         </s.ClockContainer>
       </s.ClockContainer>

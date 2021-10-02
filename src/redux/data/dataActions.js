@@ -21,9 +21,16 @@ const fetchDataFailed = (payload) => {
   };
 };
 
-const initNewGame = (payload) => {
+const createNewGame = (payload) => {
   return {
-    type: "INIT_NEW_GAME",
+    type: "CREATE_GAME",
+    payload: payload
+  };
+};
+
+const joinNewGame = (payload) => {
+  return {
+    type: "JOIN_GAME",
     payload: payload
   };
 };
@@ -58,9 +65,13 @@ export const createGame = (address) => {
               dispatch(fetchDataFailed("Error creating a new game"));
             }).then((receipt) => {
               console.log("Game Create Success", receipt);
+              const challengerAddress = receipt.events["GameCreated"]["returnValues"]["challengerAddress"];
               const gameId = receipt.events["GameCreated"]["returnValues"]["gameId"];
               console.log("GameId: ", gameId);
-              dispatch(initNewGame(gameId));
+              dispatch(createNewGame({
+                gameId: gameId,
+                challenger: challengerAddress,
+              }));
             });
     } catch (err) {
       console.log(err);
@@ -86,7 +97,17 @@ export const joinGame = (address, gameId) => {
             dispatch(fetchDataFailed("Error joining game with gameId: " + gameId));
           }).then((receipt) => {
             console.log("Game Joined Success", receipt);
-            //dispatch(gameJoined(""));
+            const challengerAddress = receipt.events["GameJoined"]["returnValues"]["challengerAddress"];
+            const challengeAcceptorAddress = receipt.events["GameJoined"]["returnValues"]["challengeAcceptorAddress"];
+            const joinedGameId = receipt.events["GameJoined"]["returnValues"]["gameId"];
+            console.log("challengerAddress: ", challengerAddress);
+            console.log("challengeAcceptorAddress: ", challengeAcceptorAddress);
+            console.log("joinedGameId: ", joinedGameId);
+            dispatch(joinNewGame({
+              gameId: joinedGameId,
+              challenger: challengerAddress,
+              challengAcceptor: challengeAcceptorAddress
+            }));
           });
     } catch (err) {
       console.log(err);

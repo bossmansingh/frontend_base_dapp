@@ -7,6 +7,8 @@ const initialState = {
   showJoinGameDialog: false,
   gameCode: "",
   gameStarted: false,
+  challenger: "",
+  challengAcceptor: ""
 };
 
 const dataReducer = (state = initialState, action) => {
@@ -40,10 +42,18 @@ const dataReducer = (state = initialState, action) => {
         ...initialState,
         showJoinGameDialog: action.payload
       };
-    case "INIT_NEW_GAME":
+    case "CREATE_GAME":
       return {
         ...state,
-        gameCode: action.payload
+        gameCode: action.payload.gameId,
+        challenger: action.payload.challenger
+      };
+    case "JOIN_GAME":
+      return {
+        ...state,
+        gameCode: action.payload.gameId,
+        challenger: action.payload.challenger,
+        challengAcceptor: action.payload.challengAcceptor
       };
     default:
       return state;

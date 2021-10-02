@@ -34,6 +34,32 @@ async function isMetaMaskInstalled() {
   return await Moralis.isMetaMaskInstalled;
 }
 
+function addEventListener(dispatch) {
+  // Add listeners start
+  Moralis.onAccountsChanged(async (accounts) => {
+    const newAddress = accounts[0];
+    console.log("NewAddress: " + newAddress);
+    try {
+      await Moralis.link(newAddress);
+    } catch (err) {
+      console.log(err);
+      // dispatch(
+      //   connectFailed("Error linking account")
+      // );
+    }
+    dispatch(
+      connectSuccess({
+        address: newAddress,
+        identiconUrl: getIdenticonUrl(newAddress),
+      })
+    );
+  });
+  Moralis.onChainChanged(() => {
+    console.log("Chain changed");
+    window.location.reload();
+  });
+}
+
 const getIdenticonUrl = (address) => {
   console.log("Get identicon for address: " + address);
   return blockies.create({
@@ -97,30 +123,8 @@ export const connectWallet = (createGameRequest, joinGameRequest, gameId) => {
         const userAccount = await Moralis.Web3.authenticate({signingMessage: "Sign into CHKMATE"});
         if (userAccount != null) {
           const address = userAccount.get("ethAddress");
+          addEventListener(dispatch);
           dispatch(connectGameAndListener(address, createGameRequest, joinGameRequest, gameId));
-          // Add listeners start
-          Moralis.onAccountsChanged(async (accounts) => {
-            const newAddress = accounts[0];
-            console.log("NewAddress: " + newAddress);
-            try {
-              await Moralis.link(newAddress);
-              dispatch(
-                connectSuccess({
-                  address: newAddress,
-                  identiconUrl: getIdenticonUrl(newAddress),
-                })
-              );
-            } catch (err) {
-              console.log(err);
-              dispatch(
-                connectFailed("Error linking account")
-              );
-            }
-          });
-          Moralis.onChainChanged(() => {
-            console.log("Chain changed");
-            window.location.reload();
-          });
         }
       } catch (err) {
         dispatch(connectFailed("Something went wrong."));
@@ -159,6 +163,7 @@ export const fetchCachedAccount = () => {
         const address = userAccount.get("ethAddress");
         if (address != null && address !== "") {
           console.log("Init Account Address: " + address);
+          addEventListener(dispatch);
           dispatch(connectGameAndListener(address, false, false, ""));
         }
       }
