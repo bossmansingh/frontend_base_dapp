@@ -1,12 +1,12 @@
 import React, { useEffect, useState, useRef } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { connect, useDispatch, useSelector } from "react-redux";
 
 import Dialog from "@material-ui/core/Dialog";
 import DialogContent from "@material-ui/core/DialogContent";
 
 import Chessboard from "chessboardjsx";
 
-import { connectWallet, initAccount, logout } from "./redux/blockchain/blockchainActions";
+import { connectWallet, fetchCachedAccount, logout } from "./redux/blockchain/blockchainActions";
 import { fetchData, createGame, joinGame, toggleInfoDialog, toggleJoinGameDialog } from "./redux/data/dataActions";
 import * as s from "./styles/globalStyles";
 import "./styles/clockStyle.css";
@@ -106,7 +106,7 @@ function App() {
 
   // Init account from cache
   if (!walletConnected) {
-    dispatch(initAccount());
+    dispatch(fetchCachedAccount());
   }
   return (
     <s.Screen>
@@ -182,6 +182,8 @@ function App() {
             onClick={(e) => {
               if (gameConnected) {
                 dispatch(createGame(address));
+              } else {
+                dispatch(connectWallet({createGameRequest: true}));
               }
               e.preventDefault();
             }}>Create Game</s.StyledButton>
@@ -196,9 +198,9 @@ function App() {
           </s.StyledButton>
         </s.Container>
         <s.SpacerMedium />
-        <s.TextDescription>{blockchain.errorMsg}</s.TextDescription>
-        {/* {blockchain.errorMsg !== "" ? (
-        ) : null} */}
+        {blockchain.errorMsg !== "" ? (
+          <s.TextDescription>{blockchain.errorMsg}</s.TextDescription>
+        ) : null}
         <s.SpacerMedium />
         {setChessboard(false)}
       </s.Container>
@@ -408,7 +410,11 @@ function App() {
                   width: "200px"
                 }} 
                 onClick={(e) => {
-                  dispatch(joinGame(address, gameCode));
+                  if (gameConnected) {
+                    dispatch(joinGame(address, gameCode));
+                  } else {
+                    dispatch(connectWallet({joinGameRequest: true, gameId: gameCode}));
+                  }
                   e.preventDefault();
                 }}
               >
@@ -481,7 +487,8 @@ function App() {
   function addClock(isEnabled) {
     const clockIndicators = []
     for (let i = 0; i < 90; i++) {
-      clockIndicators[i] = <s.ClockContainer className="clock-indicator"/>
+      const key = "clock-indicator-"+i;
+      clockIndicators[i] = <s.ClockContainer key={key} className="clock-indicator"/>
     }
     return(
       <s.ClockContainer className="clock-wrapper">
