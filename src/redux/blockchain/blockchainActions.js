@@ -45,10 +45,11 @@ const getIdenticonUrl = (address) => {
 
 const connectGameAndListener = (account) => {
   return async (dispatch) => {
-    const web3 = await Moralis.enable();
     const address = account.get("ethAddress");
     console.log("ConnectGameAndListener: " + address);
     const identiconUrl = getIdenticonUrl(address);
+    // Init Contract
+    const web3 = await Moralis.enable();
     const networkId = await window.ethereum.request({
       method: "net_version",
     });
@@ -68,6 +69,13 @@ const connectGameAndListener = (account) => {
       );
     } else {
       dispatch(connectFailed("Change network to CHKMATE."));
+      dispatch(
+        connectSuccess({
+          address: address,
+          identiconUrl: identiconUrl,
+          web3: web3,
+        })
+      );
     }
   };
 };
@@ -100,8 +108,8 @@ export const connectWallet = () => {
             }
           });
           Moralis.onChainChanged(() => {
-            //window.location.reload();
             console.log("Chain changed");
+            window.location.reload();
           });
         }
       } catch (err) {
@@ -109,6 +117,22 @@ export const connectWallet = () => {
       }
     } else {
       dispatch(connectFailed("Install Metamask."));
+    }
+  };
+};
+
+export const logout = () => {
+  return async (dispatch) => {
+    try {
+      await Moralis.User.logOut();
+      dispatch(
+        connectSuccess({
+          address: "",
+          identiconUrl: ""
+        })
+      );
+    } catch (err) {
+      console.log(err);
     }
   };
 };

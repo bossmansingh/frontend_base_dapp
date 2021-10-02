@@ -6,7 +6,7 @@ import DialogContent from "@material-ui/core/DialogContent";
 
 import Chessboard from "chessboardjsx";
 
-import { connectWallet, initAccount } from "./redux/blockchain/blockchainActions";
+import { connectWallet, initAccount, logout } from "./redux/blockchain/blockchainActions";
 import { fetchData, createGame, joinGame, toggleInfoDialog, toggleJoinGameDialog } from "./redux/data/dataActions";
 import * as s from "./styles/globalStyles";
 import "./styles/clockStyle.css";
@@ -105,7 +105,7 @@ function App() {
   }, [address, gameConnected, dispatch]);
 
   // Init account from cache
-  if (!gameConnected) {
+  if (!walletConnected) {
     dispatch(initAccount());
   }
   return (
@@ -155,12 +155,16 @@ function App() {
           { walletConnected && blockchain.identiconUrl != null ? (
             <s.Identicon 
               alt="identicon" 
-              src={(blockchain.identiconUrl != null ? blockchain.identiconUrl : logo)} />
+              src={(blockchain.identiconUrl != null ? blockchain.identiconUrl : logo)}
+              onClick={(e) => {
+                e.preventDefault();
+                dispatch(logout());
+              }} />
           ) : (
             <s.StyledButton
               onClick={(e) => {
-                dispatch(connectWallet());
                 e.preventDefault();
+                dispatch(connectWallet());
               } 
             }>
               CONNECT

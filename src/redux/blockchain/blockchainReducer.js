@@ -16,7 +16,7 @@ const blockchainReducer = (state = initialState, action) => {
       };
     case "CONNECTION_SUCCESS":
       return {
-        ...initialState,
+        ...state,
         loading: false,
         address: action.payload.address,
         identiconUrl: action.payload.identiconUrl,
@@ -25,7 +25,7 @@ const blockchainReducer = (state = initialState, action) => {
       };
     case "CONNECTION_FAILED":
       return {
-        ...initialState,
+        ...state,
         loading: false,
         errorMsg: action.payload,
       };
