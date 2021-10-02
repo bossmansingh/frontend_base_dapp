@@ -20,6 +20,7 @@ const dataReducer = (state = initialState, action) => {
       return {
         ...initialState,
         loading: false,
+        showAccountChangeAlert: false,
         accountBalance: action.payload.address,
       };
     case "CHECK_DATA_FAILED":

@@ -6,7 +6,7 @@ import DialogContent from "@material-ui/core/DialogContent";
 
 import Chessboard from "chessboardjsx";
 
-import { connect, initAccount } from "./redux/blockchain/blockchainActions";
+import { connectWallet, initAccount } from "./redux/blockchain/blockchainActions";
 import { fetchData, createGame, joinGame, toggleInfoDialog, toggleJoinGameDialog } from "./redux/data/dataActions";
 import * as s from "./styles/globalStyles";
 import "./styles/clockStyle.css";
@@ -53,20 +53,24 @@ function getRandomNumber(min, max) {
 }
 
 function App() {
-  //const ref = useRef();
+  //
+  
+  const ref = useRef();
   const dispatch = useDispatch();
   const blockchain = useSelector((state) => state.blockchain);
   const data = useSelector((state) => state.data);
   const address = blockchain.address;
   const contract = blockchain.gameContract;
-  const walletConnected = address !== null && address !== "";
+  const walletConnected = address != null && address !== "";
   const contractFetched = contract != null;
-  const gameConnected = walletConnected && contractFetched !== null;
-  const gameStarted = data.gameCode !== null && data.gameCode !== "";
-  console.log("walletConnected: " + walletConnected);
-  console.log("contractFetched: " + contractFetched);
-  console.log("gameConnected: " + gameConnected);
-  console.log("gameStarted: " + gameStarted);
+  const gameConnected = walletConnected && contractFetched;
+  const gameStarted = data.gameCode != null && data.gameCode !== "";
+
+  console.log("App() | Address: " + address);
+  console.log("App() | walletConnected: " + walletConnected);
+  console.log("App() | contractFetched: " + contractFetched);
+  console.log("App() | gameConnected: " + gameConnected);
+  console.log("App() | gameStarted: " + gameStarted);
 
   const [player, _setPlayer] = useState(true);
   const [opponent, _setOpponent] = useState(false);
@@ -114,7 +118,7 @@ function App() {
       */}
       {renderHelpPopup()}
       {renderJoinGamePopup()}
-      {!gameStarted ? renderGameBoard() : renderWelcomePage()}
+      {gameStarted ? renderGameBoard() : renderWelcomePage()}
     </s.Screen>
   );
 
@@ -155,7 +159,7 @@ function App() {
           ) : (
             <s.StyledButton
               onClick={(e) => {
-                dispatch(connect());
+                dispatch(connectWallet());
                 e.preventDefault();
               } 
             }>
@@ -168,7 +172,7 @@ function App() {
 
   function renderWelcomePage() {
     return (
-      <s.Container ai={"center"} jc={"center"} style={{paddingTop: "50px"}}>
+      <s.Container ai={"center"} jc={"center"} style={{padding: "50px"}}>
         <s.Container ai={"center"} jc={"center"} fd={"row"}>
           <s.StyledButton style={{width:"130px", height:"40px"}}
             onClick={(e) => {
@@ -203,7 +207,24 @@ function App() {
         position="start" 
         draggable={isEnable}
         lightSquareStyle={{ backgroundColor: `rgb(${lightSquareColor})` }}
-        darkSquareStyle={{ backgroundColor: `rgb(${darkSquareColor})` }} />
+        darkSquareStyle={{ backgroundColor: `rgb(${darkSquareColor})` }}
+        // pieces={{
+        //   wK: () => (
+        //     <img
+        //       style={{
+        //         alignItems: "center",
+        //         justifyContent: "center",
+        //         flexDirection: "center",
+        //         borderRadius: "35px",
+        //         width: "70px",
+        //         height: "70px"
+        //       }}
+        //       src={blockchain.identiconUrl}
+        //       alt={"player1"}
+        //     />
+        //   )
+        // }} 
+        />
     );
   }
 

@@ -105,11 +105,6 @@ export const fetchData = (account) => {
         .blockchain.gameContract.methods.getContractBalance()
         .call();
       console.log("Contract balance: ", web3.utils.fromWei(contractBalance, "ether"));
-      // dispatch(
-      //   fetchDataSuccess({
-      //     contractBalance
-      //   })
-      // );
     } catch (err) {
       console.log(err);
       dispatch(fetchDataFailed("Could not load data from contract."));

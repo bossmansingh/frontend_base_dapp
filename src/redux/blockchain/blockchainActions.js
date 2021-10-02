@@ -2,7 +2,7 @@
 import Web3 from "web3";
 import GameContract from "../../contracts/GameContract.json";
 import blockies from "../../utils/Blockies";
-import { fetchData } from "../data/dataActions";
+import { fetchData, showAccountChangeAlert } from "../data/dataActions";
 
 const Moralis = require('moralis');
 
@@ -26,30 +26,37 @@ const connectFailed = (payload) => {
   };
 };
 
-const updateAccountRequest = (payload) => {
-  return {
-    type: "UPDATE_ACCOUNT",
-    payload: payload,
-  };
+async function isWeb3Active() {
+  return await Moralis.ensureWeb3IsInstalled;
+}
+
+async function isMetaMaskInstalled() {
+  return await Moralis.isMetaMaskInstalled;
+}
+
+const getIdenticonUrl = (address) => {
+  console.log("Get identicon for address: " + address);
+  return blockies.create({
+    seed: address,
+    size: 8,
+    scale: 5
+  }).toDataURL();
 };
 
-const updateIdenticon = (account) => {
+const connectGameAndListener = (account) => {
   return async (dispatch) => {
-    const web3 = new Web3(window.ethereum);
+    const web3 = await Moralis.enable();
     const address = account.get("ethAddress");
-    const identiconUrl = blockies.create({
-      seed: address,
-      size: 10,
-      scale: 16
-    }).toDataURL();
+    console.log("ConnectGameAndListener: " + address);
+    const identiconUrl = getIdenticonUrl(address);
     const networkId = await window.ethereum.request({
       method: "net_version",
     });
     const networkData = await GameContract.networks[networkId];
     if (networkData) {
       const gameContractObj = new web3.eth.Contract(
-        GameContract.abi,
-        networkData.address
+        GameContract.abi,   // Will be replaced with actual contract ABI once deployed
+        networkData.address // Will be replaced with actual contract address once deployed
       );
       dispatch(
         connectSuccess({
@@ -59,37 +66,44 @@ const updateIdenticon = (account) => {
           web3: web3,
         })
       );
-      // Add listeners start
-      window.ethereum.on("accountsChanged", (accounts) => {
-        dispatch(updateAccount(accounts[0]));
-      });
-      window.ethereum.on("chainChanged", () => {
-        window.location.reload();
-      });
-      // Add listeners end
     } else {
       dispatch(connectFailed("Change network to CHKMATE."));
     }
   };
 };
 
-export const initAccount = () => {
-  return async (dispatch) => {
-    if (window.ethereum) {
-      let userAccount = await Moralis.User.current();
-      if (userAccount) {
-        dispatch(updateIdenticon(userAccount));
-      }
-    }
-  };
-};
-export const connect = () => {
+export const connectWallet = () => {
   return async (dispatch) => {
     dispatch(connectRequest());
-    if (window.ethereum) {
+    if (isMetaMaskInstalled()) {
       try {
-        const userAccount = await Moralis.Web3.authenticate();
-        dispatch(updateIdenticon(userAccount));
+        const userAccount = await Moralis.Web3.authenticate({signingMessage: "Sign into CHKMATE"});
+        if (userAccount != null) {
+          dispatch(connectGameAndListener(userAccount));
+          // Add listeners start
+          Moralis.onAccountsChanged(async (accounts) => {
+            const newAddress = accounts[0];
+            console.log("NewAddress: " + newAddress);
+            try {
+              await Moralis.link(newAddress);
+              dispatch(
+                connectSuccess({
+                  address: newAddress,
+                  identiconUrl: getIdenticonUrl(newAddress),
+                })
+              );
+            } catch (err) {
+              console.log(err);
+              dispatch(
+                connectFailed("Error linking account")
+              );
+            }
+          });
+          Moralis.onChainChanged(() => {
+            //window.location.reload();
+            console.log("Chain changed");
+          });
+        }
       } catch (err) {
         dispatch(connectFailed("Something went wrong."));
       }
@@ -99,9 +113,17 @@ export const connect = () => {
   };
 };
 
-export const updateAccount = (account) => {
+export const initAccount = () => {
   return async (dispatch) => {
-    dispatch(updateAccountRequest({ account: account }));
-    dispatch(fetchData(account));
+    if (isWeb3Active()) {
+      const userAccount = await Moralis.User.current();
+      if (userAccount != null) {
+        const address = userAccount.get("ethAddress");
+        if (address != null && address !== "") {
+          console.log("Init Account Address: " + address);
+          dispatch(connectGameAndListener(userAccount));
+        }
+      }
+    }
   };
 };

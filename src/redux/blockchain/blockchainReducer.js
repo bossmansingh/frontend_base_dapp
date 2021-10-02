@@ -4,7 +4,7 @@ const initialState = {
   identiconUrl: null,
   gameContract: null,
   web3: null,
-  errorMsg: "",
+  errorMsg: ""
 };
 
 const blockchainReducer = (state = initialState, action) => {
@@ -28,11 +28,6 @@ const blockchainReducer = (state = initialState, action) => {
         ...initialState,
         loading: false,
         errorMsg: action.payload,
-      };
-    case "UPDATE_ACCOUNT":
-      return {
-        ...state,
-        account: action.payload.account,
       };
     default:
       return state;
