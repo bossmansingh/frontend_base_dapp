@@ -1,10 +1,10 @@
 // constants
-import Web3 from "web3";
 import GameContract from "../../contracts/GameContract.json";
 import blockies from "../../utils/Blockies";
 import { createGame, joinGame } from "../data/dataActions";
 
 const Moralis = require('moralis');
+const signingMessage = "Welcome to CHKMATE!\n Please sign this transaction to connect your wallet.\n\nBy signing you agree to terms and condition of CHKMATE.";
 
 const connectRequest = () => {
   return {
@@ -66,8 +66,12 @@ const getIdenticonUrl = (address) => {
   }).toDataURL();
 };
 
-const connectGameAndListener = (address, createGameRequest, joinGameRequest, gameId) => {
+const connectGameAndListener = (payload) => {
   return async (dispatch) => {
+    const address = payload.address;
+    const createGameRequest = payload.createGameRequest;
+    const joinGameRequest = payload.joinGameRequest;
+    const gameId = payload.gameId;
     console.table("2 address: ", address);
     console.log("createGameRequest: " + createGameRequest);
     console.log("joinGameRequest: " + joinGameRequest);
@@ -112,16 +116,24 @@ const connectGameAndListener = (address, createGameRequest, joinGameRequest, gam
   };
 };
 
-export const connectWallet = (createGameRequest, joinGameRequest, gameId) => {
+export const connectWallet = (payload) => {
   return async (dispatch) => {
     if (isMetaMaskInstalled()) {
       try {
+        const createGameRequest = payload.createGameRequest;
+        const joinGameRequest = payload.joinGameRequest;
+        const gameId = payload.gameId;
         dispatch(connectRequest());
-        const userAccount = await Moralis.Web3.authenticate({signingMessage: "Sign into CHKMATE"});
+        const userAccount = await Moralis.Web3.authenticate({signingMessage: signingMessage});
         if (userAccount != null) {
           const address = userAccount.get("ethAddress");
           addEventListener(dispatch);
-          dispatch(connectGameAndListener(address, createGameRequest, joinGameRequest, gameId));
+          dispatch(connectGameAndListener({
+            createGameRequest: createGameRequest,
+            joinGameRequest: joinGameRequest,
+            gameId: gameId,
+            address: address
+          }));
         }
       } catch (err) {
         dispatch(connectFailed("Something went wrong."));
@@ -161,7 +173,7 @@ export const fetchCachedAccount = () => {
         if (address != null && address !== "") {
           console.log("Init Account Address: " + address);
           addEventListener(dispatch);
-          dispatch(connectGameAndListener(address, false, false, ""));
+          dispatch(connectGameAndListener({address: address}));
         }
       }
     }

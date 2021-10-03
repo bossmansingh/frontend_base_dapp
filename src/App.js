@@ -71,7 +71,9 @@ function App() {
   let gameCreated = data.gameModel !== null;
   let gameStarted = false;
   let currentTurnAddress = "";
+  let gameBoardPosition = "start";
   if (gameCreated) {
+    gameBoardPosition = data.gameModel.currentBoardPosition;
     gameStarted = data.gameModel.gameStarted === true;
     currentTurnAddress = data.gameModel.get("currentTurnAddress");
   }
@@ -215,7 +217,7 @@ function App() {
               if (gameConnected) {
                 dispatch(createGame(address));
               } else {
-                dispatch(connectWallet(true, false, ""));
+                dispatch(connectWallet({createGameRequest: true}));
               }
             }}>Create Game</s.StyledButton>
           <s.SpacerMedium />
@@ -241,7 +243,7 @@ function App() {
   function setChessboard(isEnable) {
     return(
       <Chessboard
-        position="start" 
+        position={gameBoardPosition}
         draggable={isEnable}
         lightSquareStyle={{ backgroundColor: `rgb(${lightSquareColor})` }}
         darkSquareStyle={{ backgroundColor: `rgb(${darkSquareColor})` }}
@@ -442,9 +444,9 @@ function App() {
                 }} 
                 onClick={(e) => {
                   if (gameConnected) {
-                    dispatch(joinGame(address, gameCode));
+                    dispatch(joinGame({gameId: gameCode, address: address}));
                   } else {
-                    dispatch(connectWallet(false, true, gameCode));
+                    dispatch(connectWallet({joinGameRequest: true, gameId: gameCode}));
                   }
                   e.preventDefault();
                 }}

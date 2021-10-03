@@ -1,5 +1,3 @@
-const Moralis = require('moralis');
-
 const initialState = {
   loading: false,
   address: "",
@@ -9,46 +7,6 @@ const initialState = {
   showJoinGameDialog: false,
   gameModel: null
 };
-
-// export class GameModel extends Moralis.Object {
-//   constructor(gameId, playerAddress) {
-//     // Set class name
-//     super("GameModel");
-//     this.gameId = gameId;
-//     this.playerAddress = playerAddress;
-//     this.opponentAddress = "";
-//     this.winnerAddress = "";
-//     this.gameStarted = false;
-//     this.gameEnded = false;
-//     this.moves = "";
-//     this.gameCreateTime = 0;
-//     this.lastTurnTime = 0;
-//     this.currentTurnAddress = "";
-//     console.log("GameModel created");
-//   }
-
-//   startGame(address) {
-//     console.log("Start game");
-//     this.opponentAddress = address;
-//     this.gameStarted = true;
-//     return this;
-//   }
-  
-//   endGame(address) {
-//     console.log("End game");
-//     this.gameEnded = true;
-//     this.winnerAddress = address;
-//     return this;
-//   }
-  
-//   updateMove(move, address) {
-//     console.log("Update game");
-//     this.moves = move;
-//     this.currentTurnAddress = address;
-//     return this;
-//   }
-// }
-// Moralis.Object.registerSubclass("GameModel", GameModel);
 
 const dataReducer = (state = initialState, action) => {
   switch (action.type) {

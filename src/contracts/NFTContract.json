@@ -23369,12 +23369,12 @@
         }
       },
       "links": {},
-      "address": "0x0609bC164e6f4De35d803E6fA010fE1540e0865b",
-      "transactionHash": "0x60d43671d08de2b3f79d778579c7803c6e4005ffd26bab9ecea14d75d9793bcf"
+      "address": "0xBCB9397b858f05f0f615C657c9e7cE9491EA9716",
+      "transactionHash": "0x99200911afdd7b4362847ef244d4d9280ab2442cfe015cc326b1397473c0a637"
     }
   },
   "schemaVersion": "3.4.3",
-  "updatedAt": "2021-10-03T17:43:28.122Z",
+  "updatedAt": "2021-10-03T19:20:17.542Z",
   "networkType": "ethereum",
   "devdoc": {
     "details": "Contract provides mint operation for owner to mint the NFT",
