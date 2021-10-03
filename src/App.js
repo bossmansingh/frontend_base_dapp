@@ -73,8 +73,8 @@ function App() {
   let currentTurnAddress = "";
   let gameBoardPosition = "start";
   if (gameCreated) {
-    gameBoardPosition = data.gameModel.currentBoardPosition;
-    gameStarted = data.gameModel.gameStarted === true;
+    gameBoardPosition = data.gameModel.get("currentBoardPosition");
+    gameStarted = data.gameModel.get("gameStarted");
     currentTurnAddress = data.gameModel.get("currentTurnAddress");
   }
 
@@ -85,6 +85,7 @@ function App() {
   console.log("App() | gameCreated: " + gameCreated);
   console.log("App() | gameStarted: " + gameStarted);
   console.log("App() | currentTurnAddress: " + currentTurnAddress);
+  console.log("App() | gameBoardPosition: " + gameBoardPosition);
   
   const player = stringValueEqual(currentTurnAddress, address);
   const opponent = stringValueEqual(currentTurnAddress, address);
@@ -166,8 +167,8 @@ function App() {
         <s.HelpButton id="help_button"
           style={{width:"40px", height:"40px"}}
           onClick={(e) => {
-            showInformationDialog();
             e.preventDefault();
+            showInformationDialog();
           } 
         }>?</s.HelpButton>
         <s.TextPageTitle
@@ -369,8 +370,8 @@ function App() {
                 fontSize: "20px"
               }} 
               onClick={(e)=> {
-                hideInformationDialog();
                 e.preventDefault();
+                hideInformationDialog();
               }}
             >
               Close
@@ -388,8 +389,8 @@ function App() {
           data.showJoinGameDialog
         } 
         onClose={(e) => {
-          hideJoinGameDialog();
           e.preventDefault();
+          hideJoinGameDialog();
         }}
       >
         <DialogContent>
@@ -415,8 +416,8 @@ function App() {
               style={{textAlign: "center"}}
               placeholder={"Game Code"} 
               onChange={(e) => {
-                handleInput(e);
                 e.preventDefault();
+                handleInput(e);
               }} />
             {
               data.errorMsg ? 
@@ -443,12 +444,12 @@ function App() {
                   width: "200px"
                 }} 
                 onClick={(e) => {
+                  e.preventDefault();
                   if (gameConnected) {
                     dispatch(joinGame({gameId: gameCode, address: address}));
                   } else {
                     dispatch(connectWallet({joinGameRequest: true, gameId: gameCode}));
                   }
-                  e.preventDefault();
                 }}
               >
                 Join Game
@@ -460,8 +461,8 @@ function App() {
                   fontSize: "20px",
                   width: "200px"
                 }} onClick={(e) => {
-                  hideJoinGameDialog();
                   e.preventDefault();
+                  hideJoinGameDialog();
                 }}
               >
                 Cancel
