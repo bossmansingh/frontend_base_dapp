@@ -92,7 +92,7 @@ function App() {
   }
   const isPlayer = stringValueEqual(playerAddress, address);
   const isOpponent = stringValueEqual(opponentAddress, address);
-  
+
   console.log("App() | Address: " + address);
   console.log("App() | walletConnected: " + walletConnected);
   console.log("App() | contractFetched: " + contractFetched);
@@ -104,8 +104,8 @@ function App() {
   console.log("App() | currentTurnAddress: " + currentTurnAddress);
   console.log("App() | gameBoardPosition: " + gameBoardPosition);
   
-  const playerTurn = isPlayer && stringValueEqual(currentTurnAddress, address);
-  const opponentTurn = isOpponent && stringValueEqual(currentTurnAddress, address);
+  const playerTurn = stringValueEqual(currentTurnAddress, playerAddress);
+  const opponentTurn = stringValueEqual(currentTurnAddress, opponentAddress);
   console.log("App() | player: " + playerTurn);
   console.log("App() | opponent: " + opponentTurn);
   
@@ -499,12 +499,12 @@ function App() {
         ai={"center"}
         style={{paddingTop: "138px"}}
       >
-        {setChessboard(gameStarted && (playerTurn || opponentTurn))}
+        {setChessboard(gameStarted && ((isPlayer && playerTurn) || (isOpponent && opponentTurn)))}
         <s.SpacerXXLarge/>
         <s.Container
           ai={"center"}
           jd={"center"}
-          style={{opacity: playerTurn ? "1" : "0.25"}}
+          style={{opacity: gameStarted ? "1" : "0.25"}}
         >
           {addClock(playerTurn)}
           <s.SpacerMedium/>
@@ -521,7 +521,7 @@ function App() {
         <s.Container
           ai={"center"}
           jd={"center"}
-          style={{opacity: opponentTurn ? "1" : "0.25"}}
+          style={{opacity: gameStarted ? "1" : "0.25"}}
         >
           {addClock(opponentTurn)}
           <s.SpacerMedium/>
