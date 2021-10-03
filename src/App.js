@@ -52,9 +52,13 @@ function getRandomNumber(min, max) {
   return Math.floor(Math.random() * (max - min) + min);
 }
 
+function stringValueEqual(str1, str2) {
+  const result = str1.localeCompare(str2, undefined, { sensitivity: 'base' }) === 0;
+  console.log(`${str1} and ${str2} are equal: ${result}`);
+  return result;
+}
+
 function App() {
-  //
-  
   const ref = useRef();
   const dispatch = useDispatch();
   const blockchain = useSelector((state) => state.blockchain);
@@ -64,30 +68,45 @@ function App() {
   const walletConnected = address != null && address !== "";
   const contractFetched = contract != null;
   const gameConnected = walletConnected && contractFetched;
-  const gameStarted = data.gameCode != null && data.gameCode !== "";
+  let gameCreated = data.gameModel !== null;
+  let gameStarted = false;
+  let challenger = "";
+  let challengAcceptor = "";
+  if (gameCreated) {
+    gameStarted = data.gameModel.gameStarted === true;
+    challenger = data.gameModel.playerAddress;
+    challengAcceptor = data.gameModel.opponentAddress;
+  }
 
   console.log("App() | Address: " + address);
   console.log("App() | walletConnected: " + walletConnected);
   console.log("App() | contractFetched: " + contractFetched);
   console.log("App() | gameConnected: " + gameConnected);
   console.log("App() | gameStarted: " + gameStarted);
-  console.log("App() | challenger: " + data.challenger);
-  console.log("App() | challengAcceptor: " + data.challengAcceptor);
+  console.log("App() | challenger: " + challenger);
+  console.log("App() | challengAcceptor: " + challengAcceptor);
+  
+  const player = stringValueEqual(challenger, address);
+  const opponent = stringValueEqual(challengAcceptor, address);
+  console.log("App() | player: " + player);
+  console.log("App() | opponent: " + opponent);
+  
+  
+  // const [player, _setPlayer] = useState(p);
+  // const [opponent, _setOpponent] = useState(o);
+  
 
-  const [player, _setPlayer] = useState(false);
-  const [opponent, _setOpponent] = useState(false);
-
-  if (data.challenger != null && data.challenger !== "" && data.challenger.toLowerCase() == address.toLowerCase() && !player) {
-    console.log("App() | challenger equal: " + data.challenger.toLowerCase() == address.toLowerCase());
-    console.log("App() | set player");
-    _setPlayer(true);
-    _setOpponent(false);
-  } else if (data.challengAcceptor != null && data.challengAcceptor !== "" && data.challengAcceptor.toLowerCase() == address.toLowerCase() && !opponent) {
-    console.log("App() | challengAcceptor equal: " + data.challengAcceptor.toLowerCase() == address.toLowerCase());
-    console.log("App() | set opponent");
-    _setPlayer(false);
-    _setOpponent(true);
-  }
+  // if (address !== null &&  && !player) {
+  //   console.log("App() | challenger equal");
+  //   console.log("App() | set player");
+  //   _setPlayer(true);
+  //   _setOpponent(false);
+  // } else if (address !== null &&  && !opponent) {
+  //   console.log("App() | challengAcceptor equal");
+  //   console.log("App() | set opponent");
+  //   _setPlayer(false);
+  //   _setOpponent(true);
+  // }
 
   const showInformationDialog = () => {
     dispatch(toggleInfoDialog(true));
@@ -132,7 +151,7 @@ function App() {
       */}
       {renderHelpPopup()}
       {renderJoinGamePopup()}
-      {gameStarted ? renderGameBoard() : renderWelcomePage()}
+      {gameCreated ? renderGameBoard() : renderWelcomePage()}
     </s.Screen>
   );
 
@@ -455,7 +474,6 @@ function App() {
   }
 
   function renderGameBoard() {
-    const gameStarted = data.gameStarted;
     return(
       <s.Container
         fd={"row"}
@@ -520,8 +538,9 @@ function App() {
   }
 
   function togglePlayerState() {
-    _setPlayer(!player);
-    _setOpponent(!opponent);
+    // _setPlayer(!player);
+    // _setOpponent(!opponent);
+    // TODO: toggle move state
   }
 }
 

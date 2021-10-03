@@ -1,5 +1,6 @@
 import web3 from "web3";
 import store from "../store";
+import { GameModel } from "./dataReducer";
 
 const fetchDataRequest = () => {
   return {
@@ -63,15 +64,23 @@ export const createGame = (address) => {
             }).once("error", (err) => {
               console.log(err);
               dispatch(fetchDataFailed("Error creating a new game"));
-            }).then((receipt) => {
+            }).then(async (receipt) => {
               console.log("Game Create Success", receipt);
               const challengerAddress = receipt.events["GameCreated"]["returnValues"]["challengerAddress"];
               const gameId = receipt.events["GameCreated"]["returnValues"]["gameId"];
               console.log("GameId: ", gameId);
-              dispatch(createNewGame({
-                gameId: gameId,
-                challenger: challengerAddress,
-              }));
+
+              // Save new game to database
+              try {
+                const gameModel = new GameModel(gameId, challengerAddress);
+                await gameModel.save();
+                console.log("Game saved");
+                dispatch(createNewGame({gameModel: gameModel})); 
+              } catch (err) {
+                console.log("Game save error");
+                console.log(err);
+                dispatch(fetchDataFailed("Error saving new game"));
+              }
             });
     } catch (err) {
       console.log(err);
@@ -103,11 +112,7 @@ export const joinGame = (address, gameId) => {
             console.log("challengerAddress: ", challengerAddress);
             console.log("challengeAcceptorAddress: ", challengeAcceptorAddress);
             console.log("joinedGameId: ", joinedGameId);
-            dispatch(joinNewGame({
-              gameId: joinedGameId,
-              challenger: challengerAddress,
-              challengAcceptor: challengeAcceptorAddress
-            }));
+            dispatch(joinNewGame(challengeAcceptorAddress));
           });
     } catch (err) {
       console.log(err);
@@ -125,7 +130,10 @@ export const fetchData = (account) => {
         .getState()
         .blockchain.gameContract.methods.getContractBalance()
         .call();
-      console.log("Contract balance: ", web3.utils.fromWei(contractBalance, "ether"));
+        if (contractBalance !== null) {
+          const balanceInEth = web3.utils.fromWei(contractBalance, "ether");
+          console.log("Contract balance in ETH: ", balanceInEth);
+        }
     } catch (err) {
       console.log(err);
       dispatch(fetchDataFailed("Could not load data from contract."));

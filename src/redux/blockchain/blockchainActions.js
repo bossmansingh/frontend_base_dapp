@@ -43,9 +43,6 @@ function addEventListener(dispatch) {
       await Moralis.link(newAddress);
     } catch (err) {
       console.log(err);
-      // dispatch(
-      //   connectFailed("Error linking account")
-      // );
     }
     dispatch(
       connectSuccess({
