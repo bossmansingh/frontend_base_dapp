@@ -498,7 +498,7 @@ function App() {
         fd={"row"}
         jc={"center"}
         ai={"center"}
-        style={{paddingTop: "138px"}}
+        style={{paddingTop: "138px", paddingBottom: "50px", paddingStart: "50px"}}
       >
         {setChessboard(gameStarted && ((isPlayer && playerTurn) || (isOpponent && opponentTurn)))}
         <s.SpacerXXLarge/>
