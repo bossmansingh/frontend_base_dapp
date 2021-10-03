@@ -26,6 +26,8 @@ const rule5 = "5. A game finishes when one of the player plays a check-mate move
 // that some default color should be used
 let lightSquareColor = getLightSquareColor();
 let darkSquareColor = getDarkSquareColor();
+const youTitle = "YOU";
+const opponentTitle = "OPPONENT";
 
 // Function to generate and return light square color
 function getLightSquareColor() {
@@ -53,9 +55,13 @@ function getRandomNumber(min, max) {
 }
 
 function stringValueEqual(str1, str2) {
-  const result = str1.localeCompare(str2, undefined, { sensitivity: 'base' }) === 0;
-  console.log(`${str1} and ${str2} are equal: ${result}`);
-  return result;
+  if (str1 === "" || str2 === "") {
+    return false;
+  } else {
+    const result = str1.localeCompare(str2, undefined, { sensitivity: 'base' }) === 0;
+    console.log(`${str1} and ${str2} are equal: ${result}`);
+    return result;
+  }
 }
 
 function App() {
@@ -84,7 +90,9 @@ function App() {
     lightSquareColor = gameModel.get("lightSquareColor");
     darkSquareColor = gameModel.get("darkSquareColor");
   }
-
+  const isPlayer = stringValueEqual(playerAddress, address);
+  const isOpponent = stringValueEqual(opponentAddress, address);
+  
   console.log("App() | Address: " + address);
   console.log("App() | walletConnected: " + walletConnected);
   console.log("App() | contractFetched: " + contractFetched);
@@ -96,8 +104,8 @@ function App() {
   console.log("App() | currentTurnAddress: " + currentTurnAddress);
   console.log("App() | gameBoardPosition: " + gameBoardPosition);
   
-  const playerTurn = stringValueEqual(playerAddress, address) && stringValueEqual(currentTurnAddress, address);
-  const opponentTurn = stringValueEqual(opponentAddress, address) && stringValueEqual(currentTurnAddress, address);
+  const playerTurn = isPlayer && stringValueEqual(currentTurnAddress, address);
+  const opponentTurn = isOpponent && stringValueEqual(currentTurnAddress, address);
   console.log("App() | player: " + playerTurn);
   console.log("App() | opponent: " + opponentTurn);
   
@@ -505,7 +513,9 @@ function App() {
               textAlign: "center", 
               fontFamily: "default-font"
             }}
-          >You</s.TextSubTitle>
+          >
+            {isPlayer ? (youTitle) : (opponentTitle)}
+          </s.TextSubTitle>
         </s.Container>
         <s.SpacerLarge/>
         <s.Container
@@ -520,7 +530,9 @@ function App() {
               textAlign: "center", 
               fontFamily: "default-font"
             }}
-          >Opponent</s.TextSubTitle>
+          >
+            {isOpponent ? (youTitle) : (opponentTitle)}
+          </s.TextSubTitle>
         </s.Container>
       </s.Container>
     );
