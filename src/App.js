@@ -7,7 +7,7 @@ import DialogContent from "@material-ui/core/DialogContent";
 import Chessboard from "chessboardjsx";
 
 import { connectWallet, fetchCachedAccount, logout } from "./redux/blockchain/blockchainActions";
-import { fetchData, createGame, joinGame, toggleInfoDialog, toggleJoinGameDialog } from "./redux/data/dataActions";
+import { fetchData, createGame, joinGame, toggleInfoDialog, toggleJoinGameDialog, togglePlayerState } from "./redux/data/dataActions";
 import * as s from "./styles/globalStyles";
 import "./styles/clockStyle.css";
 
@@ -24,8 +24,8 @@ const rule5 = "5. A game finishes when one of the player plays a check-mate move
 
 // The random color should be generated when the game starts, before 
 // that some default color should be used
-const lightSquareColor = getLightSquareColor();
-const darkSquareColor = getDarkSquareColor();
+let lightSquareColor = getLightSquareColor();
+let darkSquareColor = getDarkSquareColor();
 
 // Function to generate and return light square color
 function getLightSquareColor() {
@@ -68,7 +68,8 @@ function App() {
   const walletConnected = address != null && address !== "";
   const contractFetched = contract != null;
   const gameConnected = walletConnected && contractFetched;
-  let gameCreated = data.gameModel !== null;
+  let gameModel = data.gameModel;
+  let gameCreated = gameModel != null;
   let gameStarted = false;
   let playerAddress = "";
   let opponentAddress = "";
@@ -93,10 +94,10 @@ function App() {
   console.log("App() | currentTurnAddress: " + currentTurnAddress);
   console.log("App() | gameBoardPosition: " + gameBoardPosition);
   
-  const player = stringValueEqual(playerAddress, address) && stringValueEqual(currentTurnAddress, address);
-  const opponent = stringValueEqual(opponentAddress, address) && stringValueEqual(currentTurnAddress, address);
-  console.log("App() | player: " + player);
-  console.log("App() | opponent: " + opponent);
+  const playerTurn = stringValueEqual(playerAddress, address) && stringValueEqual(currentTurnAddress, address);
+  const opponentTurn = stringValueEqual(opponentAddress, address) && stringValueEqual(currentTurnAddress, address);
+  console.log("App() | player: " + playerTurn);
+  console.log("App() | opponent: " + opponentTurn);
   
   
   // const [player, _setPlayer] = useState(p);
@@ -488,14 +489,14 @@ function App() {
         ai={"center"}
         style={{paddingTop: "138px"}}
       >
-        {setChessboard(gameStarted && (player || opponent))}
+        {setChessboard(gameStarted && (playerTurn || opponentTurn))}
         <s.SpacerXXLarge/>
         <s.Container
           ai={"center"}
           jd={"center"}
-          style={{opacity: player ? "1" : "0.25"}}
+          style={{opacity: playerTurn ? "1" : "0.25"}}
         >
-          {addClock(player)}
+          {addClock(playerTurn)}
           <s.SpacerMedium/>
           <s.TextSubTitle
             style={{
@@ -508,9 +509,9 @@ function App() {
         <s.Container
           ai={"center"}
           jd={"center"}
-          style={{opacity: opponent ? "1" : "0.25"}}
+          style={{opacity: opponentTurn ? "1" : "0.25"}}
         >
-          {addClock(opponent)}
+          {addClock(opponentTurn)}
           <s.SpacerMedium/>
           <s.TextSubTitle
             style={{
@@ -536,7 +537,7 @@ function App() {
             {clockIndicators}
           </s.ClockContainer>
           <s.ClockContainer className="clock-second" rotate={isEnabled ? 1 : 0} 
-            onAnimationEnd={() => togglePlayerState()} 
+            onAnimationEnd={() => togglePlayer()} 
           />
           <s.ClockContainer className="clock-center"/>
         </s.ClockContainer>
@@ -544,10 +545,13 @@ function App() {
     );
   }
 
-  function togglePlayerState() {
-    // _setPlayer(!player);
-    // _setOpponent(!opponent);
-    // TODO: toggle move state
+  function togglePlayer() {
+    // Toggle player turn state
+    if (playerTurn && opponentAddress !== "" && gameModel != null) {
+      dispatch(togglePlayerState({gameModel: gameModel, address: opponentAddress}))
+    } else if (opponentTurn && playerAddress !== "" && gameModel != null) {
+      dispatch(togglePlayerState({gameModel: gameModel, address: playerAddress}))
+    }
   }
 }
 

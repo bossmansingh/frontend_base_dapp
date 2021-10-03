@@ -129,6 +129,17 @@ export const toggleJoinGameDialog = (payload) => {
   };
 };
 
+export const togglePlayerState = (payload) => {
+  return async (dispatch) => {
+    // Update game data when turn switches to other player
+    const gameModel = payload.gameModel;
+    const address = payload.address;
+    gameModel.set("currentTurnAddress", address);
+    const result = await gameModel.save();
+    dispatch(updateGame({gameModel: result}));
+  };
+};
+
 export const createGame = (address) => {
   return async (dispatch) => {
     try {
@@ -187,6 +198,7 @@ export const joinGame = (payload) => {
             }).then(async (receipt) => {
               console.log("Game Joined Success", receipt);
               console.table(gameModel);
+              // Update game data after opponent joins
               const playerAddress = gameModel.get("playerAddress");
               gameModel.set("opponentAddress", address);
               gameModel.set("gameStarted", true);
