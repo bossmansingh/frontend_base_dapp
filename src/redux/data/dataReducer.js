@@ -53,6 +53,15 @@ const dataReducer = (state = initialState, action) => {
         showJoinGameDialog: false,
         gameModel: action.payload.gameModel
       };
+    case "UPDATE_GAME":
+      // const updatedModel = state.gameModel;
+      // updatedModel.updateMove(action.payload.move);
+      return {
+        ...state,
+        showInfoDialog: false,
+        showJoinGameDialog: false,
+        gameModel: action.payload.gameModel
+      };
     case "UPDATE_MOVE":
       // const updatedModel = state.gameModel;
       // updatedModel.updateMove(action.payload.move);

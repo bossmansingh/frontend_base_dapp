@@ -37,12 +37,19 @@ const joinNewGame = (payload) => {
   };
 };
 
+const updateGame = (payload) => {
+  return {
+    type: "UPDATE_GAME",
+    payload: payload
+  };
+};
+
 function getGameModelQuery() {
   const gameModel = Moralis.Object.extend("GameModel");
   return new Moralis.Query(gameModel);
 }
 
-async function queryGameModel(gameId, address) {
+async function queryGameModel(gameId) {
   try {
     console.log("Fetch game from database");
     const query = getGameModelQuery();
@@ -51,11 +58,7 @@ async function queryGameModel(gameId, address) {
     const gameModel = await query.first();
     console.log("Game fetched:");
     console.table(gameModel);
-    const playerAddress = gameModel.get("playerAddress");
-    gameModel.set("opponentAddress", address);
-    gameModel.set("gameStarted", true);
-    gameModel.set("currentTurnAddress", playerAddress);
-    return await gameModel.save();
+    return gameModel;
   } catch (err) {
     console.log("Query Game error");
     console.log(err);
@@ -89,6 +92,27 @@ async function saveNewGameToDatabase(gameId, address) {
     console.log(err);
     return null;
   }
+}
+
+async function addSubscription(dispatch, gameId) {
+  const subscriptionQuery = getGameModelQuery();
+  subscriptionQuery.equalTo("gameId", gameId.toString());
+  const subscription = await subscriptionQuery.subscribe();
+  console.log("Add Subscription: ", subscription);
+  subscription.on("update", (gameModel) => {
+    console.log(`GameMode with id: ${gameId} updated`);
+    console.table(gameModel);
+    dispatch(updateGame({gameModel: gameModel}));
+  });
+}
+
+async function removeSubscription(gameId) {
+  const subscriptionQuery = getGameModelQuery();
+  subscriptionQuery.equalTo("gameId", gameId.toString());
+  const subscription = await subscriptionQuery.unsubscribe();
+  console.log("Remove Subscription: ", subscription);
+  // This will close the WebSocket connection to the LiveQuery server, cancel the auto-reconnect, and unsubscribe all subscriptions based on it.
+  Moralis.LiveQuery.close();
 }
 
 export const toggleInfoDialog = (payload) => {
@@ -128,7 +152,7 @@ export const createGame = (address) => {
               }).then(async (receipt) => {
                 console.log("Game Create Success", receipt);
                 dispatch(createNewGame({gameModel: gameModel})); 
-                // TODO: Add subscription to game object on database for currentGameCounter
+                await addSubscription(dispatch, currentGameCounter);
               });
       } else {
         dispatch(fetchDataFailed("Error creating a new game"));
@@ -163,8 +187,13 @@ export const joinGame = (payload) => {
             }).then(async (receipt) => {
               console.log("Game Joined Success", receipt);
               console.table(gameModel);
+              const playerAddress = gameModel.get("playerAddress");
+              gameModel.set("opponentAddress", address);
+              gameModel.set("gameStarted", true);
+              gameModel.set("currentTurnAddress", playerAddress);
+              await gameModel.save();
               dispatch(joinNewGame({gameModel: gameModel})); 
-              // TODO: Add subscription to game object on database for gameId
+              await addSubscription(dispatch, gameId);
             });
       } else {
         dispatch(fetchDataFailed("Either the game does not exists or some network error occurred."));
@@ -179,8 +208,8 @@ export const joinGame = (payload) => {
 };
 
 export const endGame = (gameId, address) => {
-  return () => {
-    // TODO: Remove subscription from game object on database for gameId
+  return async () => {
+    await removeSubscription(gameId);
   };
 };
 

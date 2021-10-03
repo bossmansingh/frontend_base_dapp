@@ -70,11 +70,15 @@ function App() {
   const gameConnected = walletConnected && contractFetched;
   let gameCreated = data.gameModel !== null;
   let gameStarted = false;
+  let playerAddress = "";
+  let opponentAddress = "";
   let currentTurnAddress = "";
   let gameBoardPosition = "start";
   if (gameCreated) {
     gameBoardPosition = data.gameModel.get("currentBoardPosition");
     gameStarted = data.gameModel.get("gameStarted");
+    playerAddress = data.gameModel.get("playerAddress");
+    opponentAddress = data.gameModel.get("opponentAddress");
     currentTurnAddress = data.gameModel.get("currentTurnAddress");
   }
 
@@ -84,11 +88,13 @@ function App() {
   console.log("App() | gameConnected: " + gameConnected);
   console.log("App() | gameCreated: " + gameCreated);
   console.log("App() | gameStarted: " + gameStarted);
+  console.log("App() | playerAddress: " + playerAddress);
+  console.log("App() | opponentAddress: " + opponentAddress);
   console.log("App() | currentTurnAddress: " + currentTurnAddress);
   console.log("App() | gameBoardPosition: " + gameBoardPosition);
   
-  const player = stringValueEqual(currentTurnAddress, address);
-  const opponent = stringValueEqual(currentTurnAddress, address);
+  const player = stringValueEqual(playerAddress, address) && stringValueEqual(currentTurnAddress, address);
+  const opponent = stringValueEqual(opponentAddress, address) && stringValueEqual(currentTurnAddress, address);
   console.log("App() | player: " + player);
   console.log("App() | opponent: " + opponent);
   
@@ -482,7 +488,7 @@ function App() {
         ai={"center"}
         style={{paddingTop: "138px"}}
       >
-        {setChessboard(gameStarted)}
+        {setChessboard(gameStarted && (player || opponent))}
         <s.SpacerXXLarge/>
         <s.Container
           ai={"center"}
