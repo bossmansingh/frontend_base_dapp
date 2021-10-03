@@ -2,6 +2,8 @@ import web3 from "web3";
 import store from "../store";
 import { GameModel } from "./dataReducer";
 
+const Moralis = require('moralis');
+
 const fetchDataRequest = () => {
   return {
     type: "CHECK_DATA_REQUEST",
@@ -35,6 +37,56 @@ const joinNewGame = (payload) => {
     payload: payload
   };
 };
+
+async function queryGameModel(dispatch, gameId, address) {
+  try {
+    const gameModel = Moralis.Object.extend("GameModel");
+    const query = new Moralis.Query(gameModel);
+    query.equalTo("gameId", gameId);
+    const resultObj = await query.first();
+    const playerAddress = resultObj.get("playerAddress");
+    console.log("Game fetched:");
+    console.table(resultObj);
+    const saveResult = await resultObj.save({
+      opponentAddress: address,
+      gameStarted: true,
+      currentTurnAddress: playerAddress
+    });
+    dispatch(joinNewGame({gameModel: saveResult})); 
+  } catch (err) {
+    console.log("Join Game error");
+    console.log(err);
+    dispatch(fetchDataFailed("Error joining new game"));
+  }
+}
+
+async function saveNewGame(dispatch, gameId, address) {
+  try {
+    console.log("Saving game");
+    const GameModel = Moralis.Object.extend("GameModel");
+    const gameModel = new GameModel();
+    console.table(gameModel);
+    const result = await gameModel.save({
+      gameId: gameId,
+      playerAddress: address,
+      opponentAddress: "",
+      winnerAddress: "",
+      gameStarted: false,
+      gameEnded: false,
+      moves: "",
+      gameCreateTime: 0,
+      lastTurnTime: 0,
+      currentTurnAddress: ""
+    });
+    console.log("Game saved");
+    console.table(result);
+    dispatch(createNewGame({gameModel: result})); 
+  } catch (err) {
+    console.log("Game save error");
+    console.log(err);
+    dispatch(fetchDataFailed("Error saving new game"));
+  }
+}
 
 export const toggleInfoDialog = (payload) => {
   return {
@@ -71,16 +123,7 @@ export const createGame = (address) => {
               console.log("GameId: ", gameId);
 
               // Save new game to database
-              try {
-                const gameModel = new GameModel(gameId, challengerAddress);
-                await gameModel.save();
-                console.log("Game saved");
-                dispatch(createNewGame({gameModel: gameModel})); 
-              } catch (err) {
-                console.log("Game save error");
-                console.log(err);
-                dispatch(fetchDataFailed("Error saving new game"));
-              }
+              await saveNewGame(dispatch, gameId, challengerAddress);
             });
     } catch (err) {
       console.log(err);
@@ -104,7 +147,7 @@ export const joinGame = (address, gameId) => {
           }).once("error", (err) => {
             console.log(err);
             dispatch(fetchDataFailed("Error joining game with gameId: " + gameId));
-          }).then((receipt) => {
+          }).then(async (receipt) => {
             console.log("Game Joined Success", receipt);
             const challengerAddress = receipt.events["GameJoined"]["returnValues"]["challengerAddress"];
             const challengeAcceptorAddress = receipt.events["GameJoined"]["returnValues"]["challengeAcceptorAddress"];
@@ -112,7 +155,9 @@ export const joinGame = (address, gameId) => {
             console.log("challengerAddress: ", challengerAddress);
             console.log("challengeAcceptorAddress: ", challengeAcceptorAddress);
             console.log("joinedGameId: ", joinedGameId);
-            dispatch(joinNewGame(challengeAcceptorAddress));
+
+            // Query game from database
+            await queryGameModel(dispatch, gameId, challengeAcceptorAddress);
           });
     } catch (err) {
       console.log(err);

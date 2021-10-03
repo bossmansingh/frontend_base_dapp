@@ -155,8 +155,8 @@ contract NFTContract is ERC721, BaseContract {
         uint8 killScore, 
         bool isRare
     ) private {
-        string memory data = string(abi.encodePacked(block.timestamp, msg.sender, counterValue));
-        uint tokenDna = Helpers.randomNumber(data);
+        //string memory data = string(abi.encodePacked(block.timestamp, msg.sender, counterValue));
+        uint tokenDna = Helpers.getDNA(block.timestamp, msg.sender, counterValue);
         string memory tokenName = string(abi.encodePacked("CHKMATE #", counterValue));
         CHKMATE memory token = CHKMATE({
           name: tokenName, 

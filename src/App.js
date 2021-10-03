@@ -70,24 +70,22 @@ function App() {
   const gameConnected = walletConnected && contractFetched;
   let gameCreated = data.gameModel !== null;
   let gameStarted = false;
-  let challenger = "";
-  let challengAcceptor = "";
+  let currentTurnAddress = "";
   if (gameCreated) {
     gameStarted = data.gameModel.gameStarted === true;
-    challenger = data.gameModel.playerAddress;
-    challengAcceptor = data.gameModel.opponentAddress;
+    currentTurnAddress = data.gameModel.get("currentTurnAddress");
   }
 
   console.log("App() | Address: " + address);
   console.log("App() | walletConnected: " + walletConnected);
   console.log("App() | contractFetched: " + contractFetched);
   console.log("App() | gameConnected: " + gameConnected);
+  console.log("App() | gameCreated: " + gameCreated);
   console.log("App() | gameStarted: " + gameStarted);
-  console.log("App() | challenger: " + challenger);
-  console.log("App() | challengAcceptor: " + challengAcceptor);
+  console.log("App() | currentTurnAddress: " + currentTurnAddress);
   
-  const player = stringValueEqual(challenger, address);
-  const opponent = stringValueEqual(challengAcceptor, address);
+  const player = stringValueEqual(currentTurnAddress, address);
+  const opponent = stringValueEqual(currentTurnAddress, address);
   console.log("App() | player: " + player);
   console.log("App() | opponent: " + opponent);
   

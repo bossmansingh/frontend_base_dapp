@@ -10,42 +10,45 @@ const initialState = {
   gameModel: null
 };
 
-export class GameModel extends Moralis.Object {
-  constructor(gameId, playerAddress) {
-    // Set class name
-    super("GameModel");
-    this.gameId = gameId;
-    this.playerAddress = playerAddress;
-    this.opponentAddress = "";
-    this.winnerAddress = "";
-    this.gameStarted = false;
-    this.gameEnded = false;
-    this.moves = "";
-    this.gameCreateTime = 0;
-    this.lastTurnTime = 0;
-    this.currentTurnAddress = "";
-    console.log("GameModel created");
-  }
+// export class GameModel extends Moralis.Object {
+//   constructor(gameId, playerAddress) {
+//     // Set class name
+//     super("GameModel");
+//     this.gameId = gameId;
+//     this.playerAddress = playerAddress;
+//     this.opponentAddress = "";
+//     this.winnerAddress = "";
+//     this.gameStarted = false;
+//     this.gameEnded = false;
+//     this.moves = "";
+//     this.gameCreateTime = 0;
+//     this.lastTurnTime = 0;
+//     this.currentTurnAddress = "";
+//     console.log("GameModel created");
+//   }
 
-  startGame(address) {
-    console.log("Start game");
-    this.opponentAddress = address;
-    this.gameStarted = true;
-  }
+//   startGame(address) {
+//     console.log("Start game");
+//     this.opponentAddress = address;
+//     this.gameStarted = true;
+//     return this;
+//   }
   
-  endGame(address) {
-    console.log("End game");
-    this.gameEnded = true;
-    this.winnerAddress = address;
-  }
+//   endGame(address) {
+//     console.log("End game");
+//     this.gameEnded = true;
+//     this.winnerAddress = address;
+//     return this;
+//   }
   
-  updateMove(move, address) {
-    console.log("Update game");
-    this.moves = move;
-    this.currentTurnAddress = address;
-  }
-}
-Moralis.Object.registerSubclass("GameModel", GameModel);
+//   updateMove(move, address) {
+//     console.log("Update game");
+//     this.moves = move;
+//     this.currentTurnAddress = address;
+//     return this;
+//   }
+// }
+// Moralis.Object.registerSubclass("GameModel", GameModel);
 
 const dataReducer = (state = initialState, action) => {
   switch (action.type) {
@@ -81,16 +84,16 @@ const dataReducer = (state = initialState, action) => {
     case "CREATE_GAME":
       return {
         ...state,
+        showInfoDialog: false,
+        showJoinGameDialog: false,
         gameModel: action.payload.gameModel
       };
     case "JOIN_GAME":
-      const updatedModel = state.gameModel;
-      updatedModel.startGame(action.payload.challengAcceptor);
       return {
         ...state,
         showInfoDialog: false,
         showJoinGameDialog: false,
-        gameModel: updatedModel
+        gameModel: action.payload.gameModel
       };
     case "UPDATE_MOVE":
       // const updatedModel = state.gameModel;

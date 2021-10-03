@@ -84,7 +84,7 @@ contract GameContract is BaseContract {
     // }
 
     mapping(uint => address) private _gamesMap;
-    mapping(address => address) private _playersMap;
+    mapping(uint => address) private _playersMap;
     mapping(uint => address) private _winnersMap;
 
     uint private _baseGameFee = 0.005 ether;
@@ -112,6 +112,8 @@ contract GameContract is BaseContract {
     * 
     */
     function createGame() external payable nonReentrant {
+        // Check and verify if the caller address is valid
+        require(msg.sender != Helpers.nullAddress(), "Caller address is not valid");
         uint currentCounter = currentCounterValue();
         address challengerAddress = _gamesMap[currentCounter];
         bool gameExists = challengerAddress != Helpers.nullAddress();
@@ -122,9 +124,10 @@ contract GameContract is BaseContract {
         require(!challengerExists, "Challenger address already exists");
         // Check and verify if a value equal to or greater than `_baseGameFee` was sent along with the transaction.
         require(msg.value >= _baseGameFee, "Sent value should be equal to game fee");
-        bool challengeAcceptorExists = _playersMap[challengerAddress] != Helpers.nullAddress();
         // Check and verify if the challenge acceptor address exist
-        require(!challengeAcceptorExists, "Challenge acceptor address already exists");
+        uint key = Helpers.getKey(currentCounter, challengerAddress);
+        bool challengeAcceptorNotExists = _playersMap[key] == Helpers.nullAddress();
+        require(challengeAcceptorNotExists, "Challenge acceptor address already exists");
         bool winnerExists = _winnersMap[currentCounter] != Helpers.nullAddress();
         // Check and verify if the winner address is not set.
         require(!winnerExists, "Winner address cannot be set before the game starts");
@@ -142,6 +145,8 @@ contract GameContract is BaseContract {
      * @param gameId id of game to be ended
      */
     function joinGame(uint gameId) external payable nonReentrant {
+        // Check and verify if the caller address is valid
+        require(msg.sender != Helpers.nullAddress(), "Caller address is not valid");
         address challengerAddress = _gamesMap[gameId];
         bool gameExists = challengerAddress != Helpers.nullAddress();
         // Check and verify if a game with specified ID  already exists.
@@ -151,14 +156,14 @@ contract GameContract is BaseContract {
         require(challengerExists, "Challenger address does not exists");
         // Check and verify if a value equal to or greater than `_baseGameFee` was sent along with the transaction.
         require(msg.value >= _baseGameFee, "Sent value should be equal to game fee");
-        address challengeAcceptorAddress = _playersMap[challengerAddress];
-        bool challengeAcceptorExists = challengeAcceptorAddress != Helpers.nullAddress();
         // Check and verify if the challenge acceptor address exist
+        uint key = Helpers.getKey(gameId, challengerAddress);
+        bool challengeAcceptorExists = _playersMap[key] != Helpers.nullAddress();
         require(!challengeAcceptorExists, "Challenge acceptor address already exists");
         // Check and verify if both player address are unique
         require(challengerAddress != msg.sender, "Both player address should be unique");
-        bool winnerExists = _winnersMap[gameId] != Helpers.nullAddress();
         // Check and verify if the winner address is not set.
+        bool winnerExists = _winnersMap[gameId] != Helpers.nullAddress();
         require(!winnerExists, "Winner address cannot be set before the game starts");
         // Join an already created game with specified `gameId`
         _joinGame(gameId);
@@ -209,8 +214,9 @@ contract GameContract is BaseContract {
         bool gameExists = challengerAddress != Helpers.nullAddress();
         // Check and verify if a game with specified ID  already exists.
         require(gameExists, "A game with specified ID does not exist");
-        bool challengeAcceptorExists = _playersMap[challengerAddress] != Helpers.nullAddress();
         // Check and verify if the challenge acceptor address exist
+        uint key = Helpers.getKey(gameId, challengerAddress);
+        bool challengeAcceptorExists = _playersMap[key] != Helpers.nullAddress();
         require(challengeAcceptorExists, "Challenge acceptor address is not set");
         address winnerAddress = _winnersMap[gameId];
         bool winnerExists = winnerAddress != Helpers.nullAddress();
@@ -235,7 +241,8 @@ contract GameContract is BaseContract {
      * @param gameId id of game to be ended
      */
     function _joinGame(uint gameId) private {
-        _playersMap[_gamesMap[gameId]] = msg.sender;
+        uint key = Helpers.getKey(gameId, _gamesMap[gameId]);
+        _playersMap[key] = msg.sender;
     }
     
     /**

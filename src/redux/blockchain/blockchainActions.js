@@ -74,7 +74,7 @@ const connectGameAndListener = (address, createGameRequest, joinGameRequest, gam
     console.log("gameId: " + gameId);
     const identiconUrl = getIdenticonUrl(address);
     // Init Contract
-    const web3 = await Moralis.enable();
+    const web3 = await Moralis.Web3.enable();
     const networkId = await window.ethereum.request({
       method: "net_version",
     });

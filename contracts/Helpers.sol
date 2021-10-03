@@ -17,12 +17,22 @@ library Helpers {
      * @param data uint value for which a random number is to be generated.
      * @return generated random number
      */
-    function randomNumber(string memory data) internal pure returns (uint) {
+    function getEncryptedKey(string memory data) private pure returns (uint) {
         uint mod = 10**16;
         uint _randomNumber = uint(keccak256(abi.encodePacked(data)));
         (bool success, uint result) = SafeMath.tryMod(_randomNumber, mod);
         require(success, "Integer overflow for mod operation while generating random number");
         return result;
+    }
+
+    function getKey(uint gameId, address addr) internal pure returns (uint) {
+        string memory data = string(abi.encodePacked(gameId, addr));
+        return getEncryptedKey(data);
+    }
+
+    function getDNA(uint timestamp, address addr, uint counterValue) internal pure returns (uint) {
+        string memory data = string(abi.encodePacked(timestamp, addr, counterValue));
+        return getEncryptedKey(data);
     }
 
     /**
