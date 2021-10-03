@@ -160,7 +160,7 @@ function App() {
     dispatch(fetchCachedAccount());
   }
   return (
-    <s.Screen>
+    <s.ResponsiveWrapper>
       {renderToolbar()}
       {/* 
         If account connected or not-connected and no NFTs minted show the chessboard with start game button
@@ -170,7 +170,7 @@ function App() {
       {renderHelpPopup()}
       {renderJoinGamePopup()}
       {gameCreated ? renderGameBoard() : renderWelcomePage()}
-    </s.Screen>
+    </s.ResponsiveWrapper>
   );
 
   function renderToolbar() {
@@ -227,33 +227,37 @@ function App() {
 
   function renderWelcomePage() {
     return (
-      <s.Container ai={"center"} jc={"center"} style={{padding: "50px"}}>
-        <s.Container ai={"center"} jc={"center"} fd={"row"}>
-          <s.StyledButton style={{width:"130px", height:"40px"}}
-            onClick={(e) => {
-              e.preventDefault();
-              if (gameConnected) {
-                dispatch(createGame({address: address, lightSquareColor: lightSquareColor, darkSquareColor: darkSquareColor}));
-              } else {
-                dispatch(connectWallet({createGameRequest: true, lightSquareColor: lightSquareColor, darkSquareColor: darkSquareColor}));
-              }
-            }}>Create Game</s.StyledButton>
-          <s.SpacerMedium />
-          <s.StyledButton style={{width:"130px", height:"40px"}}
-            onClick={(e) => {
-              showJoinGameDialog();
-              e.preventDefault();
-            }}
-          >
-            Join Game
-          </s.StyledButton>
-        </s.Container>
-        <s.SpacerMedium />
-        {blockchain.errorMsg !== "" ? (
-          <s.TextDescription>{blockchain.errorMsg}</s.TextDescription>
-        ) : null}
-        <s.SpacerMedium />
+      <s.Container ai={"center"} jc={"center"} fd={"row"}style={{padding: "50px"}}>
         {setChessboard(false)}
+        <s.SpacerXXLarge />
+        <s.Container ai={"center"} jc={"center"}>
+          <s.TextTitle style={{textAlign: "center"}}>Welcome to CHKMATE!</s.TextTitle>
+          <s.SpacerMedium />
+          {blockchain.errorMsg !== "" ? (
+            <s.TextDescription>{blockchain.errorMsg}</s.TextDescription>
+          ) : null}
+          <s.SpacerMedium />
+          <s.Container ai={"center"} jc={"center"} fd={"row"}>
+            <s.StyledButton style={{width:"130px", height:"40px"}}
+              onClick={(e) => {
+                e.preventDefault();
+                if (gameConnected) {
+                  dispatch(createGame({address: address, lightSquareColor: lightSquareColor, darkSquareColor: darkSquareColor}));
+                } else {
+                  dispatch(connectWallet({createGameRequest: true, lightSquareColor: lightSquareColor, darkSquareColor: darkSquareColor}));
+                }
+              }}>Create Game</s.StyledButton>
+            <s.SpacerMedium />
+            <s.StyledButton style={{width:"130px", height:"40px"}}
+              onClick={(e) => {
+                showJoinGameDialog();
+                e.preventDefault();
+              }}
+            >
+              Join Game
+            </s.StyledButton>
+          </s.Container>
+        </s.Container>
       </s.Container>
     );
   }
@@ -498,7 +502,7 @@ function App() {
         fd={"row"}
         jc={"center"}
         ai={"center"}
-        style={{paddingTop: "138px", paddingBottom: "50px", paddingStart: "50px"}}
+        style={{padding: "50px"}}
       >
         {setChessboard(gameStarted && ((isPlayer && playerTurn) || (isOpponent && opponentTurn)))}
         <s.SpacerXXLarge/>

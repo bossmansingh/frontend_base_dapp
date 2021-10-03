@@ -55,6 +55,8 @@ export const ResponsiveWrapper = styled.div`
   justify-content: stretched;
   align-items: stretched;
   width: 100%;
+  min-height: 100vh;
+  background-color: var(--black);
 `;
 
 // Used for providing a wrapper around a component
