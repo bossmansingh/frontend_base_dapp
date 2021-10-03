@@ -72,6 +72,8 @@ const connectGameAndListener = (payload) => {
     const createGameRequest = payload.createGameRequest;
     const joinGameRequest = payload.joinGameRequest;
     const gameId = payload.gameId;
+    const lightSquareColor = payload.lightSquareColor;
+    const darkSquareColor = payload.darkSquareColor;
     console.table("2 address: ", address);
     console.log("createGameRequest: " + createGameRequest);
     console.log("joinGameRequest: " + joinGameRequest);
@@ -98,7 +100,7 @@ const connectGameAndListener = (payload) => {
       );
       if (createGameRequest) {
         console.log("Create game request");
-        dispatch(createGame(address));
+        dispatch(createGame({address: address, lightSquareColor: lightSquareColor, darkSquareColor: darkSquareColor}));
       } else if (joinGameRequest && gameId != null && gameId !== "") {
         console.log("Join game request");
         dispatch(joinGame(address, gameId));
@@ -123,6 +125,8 @@ export const connectWallet = (payload) => {
         const createGameRequest = payload.createGameRequest;
         const joinGameRequest = payload.joinGameRequest;
         const gameId = payload.gameId;
+        const lightSquareColor = payload.lightSquareColor;
+        const darkSquareColor = payload.darkSquareColor;
         dispatch(connectRequest());
         const userAccount = await Moralis.Web3.authenticate({signingMessage: signingMessage});
         if (userAccount != null) {
@@ -132,7 +136,9 @@ export const connectWallet = (payload) => {
             createGameRequest: createGameRequest,
             joinGameRequest: joinGameRequest,
             gameId: gameId,
-            address: address
+            address: address,
+            lightSquareColor: lightSquareColor,
+            darkSquareColor: darkSquareColor
           }));
         }
       } catch (err) {

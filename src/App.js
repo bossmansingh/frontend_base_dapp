@@ -76,11 +76,13 @@ function App() {
   let currentTurnAddress = "";
   let gameBoardPosition = "start";
   if (gameCreated) {
-    gameBoardPosition = data.gameModel.get("currentBoardPosition");
-    gameStarted = data.gameModel.get("gameStarted");
-    playerAddress = data.gameModel.get("playerAddress");
-    opponentAddress = data.gameModel.get("opponentAddress");
-    currentTurnAddress = data.gameModel.get("currentTurnAddress");
+    gameBoardPosition = gameModel.get("currentBoardPosition");
+    gameStarted = gameModel.get("gameStarted");
+    playerAddress = gameModel.get("playerAddress");
+    opponentAddress = gameModel.get("opponentAddress");
+    currentTurnAddress = gameModel.get("currentTurnAddress");
+    lightSquareColor = gameModel.get("lightSquareColor");
+    darkSquareColor = gameModel.get("darkSquareColor");
   }
 
   console.log("App() | Address: " + address);
@@ -223,9 +225,9 @@ function App() {
             onClick={(e) => {
               e.preventDefault();
               if (gameConnected) {
-                dispatch(createGame(address));
+                dispatch(createGame({address: address, lightSquareColor: lightSquareColor, darkSquareColor: darkSquareColor}));
               } else {
-                dispatch(connectWallet({createGameRequest: true}));
+                dispatch(connectWallet({createGameRequest: true, lightSquareColor: lightSquareColor, darkSquareColor: darkSquareColor}));
               }
             }}>Create Game</s.StyledButton>
           <s.SpacerMedium />

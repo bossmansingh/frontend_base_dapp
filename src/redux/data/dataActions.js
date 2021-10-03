@@ -9,13 +9,6 @@ const fetchDataRequest = () => {
   };
 };
 
-const fetchDataSuccess = (payload) => {
-  return {
-    type: "CHECK_DATA_SUCCESS",
-    payload: payload,
-  };
-};
-
 const fetchDataFailed = (payload) => {
   return {
     type: "CHECK_DATA_FAILED",
@@ -66,8 +59,12 @@ async function queryGameModel(gameId) {
   }
 }
 
-async function saveNewGameToDatabase(gameId, address) {
+async function saveNewGameToDatabase(payload) {
   try {
+    const gameId = payload.gameId;
+    const address = payload.address;
+    const lightSquareColor = payload.lightSquareColor;
+    const darkSquareColor = payload.darkSquareColor;
     console.log("Saving game to database");
     const GameModel = Moralis.Object.extend("GameModel");
     const gameModel = new GameModel();
@@ -82,7 +79,9 @@ async function saveNewGameToDatabase(gameId, address) {
       currentBoardPosition: "start",
       gameCreateTime: 0,
       lastTurnTime: 0,
-      currentTurnAddress: ""
+      currentTurnAddress: "",
+      lightSquareColor: lightSquareColor,
+      darkSquareColor: darkSquareColor
     });
     console.log("Game saved");
     console.table(result);
@@ -140,12 +139,20 @@ export const togglePlayerState = (payload) => {
   };
 };
 
-export const createGame = (address) => {
+export const createGame = (payload) => {
   return async (dispatch) => {
     try {
+      const address = payload.address;
+      const lightSquareColor = payload.lightSquareColor;
+      const darkSquareColor = payload.darkSquareColor;
       // Save new game to database
       const currentGameCounter = await getGameModelQuery().count();
-      const gameModel = await saveNewGameToDatabase(currentGameCounter, address);
+      const gameModel = await saveNewGameToDatabase({
+        gameId: currentGameCounter, 
+        address: address, 
+        lightSquareColor: lightSquareColor, 
+        darkSquareColor: darkSquareColor
+      });
       if (gameModel != null) {
         console.log("Create and add new game to blockchain");
         await store
