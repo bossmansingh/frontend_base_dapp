@@ -265,6 +265,7 @@ function App() {
         draggable={isEnable}
         lightSquareStyle={{ backgroundColor: `rgb(${lightSquareColor})` }}
         darkSquareStyle={{ backgroundColor: `rgb(${darkSquareColor})` }}
+        showNotation={false}
         // pieces={{
         //   wK: () => (
         //     <img
