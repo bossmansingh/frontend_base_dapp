@@ -29,6 +29,10 @@ const blockchainReducer = (state = initialState, action) => {
         loading: false,
         errorMsg: action.payload,
       };
+    case "CLEAR_BLOCKCHAIN_DATA":
+      return {
+        ...initialState
+      };
     default:
       return state;
   }

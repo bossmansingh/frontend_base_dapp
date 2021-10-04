@@ -37,6 +37,12 @@ const updateGame = (payload) => {
   };
 };
 
+export const clearGameData = () => {
+  return {
+    type: "CLEAR_GAME_DATA"
+  };
+};
+
 function getGameModelQuery() {
   const gameModel = Moralis.Object.extend("GameModel");
   return new Moralis.Query(gameModel);
@@ -44,16 +50,12 @@ function getGameModelQuery() {
 
 async function queryGameModel(gameId) {
   try {
-    console.log("Fetch game from database");
     const query = getGameModelQuery();
-    console.log("GameId: " + gameId);
     query.equalTo("gameId", gameId.toString());
     const gameModel = await query.first();
-    console.log("Game fetched:");
     console.table(gameModel);
     return gameModel;
   } catch (err) {
-    console.log("Query Game error");
     console.log(err);
     return null;
   }
@@ -65,7 +67,6 @@ async function saveNewGameToDatabase(payload) {
     const address = payload.address;
     const lightSquareColor = payload.lightSquareColor;
     const darkSquareColor = payload.darkSquareColor;
-    console.log("Saving game to database");
     const GameModel = Moralis.Object.extend("GameModel");
     const gameModel = new GameModel();
     console.table(gameModel);
@@ -83,11 +84,8 @@ async function saveNewGameToDatabase(payload) {
       lightSquareColor: lightSquareColor,
       darkSquareColor: darkSquareColor
     });
-    console.log("Game saved");
-    console.table(result);
     return result;
   } catch (err) {
-    console.log("Game save error");
     console.log(err);
     return null;
   }
@@ -97,10 +95,7 @@ async function addSubscription(dispatch, gameId) {
   const subscriptionQuery = getGameModelQuery();
   subscriptionQuery.equalTo("gameId", gameId.toString());
   const subscription = await subscriptionQuery.subscribe();
-  console.log("Add Subscription: ", subscription);
   subscription.on("update", (gameModel) => {
-    console.log(`GameMode with id: ${gameId} updated`);
-    console.table(gameModel);
     dispatch(updateGame({gameModel: gameModel}));
   });
 }
@@ -108,8 +103,7 @@ async function addSubscription(dispatch, gameId) {
 async function removeSubscription(gameId) {
   const subscriptionQuery = getGameModelQuery();
   subscriptionQuery.equalTo("gameId", gameId.toString());
-  const subscription = await subscriptionQuery.unsubscribe();
-  console.log("Remove Subscription: ", subscription);
+  await subscriptionQuery.unsubscribe();
   // This will close the WebSocket connection to the LiveQuery server, cancel the auto-reconnect, and unsubscribe all subscriptions based on it.
   Moralis.LiveQuery.close();
 }
@@ -154,7 +148,6 @@ export const createGame = (payload) => {
         darkSquareColor: darkSquareColor
       });
       if (gameModel != null) {
-        console.log("Create and add new game to blockchain");
         await store
               .getState()
               .blockchain.gameContract.methods.createGame()
@@ -165,10 +158,9 @@ export const createGame = (payload) => {
                 console.log(err);
                 dispatch(fetchDataFailed("Error creating a new game"));
                 // Delete saved game model from database
-                const deleteSuccess = await gameModel.destroy();
-                console.log("DeleteSuccess: ", deleteSuccess);
+                await gameModel.destroy();
               }).then(async (receipt) => {
-                console.log("Game Create Success", receipt);
+                //console.log("Game Create Success", receipt);
                 dispatch(createNewGame({gameModel: gameModel})); 
                 await addSubscription(dispatch, currentGameCounter);
               });
@@ -190,9 +182,6 @@ export const joinGame = (payload) => {
       const address = payload.address;
       const gameModel = await queryGameModel(gameId, address);
       if (gameModel != null) {
-        console.log("Join game request");
-        console.log("Challenge acceptor address: ", address);
-        console.log("GameId: ", gameId);
         await store
             .getState()
             .blockchain.gameContract.methods.joinGame(gameId)
@@ -201,9 +190,9 @@ export const joinGame = (payload) => {
               value: web3.utils.toWei("0.05", "ether")
             }).once("error", (err) => {
               console.log(err);
-              dispatch(fetchDataFailed("Error joining game with gameId: " + gameId));
+              dispatch(fetchDataFailed("Error joining game with code: " + gameId));
             }).then(async (receipt) => {
-              console.log("Game Joined Success", receipt);
+              //console.log("Game Joined Success", receipt);
               console.table(gameModel);
               // Update game data after opponent joins
               const playerAddress = gameModel.get("playerAddress");

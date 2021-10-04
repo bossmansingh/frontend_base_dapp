@@ -54,8 +54,6 @@ const dataReducer = (state = initialState, action) => {
         gameModel: action.payload.gameModel
       };
     case "UPDATE_GAME":
-      // const updatedModel = state.gameModel;
-      // updatedModel.updateMove(action.payload.move);
       return {
         ...state,
         showInfoDialog: false,
@@ -68,7 +66,7 @@ const dataReducer = (state = initialState, action) => {
       return {
         ...state.gameModel.updateMove(action.payload.move)
       };
-    case "LOGOUT":
+    case "CLEAR_GAME_DATA":
       return {
         ...initialState
       };

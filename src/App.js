@@ -148,14 +148,14 @@ function App() {
   return (
     <s.ResponsiveWrapper>
       {renderToolbar()}
+      {renderHelpPopup()}
+      {renderJoinGamePopup()}
+      {gameCreated ? renderGameBoard() : renderWelcomePage()}
       {/* 
         If account connected or not-connected and no NFTs minted show the chessboard with start game button
         If account connected or not-connected and NFTs minted show minted NFTs with start game button
         TODO: Show minted NFTs (in carousel) 
       */}
-      {renderHelpPopup()}
-      {renderJoinGamePopup()}
-      {gameCreated ? renderGameBoard() : renderWelcomePage()}
     </s.ResponsiveWrapper>
   );
 

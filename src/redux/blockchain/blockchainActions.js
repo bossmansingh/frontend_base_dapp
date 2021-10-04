@@ -1,7 +1,7 @@
 // constants
 import GameContract from "../../contracts/GameContract.json";
 import blockies from "../../utils/Blockies";
-import { createGame, joinGame } from "../data/dataActions";
+import { createGame, joinGame, clearGameData } from "../data/dataActions";
 
 const Moralis = require('moralis');
 const signingMessage = "Welcome to CHKMATE!\n Please sign this transaction to connect your wallet.\n\nBy signing you agree to terms and condition of CHKMATE.";
@@ -23,6 +23,12 @@ const connectFailed = (payload) => {
   return {
     type: "CONNECTION_FAILED",
     payload: payload,
+  };
+};
+
+const clearBlockchainData = () => {
+  return {
+    type: "CLEAR_BLOCKCHAIN_DATA"
   };
 };
 
@@ -58,7 +64,6 @@ function addEventListener(dispatch) {
 }
 
 const getIdenticonUrl = (address) => {
-  console.log("Get identicon for address: " + address);
   return blockies.create({
     seed: address,
     size: 8,
@@ -74,10 +79,6 @@ const connectGameAndListener = (payload) => {
     const gameId = payload.gameId;
     const lightSquareColor = payload.lightSquareColor;
     const darkSquareColor = payload.darkSquareColor;
-    console.table("2 address: ", address);
-    console.log("createGameRequest: " + createGameRequest);
-    console.log("joinGameRequest: " + joinGameRequest);
-    console.log("gameId: " + gameId);
     const identiconUrl = getIdenticonUrl(address);
     // Init Contract
     const web3 = await Moralis.Web3.enable();
@@ -99,10 +100,8 @@ const connectGameAndListener = (payload) => {
         })
       );
       if (createGameRequest) {
-        console.log("Create game request");
         dispatch(createGame({address: address, lightSquareColor: lightSquareColor, darkSquareColor: darkSquareColor}));
       } else if (joinGameRequest && gameId != null && gameId !== "") {
-        console.log("Join game request");
         dispatch(joinGame(address, gameId));
       }
     } else {
@@ -155,12 +154,8 @@ export const logout = () => {
     if (isWeb3Active()) {
       try {
         await Moralis.User.logOut();
-        dispatch(
-          connectSuccess({
-            address: "",
-            identiconUrl: ""
-          })
-        );
+        dispatch(clearGameData());
+        dispatch(clearBlockchainData());
       } catch (err) {
         console.log(err);
         dispatch(connectFailed("Logout Failed."));
