@@ -77,7 +77,7 @@ async function saveNewGameToDatabase(payload) {
       winnerAddress: "",
       gameStarted: false,
       gameEnded: false,
-      currentBoardPosition: "start",
+      fenString: "start",
       gameCreateTime: 0,
       lastTurnTime: 0,
       currentTurnAddress: "",
@@ -127,6 +127,10 @@ export const togglePlayerState = (payload) => {
     // Update game data when turn switches to other player
     const gameModel = payload.gameModel;
     const address = payload.address;
+    const fenString = payload.fen;
+    if (fenString != null && fenString !== "") {
+      gameModel.set("fenString", fenString);
+    }
     gameModel.set("currentTurnAddress", address);
     const result = await gameModel.save();
     dispatch(updateGame({gameModel: result}));

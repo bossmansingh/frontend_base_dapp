@@ -5,6 +5,7 @@ import Dialog from "@material-ui/core/Dialog";
 import DialogContent from "@material-ui/core/DialogContent";
 
 import Chessboard from "chessboardjsx";
+import Chess from "chess.js";
 
 import { connectWallet, fetchCachedAccount, logout } from "./redux/blockchain/blockchainActions";
 import { fetchData, createGame, joinGame, toggleInfoDialog, toggleJoinGameDialog, togglePlayerState } from "./redux/data/dataActions";
@@ -14,7 +15,6 @@ import "./styles/clockStyle.css";
 // import styled from "styled-components";
 // import { create } from "ipfs-http-client";
 import logo from "./assets/chessboard_logo.jpg";
-import { onDragStart, onDrop } from "./components/chessGame";
 
 const gameTitle = "Welcome to CHKMATE!";
 const gameDescription = `First ever chess game built on blockchain. Create a new game or join an existing game using a game code. To read more about the rules of the game press the help icon in the top left corner.`;
@@ -31,6 +31,7 @@ let lightSquareColor = getLightSquareColor();
 let darkSquareColor = getDarkSquareColor();
 const youTitle = "YOU";
 const opponentTitle = "OPPONENT";
+let gameBoard = null;
 
 // Function to generate and return light square color
 function getLightSquareColor() {
@@ -68,7 +69,7 @@ function stringValueEqual(str1, str2) {
 }
 
 function App() {
-  const ref = useRef();
+  gameBoard = useRef(null);
   const dispatch = useDispatch();
   const blockchain = useSelector((state) => state.blockchain);
   const data = useSelector((state) => state.data);
@@ -83,9 +84,9 @@ function App() {
   let playerAddress = "";
   let opponentAddress = "";
   let currentTurnAddress = "";
-  let gameBoardPosition = "start";
+  let fenString = "start";
   if (gameCreated) {
-    gameBoardPosition = gameModel.get("currentBoardPosition");
+    fenString = gameModel.get("fenString");
     gameStarted = gameModel.get("gameStarted");
     playerAddress = gameModel.get("playerAddress");
     opponentAddress = gameModel.get("opponentAddress");
@@ -105,7 +106,7 @@ function App() {
   console.log("App() | playerAddress: " + playerAddress);
   console.log("App() | opponentAddress: " + opponentAddress);
   console.log("App() | currentTurnAddress: " + currentTurnAddress);
-  console.log("App() | gameBoardPosition: " + gameBoardPosition);
+  console.log("App() | fenString: " + fenString);
   
   const playerTurn = stringValueEqual(currentTurnAddress, playerAddress);
   const opponentTurn = stringValueEqual(currentTurnAddress, opponentAddress);
@@ -139,6 +140,9 @@ function App() {
     if (gameConnected) {
       // TODO: fetch NFT data
       dispatch(fetchData(address));
+      // Init chess board
+      gameBoard.current = new Chess();
+      //updateStatus();
     }
   }, [address, gameConnected, dispatch]);
 
@@ -260,16 +264,87 @@ function App() {
     );
   }
 
+  function onDragStart (source, piece, position, orientation) {
+    console.log("onDragStart");
+    // do not pick up pieces if the game is over
+    if (gameBoard.current.game_over()) return false;
+    console.log("Game not over");
+    console.log("Current turn " + gameBoard.current.turn());
+    // only pick up pieces for the side to move
+    if ((gameBoard.current.turn() === 'w' && piece.search(/^b/) !== -1) ||
+        (gameBoard.current.turn() === 'b' && piece.search(/^w/) !== -1)) {
+      return false;
+    }
+  }
+  
+  function onDrop(payload) {
+    const source = payload.sourceSquare;
+    const target = payload.targetSquare;
+    
+    // see if the move is legal
+    const move = gameBoard.current.move({
+      from: source,
+      to: target
+    });
+    
+    // illegal move
+    if (move === null) return 'snapback';
+  
+    updateStatus();
+  }
+  
+  // update the board position after the piece snap
+  // for castling, en passant, pawn promotion
+  // function onSnapEnd() {
+  //   board.position(gameBoard.fen());
+  // }
+  
+  function updateStatus () {
+    let status = "";
+  
+    const moveColor = gameBoard.current.turn() === 'b' ? 'Black' : 'White';
+    const address = gameBoard.current.turn() === 'w' ? playerAddress : opponentAddress;
+  
+    // checkmate?
+    if (gameBoard.current.in_checkmate()) {
+      status = 'Game over, ' + moveColor + ' is in checkmate.';
+    }
+  
+    // draw?
+    else if (gameBoard.current.in_draw()) {
+      status = 'Game over, drawn position';
+    }
+  
+    // game still on
+    else {
+      status = moveColor + ' to move';
+  
+      // check?
+      if (gameBoard.current.in_check()) {
+        status += ', ' + moveColor + ' is in check';
+      }
+    }
+  
+    console.log("Game Status: " + status);
+    console.log("Game Fen: " + gameBoard.current.fen());
+    if (gameModel != null) {
+      dispatch(togglePlayerState({gameModel: gameModel, address: address, fen: gameBoard.current.fen()}))
+    }
+    //   $status.html(status);
+    //   $fen.html(game.fen());
+    //   $pgn.html(game.pgn());
+  }
+
   function setChessboard(isEnable) {
     return(
       <Chessboard
-        position={gameBoardPosition}
+        position={fenString}
         draggable={isEnable}
         lightSquareStyle={{ backgroundColor: `rgb(${lightSquareColor})` }}
         darkSquareStyle={{ backgroundColor: `rgb(${darkSquareColor})` }}
         showNotation={false}
-        onDrop={onDrop}
         onDragStart={onDragStart}
+        onDrop={onDrop}
         // pieces={{
         //   wK: () => (
         //     <img
