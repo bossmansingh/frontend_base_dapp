@@ -15,6 +15,8 @@ import "./styles/clockStyle.css";
 // import { create } from "ipfs-http-client";
 import logo from "./assets/chessboard_logo.jpg";
 
+const gameTitle = "Welcome to CHKMATE!";
+const gameDescription = `First ever chess game built on blockchain. Create a new game or join an existing game using a game code. To read more about the rules of the game press the help icon in the top left corner.`;
 const gameInstructions = "It is a NFT based game of chess where every player have a chance to mint a unique CHKMATE NFT win card, in half the price. Rules are simple here, to create a new game or to join an existing game it would cost you 0.05 eth. Each player has to deposits the same amount into the contract and the winner receives the CHKMATE NFT. Each card has unique characteristics about the game which includes winning piece, winning board, winning time and total kills.";
 const rule1 = "1. To create a new game a fee of 0.05 eth is to be deposited into the contract."; 
 const rule2 = "2. Once a game is created a unique code will be generated that you can share with the other player for them to join. The other player will have 30 minutes to join before the game auto-forfeits. In that case, the deposited eth will be returned to your wallet[1].";
@@ -109,22 +111,6 @@ function App() {
   console.log("App() | player: " + playerTurn);
   console.log("App() | opponent: " + opponentTurn);
   
-  
-  // const [player, _setPlayer] = useState(p);
-  // const [opponent, _setOpponent] = useState(o);
-  
-
-  // if (address !== null &&  && !player) {
-  //   console.log("App() | challenger equal");
-  //   console.log("App() | set player");
-  //   _setPlayer(true);
-  //   _setOpponent(false);
-  // } else if (address !== null &&  && !opponent) {
-  //   console.log("App() | challengAcceptor equal");
-  //   console.log("App() | set opponent");
-  //   _setPlayer(false);
-  //   _setOpponent(true);
-  // }
 
   const showInformationDialog = () => {
     dispatch(toggleInfoDialog(true));
@@ -145,12 +131,12 @@ function App() {
   const [gameCode, _setGameCode] = useState("");
 
   const handleInput = (event) => {
-    console.log("Text: ", event.target.value);
     _setGameCode(event.target.value);
   };
 
   useEffect(() => {
     if (gameConnected) {
+      // TODO: fetch NFT data
       dispatch(fetchData(address));
     }
   }, [address, gameConnected, dispatch]);
@@ -175,63 +161,70 @@ function App() {
 
   function renderToolbar() {
     return <s.Container
-      style={{ 
-        padding: 8 
-      }}
       ai={"center"}
       fd={"row"}
+      style={{padding: "8px"}}
+    >
+      <s.HelpButton id="help_button"
+        style={{width:"40px", height:"40px", marginLeft: "5px"}}
+        onClick={(e) => {
+          e.preventDefault();
+          showInformationDialog();
+        } 
+      }>?</s.HelpButton>
+      <s.TextPageTitle
+        style={{ 
+          color: "white", 
+          marginLeft: "auto", 
+          paddingLeft: (walletConnected ? "0px" : "60px") 
+        }}
       >
-        <s.HelpButton id="help_button"
-          style={{width:"40px", height:"40px"}}
-          onClick={(e) => {
-            e.preventDefault();
-            showInformationDialog();
-          } 
-        }>?</s.HelpButton>
-        <s.TextPageTitle
-          style={{ 
-            color: "white", 
-            marginLeft: "auto", 
-            paddingLeft: (walletConnected ? "0px" : "60px") 
-          }}
-        >
-          CHKMATE
-        </s.TextPageTitle>
-        
-        <s.Container 
-          style={{ 
-            marginLeft: "auto" 
-          }}
-        >
-          { walletConnected && blockchain.identiconUrl != null ? (
-            <s.Identicon 
-              alt="identicon" 
-              src={(blockchain.identiconUrl != null ? blockchain.identiconUrl : logo)}
-              onClick={(e) => {
-                e.preventDefault();
-                dispatch(logout());
-              }} />
-          ) : (
-            <s.StyledButton
-              onClick={(e) => {
-                e.preventDefault();
-                dispatch(connectWallet());
-              } 
-            }>
-              CONNECT
-            </s.StyledButton>
-          )}
-        </s.Container>
+        CHKMATE
+      </s.TextPageTitle>
+      <s.Container 
+        style={{ 
+          marginLeft: "auto",
+          marginRight: "5px"
+        }}
+      >
+        { walletConnected && blockchain.identiconUrl != null ? (
+          <s.Identicon 
+            alt="identicon" 
+            src={(blockchain.identiconUrl != null ? blockchain.identiconUrl : logo)}
+            onClick={(e) => {
+              e.preventDefault();
+              dispatch(logout());
+            }} />
+        ) : (
+          <s.StyledButton
+            onClick={(e) => {
+              e.preventDefault();
+              dispatch(connectWallet({
+                lightSquareColor: lightSquareColor, 
+                darkSquareColor: darkSquareColor
+              }));
+            } 
+          }>
+            CONNECT
+          </s.StyledButton>
+        )}
+      </s.Container>
     </s.Container>;
   }
 
   function renderWelcomePage() {
     return (
-      <s.Container ai={"center"} jc={"center"} fd={"row"}style={{padding: "50px"}}>
+      <s.Container ai={"center"} jc={"center"} fd={"row"} style={{padding: "50px"}}>
         {setChessboard(false)}
         <s.SpacerXXLarge />
-        <s.Container ai={"center"} jc={"center"}>
-          <s.TextTitle style={{textAlign: "center"}}>Welcome to CHKMATE!</s.TextTitle>
+        <s.Container ai={"center"} jc={"center"} style={{padding: "20px"}}>
+          <s.TextSubTitle style={{textAlign: "center"}}>{gameTitle}</s.TextSubTitle>
+          <s.SpacerSmall />
+          <s.TextDescription style={{
+            textAlign: "justify",
+            marginLeft: "5px",
+            marginRight: "5px"
+          }}>{gameDescription}</s.TextDescription>
           <s.SpacerMedium />
           {blockchain.errorMsg !== "" ? (
             <s.TextDescription>{blockchain.errorMsg}</s.TextDescription>
@@ -244,7 +237,11 @@ function App() {
                 if (gameConnected) {
                   dispatch(createGame({address: address, lightSquareColor: lightSquareColor, darkSquareColor: darkSquareColor}));
                 } else {
-                  dispatch(connectWallet({createGameRequest: true, lightSquareColor: lightSquareColor, darkSquareColor: darkSquareColor}));
+                  dispatch(connectWallet({
+                    createGameRequest: true, 
+                    lightSquareColor: lightSquareColor, 
+                    darkSquareColor: darkSquareColor
+                  }));
                 }
               }}>Create Game</s.StyledButton>
             <s.SpacerMedium />
@@ -470,7 +467,12 @@ function App() {
                   if (gameConnected) {
                     dispatch(joinGame({gameId: gameCode, address: address}));
                   } else {
-                    dispatch(connectWallet({joinGameRequest: true, gameId: gameCode}));
+                    dispatch(connectWallet({
+                      joinGameRequest: true,
+                      gameId: gameCode, 
+                      lightSquareColor: lightSquareColor, 
+                      darkSquareColor: darkSquareColor
+                    }));
                   }
                 }}
               >

@@ -98,12 +98,12 @@ export const TextSubTitle = styled.p`
   font-size: 26px;
   font-weight: bold;
   line-height: 1.6;
+  font-family: default-font;
 `;
 
 export const TextDescription = styled.p`
   color: var(--white);
   font-size: 14px;
-  font-weight: 600;
   line-height: 1.6;
   font-family: default-font;
 `;
