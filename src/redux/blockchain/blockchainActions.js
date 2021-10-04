@@ -102,7 +102,8 @@ const connectGameAndListener = (payload) => {
       if (createGameRequest) {
         dispatch(createGame({address: address, lightSquareColor: lightSquareColor, darkSquareColor: darkSquareColor}));
       } else if (joinGameRequest && gameId != null && gameId !== "") {
-        dispatch(joinGame(address, gameId));
+        console.log("Join game gameId: " + gameId);
+        dispatch(joinGame({address: address, gameId: gameId}));
       }
     } else {
       dispatch(connectFailed("Change network to CHKMATE."));

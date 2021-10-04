@@ -14,6 +14,7 @@ import "./styles/clockStyle.css";
 // import styled from "styled-components";
 // import { create } from "ipfs-http-client";
 import logo from "./assets/chessboard_logo.jpg";
+import { onDragStart, onDrop } from "./components/chessGame";
 
 const gameTitle = "Welcome to CHKMATE!";
 const gameDescription = `First ever chess game built on blockchain. Create a new game or join an existing game using a game code. To read more about the rules of the game press the help icon in the top left corner.`;
@@ -267,6 +268,8 @@ function App() {
         lightSquareStyle={{ backgroundColor: `rgb(${lightSquareColor})` }}
         darkSquareStyle={{ backgroundColor: `rgb(${darkSquareColor})` }}
         showNotation={false}
+        onDrop={onDrop}
+        onDragStart={onDragStart}
         // pieces={{
         //   wK: () => (
         //     <img
