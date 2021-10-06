@@ -232,7 +232,7 @@ function App() {
           }}>{gameDescription}</s.TextDescription>
           <s.SpacerMedium />
           {blockchain.errorMsg !== "" ? (
-            <s.TextDescription>{blockchain.errorMsg}</s.TextDescription>
+            <s.TextParagraph style={{textAlign:"center", color: "red"}}>{blockchain.errorMsg}</s.TextParagraph>
           ) : null}
           <s.SpacerMedium />
           <s.Container ai={"center"} jc={"center"} fd={"row"}>
@@ -264,8 +264,9 @@ function App() {
     );
   }
 
-  function onDragStart (source, piece, position, orientation) {
+  function onDragStart (payload) {
     console.log("onDragStart");
+    const piece = payload.piece;
     // do not pick up pieces if the game is over
     if (gameBoard.current.game_over()) return false;
     console.log("Game not over");

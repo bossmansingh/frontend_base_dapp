@@ -32,10 +32,6 @@ const clearBlockchainData = () => {
   };
 };
 
-async function isWeb3Active() {
-  return await Moralis.ensureWeb3IsInstalled;
-}
-
 async function isMetaMaskInstalled() {
   return await Moralis.isMetaMaskInstalled;
 }
@@ -82,6 +78,7 @@ const connectGameAndListener = (payload) => {
     const identiconUrl = getIdenticonUrl(address);
     // Init Contract
     const web3 = await Moralis.Web3.enable();
+
     const networkId = await window.ethereum.request({
       method: "net_version",
     });
@@ -142,17 +139,18 @@ export const connectWallet = (payload) => {
           }));
         }
       } catch (err) {
-        dispatch(connectFailed("Something went wrong."));
+        console.log(err);
+        dispatch(connectFailed("No web3 enabled wallet found. Please install one and then try again"));
       }
     } else {
-      dispatch(connectFailed("Install Metamask."));
+      dispatch(connectFailed("Please install a web3 enabled wallet"));
     }
   };
 };
 
 export const logout = () => {
   return async (dispatch) => {
-    if (isWeb3Active()) {
+    if (isMetaMaskInstalled()) {
       try {
         await Moralis.User.logOut();
         dispatch(clearGameData());
@@ -167,7 +165,7 @@ export const logout = () => {
 
 export const fetchCachedAccount = () => {
   return async (dispatch) => {
-    if (isWeb3Active()) {
+    if (isMetaMaskInstalled()) {
       const userAccount = await Moralis.User.current();
       if (userAccount != null) {
         console.table("1 account: ", userAccount);
