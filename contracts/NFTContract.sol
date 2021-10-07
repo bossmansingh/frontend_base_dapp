@@ -43,7 +43,7 @@ contract NFTContract is ERC721, BaseContract {
         _;
     }
     
-    uint private _mintingFee = 0.01 ether;
+    uint private _mintingFee = Helpers.MINT_FEE;
     address private _gameContractAddress;
     CHKMATE[] private _tokens;
     

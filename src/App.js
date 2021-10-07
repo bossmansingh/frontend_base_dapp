@@ -146,7 +146,7 @@ function App() {
   useEffect(() => {
     if (gameConnected) {
       // TODO: fetch NFT data
-      console.log("Fetch data................");
+      console.log("................Fetch data................");
       dispatch(fetchData(address));
       // Init chess board
       gameBoard.current = new Chess();

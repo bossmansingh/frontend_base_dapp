@@ -11,6 +11,9 @@ library Helpers {
     
     using SafeMath for uint;
 
+    uint constant GAME_FEE = 0.05 ether;
+    uint constant MINT_FEE = GAME_FEE * 2;
+
     /**
      * Create and return a random number based on input `data`.
      * 

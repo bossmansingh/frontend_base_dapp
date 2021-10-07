@@ -67,13 +67,35 @@ function getGameModelQuery() {
 async function queryGameModel(gameId) {
   try {
     const query = getGameModelQuery();
-    query.equalTo('gameId', gameId.toString());
+    query.get(gameId);
     const gameModel = await query.first();
     console.table(gameModel);
     return gameModel;
   } catch (err) {
     console.log(err);
     return null;
+  }
+}
+
+async function currentGameOrNull(address, dispatch) {
+  try {
+    const startedGamesQuery = getGameModelQuery();
+    startedGamesQuery.equalTo('gameStarted', true);
+    const playerAddressMatchQuery = getGameModelQuery();
+    playerAddressMatchQuery.equalTo('playerAddress', address);
+    const opponentAddressMatchQuery = getGameModelQuery();
+    opponentAddressMatchQuery.equalTo('opponentAddress', address);
+    const mainQuery = Moralis.Query.and(
+      startedGamesQuery,
+      Moralis.Query.or(playerAddressMatchQuery, opponentAddressMatchQuery)
+    );
+    const gameModel = await mainQuery.first();
+    if (gameModel != null) {
+      console.table('GameModel', gameModel);
+      dispatch(updateGame({gameModel: gameModel}));
+    }
+  } catch (err) {
+    console.log(err);
   }
 }
 
@@ -210,7 +232,7 @@ export const joinGame = (payload) => {
       // Query game from database
       const gameId = payload.gameId;
       const address = payload.address;
-      const gameModel = await queryGameModel(gameId, address);
+      const gameModel = await queryGameModel(gameId);
       const gameFee = gameModel.get('gameFee');
       if (gameModel != null) {
         await store
@@ -252,7 +274,7 @@ export const endGame = (gameId, address) => {
   };
 };
 
-export const fetchData = (account) => {
+export const fetchData = (address) => {
   return async (dispatch) => {
     dispatch(fetchDataRequest());
     try {
@@ -264,6 +286,7 @@ export const fetchData = (account) => {
         .getState()
         .blockchain.gameContract.methods.getBaseGameFee()
         .call();
+      
       if (isValidString(contractBalance)) {
         const balanceInEth = web3.utils.fromWei(contractBalance, 'ether');
         console.log(`Contract balance in ETH: ${balanceInEth}`);
@@ -273,6 +296,7 @@ export const fetchData = (account) => {
         console.log(`Base game fee in ETH: ${baseGameFeeInEth}`);
         dispatch(updateBaseGameFee(baseGameFeeInEth));
       }
+      await currentGameOrNull(address, dispatch);
     } catch (err) {
       console.log(err);
       dispatch(fetchDataFailed('Could not load data from contract.'));

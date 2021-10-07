@@ -87,7 +87,7 @@ contract GameContract is BaseContract {
     mapping(string => address) private _opponentMap;
     mapping(string => address) private _winnersMap;
 
-    uint private _baseGameFee = 0.05 ether;
+    uint private _baseGameFee = Helpers.GAME_FEE;
     IERC20 private _token = new ERC20("ether", "ETH");
     NFTContract private nftContract = new NFTContract(address(this));
     

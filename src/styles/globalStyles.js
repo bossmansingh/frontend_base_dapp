@@ -102,7 +102,7 @@ export const TextSubTitle = styled.p`
 `;
 
 export const TextDescription = styled.p`
-  color: var(--white);
+  color: var(--yellow);
   font-size: 14px;
   line-height: 1.6;
   font-family: default-font;
