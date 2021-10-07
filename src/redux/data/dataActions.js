@@ -1,4 +1,4 @@
-import { isValidString } from "../../utils/Helpers";
+import { getShortGameId, isValidString } from "../../utils/Helpers";
 import store from "../store";
 
 const Moralis = require('moralis');
@@ -64,10 +64,10 @@ function getGameModelQuery() {
   return new Moralis.Query(GameModelInstance);
 }
 
-async function queryGameModel(gameId) {
+async function queryGameModel(shortId) {
   try {
     const query = getGameModelQuery();
-    query.get(gameId);
+    query.equalTo('shortId', shortId);
     const gameModel = await query.first();
     console.table(gameModel);
     return gameModel;
@@ -79,16 +79,11 @@ async function queryGameModel(gameId) {
 
 async function currentGameOrNull(address, dispatch) {
   try {
-    const startedGamesQuery = getGameModelQuery();
-    startedGamesQuery.equalTo('gameStarted', true);
     const playerAddressMatchQuery = getGameModelQuery();
     playerAddressMatchQuery.equalTo('playerAddress', address);
     const opponentAddressMatchQuery = getGameModelQuery();
     opponentAddressMatchQuery.equalTo('opponentAddress', address);
-    const mainQuery = Moralis.Query.and(
-      startedGamesQuery,
-      Moralis.Query.or(playerAddressMatchQuery, opponentAddressMatchQuery)
-    );
+    const mainQuery = Moralis.Query.or(playerAddressMatchQuery, opponentAddressMatchQuery);
     const gameModel = await mainQuery.first();
     if (gameModel != null) {
       dispatch(updateGame({gameModel: gameModel}));
@@ -199,9 +194,10 @@ export const createGame = (payload) => {
       });
       console.table('GameModel', gameModel);
       if (gameModel != null) {
+        const gameId = gameModel.id;
         await store
               .getState()
-              .blockchain.gameContract.methods.createGame(gameModel.id)
+              .blockchain.gameContract.methods.createGame(gameId)
               .send({
                 from: address,
                 value: web3.utils.toWei(gameFee, 'ether')
@@ -211,7 +207,8 @@ export const createGame = (payload) => {
                 // Delete saved game model from database
                 await gameModel.destroy();
               }).then(async (receipt) => {
-                //console.log("Game Create Success", receipt);
+                gameModel.set('shortId', getShortGameId(gameId));
+                await gameModel.save();
                 dispatch(createNewGame({gameModel: gameModel})); 
                 await addSubscription(dispatch, gameModel.id);
               });
@@ -229,11 +226,12 @@ export const joinGame = (payload) => {
   return async (dispatch) => {
     try {
       // Query game from database
-      const gameId = payload.gameId;
+      const shortId = payload.gameId;
       const address = payload.address;
-      const gameModel = await queryGameModel(gameId);
-      const gameFee = gameModel.get('gameFee');
+      const gameModel = await queryGameModel(shortId);
       if (gameModel != null) {
+        const gameFee = gameModel.get('gameFee');
+        const gameId = gameModel.id;
         await store
             .getState()
             .blockchain.gameContract.methods.joinGame(gameId)

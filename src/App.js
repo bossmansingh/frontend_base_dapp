@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { connect, useDispatch, useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import Dialog from "@material-ui/core/Dialog";
 import DialogContent from "@material-ui/core/DialogContent";
@@ -7,7 +7,7 @@ import DialogContent from "@material-ui/core/DialogContent";
 import Chessboard from "chessboardjsx";
 import Chess from "chess.js";
 
-import { isValidString } from "./utils/Helpers";
+import { getShortGameId, isValidString } from "./utils/Helpers";
 import { connectWallet, fetchCachedAccount, logout } from "./redux/blockchain/blockchainActions";
 import { DialogType, fetchData, createGame, joinGame, showInfoDialog, showCreateGameDialog, showJoinGameDialog, hideDialog, togglePlayerState } from "./redux/data/dataActions";
 import * as s from "./styles/globalStyles";
@@ -67,6 +67,24 @@ function stringValueEqual(str1, str2) {
   }
 }
 
+// This is the function we wrote earlier
+async function copyTextToClipboard(text) {
+  if ('clipboard' in navigator) {
+    return await navigator.clipboard.writeText(text);
+  } else {
+    return document.execCommand('copy', true, text);
+  }
+}
+
+const handleCopyClick = async (text) => {
+  try {
+    await copyTextToClipboard(text);
+    alert('Copied to clipboard');
+  } catch (err) {
+    console.log(err);
+  }
+};
+
 const gameBoard = Chess();
 
 function App() {
@@ -75,6 +93,7 @@ function App() {
   const [gameFee, _setGameFee] = useState('0.05');
 
   const gameCodeInputEvent = (event) => {
+    event.preventDefault();
     _setGameCode(event.target.value);
   };
   
@@ -108,8 +127,11 @@ function App() {
   let playerAddress = '';
   let opponentAddress = '';
   let currentTurnAddress = '';
+  let gameShortId = '';
   let fenString = 'start';
+  // let 
   if (gameCreated) {
+    gameShortId = getShortGameId(gameModel.id);
     fenString = gameModel.get('fenString');
     gameStarted = gameModel.get('gameStarted');
     playerAddress = gameModel.get('playerAddress');
@@ -193,7 +215,7 @@ function App() {
         (gameBoard.turn() === 'b' && piece.search(/^w/) !== -1)) {
       return false;
     }
-  }
+  };
 
   return (
     <s.ResponsiveWrapper>
@@ -201,7 +223,7 @@ function App() {
       {renderHelpPopup()}
       {renderCreateGamePopup()}
       {renderJoinGamePopup()}
-      <s.Container jc={"center"} style={{margin: "50px"}}>
+      <s.Container jc={"center"} style={{marginTop: "50px"}}>
         {gameCreated ? renderGameBoard() : renderWelcomePage()}
       </s.Container>
       {/* 
@@ -667,9 +689,8 @@ function App() {
             marginLeft: '5px',
             marginRight: '5px'
           }}>{gameDescription}</s.TextDescription>
-          <s.SpacerMedium />
           {data.errorMessage !== "" ? (
-            <s.TextParagraph style={{textAlign:'center', color: 'red'}}>{data.errorMessage}</s.TextParagraph>
+            <s.TextParagraph style={{textAlign:'center', color: 'red', marginTop: '10px'}}>{data.errorMessage}</s.TextParagraph>
           ) : null}
           <s.SpacerMedium />
           <s.Container ai={'center'} jc={'center'} fd={'row'}>
@@ -711,15 +732,27 @@ function App() {
         {setChessboard(gameStarted && ((isPlayer && playerTurn) || (isOpponent && opponentTurn)))}
         <s.SpacerXXLarge/>
         <s.Container>
-          {!gameStarted ? (<s.TextDescription style={{
-            textAlign: 'center',
-            marginLeft: '5px',
-            marginRight: '5px',
-            fontSize: '18px'
-          }}>The game will begin as soon as the opponent joins</s.TextDescription>) : (null)}
-          <s.SpacerMedium />
+          {!gameStarted ? (
+              <s.Container ai={'center'}>
+                <s.TextDescription 
+                  style={{
+                    textAlign: 'start',
+                    fontSize: '18px'
+                  }}
+                >The game will begin as soon as the opponent joins. Please share the ID given below with the opponent</s.TextDescription>
+                <s.SpacerMedium />
+                <s.TextPageTitle onClick={(e) => {
+                  e.preventDefault();
+                  handleCopyClick(gameShortId);
+                }}>{gameShortId}</s.TextPageTitle>
+                <s.TextParagraph style={{fontSize: '14px'}}>Click to copy to clipboard</s.TextParagraph>
+              </s.Container>
+            ) 
+            : 
+            (null)
+          }
           {data.errorMessage !== "" ? (
-            <s.TextParagraph style={{textAlign:'center', color: 'red'}}>{data.errorMessage}</s.TextParagraph>
+            <s.TextParagraph style={{textAlign:'center', color: 'red', marginTop: '24px'}}>{data.errorMessage}</s.TextParagraph>
           ) : null}
           <s.SpacerMedium />
           <s.Container fd={'row'}>
@@ -764,12 +797,14 @@ function App() {
 
   function addClock(isEnabled) {
     const clockIndicators = []
+    const currentSeconds = new Date().getSeconds();
+    console.log(`currentSeconds: ${currentSeconds}`)
     for (let i = 0; i < 90; i++) {
       const key = `clock-indicator-${i}`;
       clockIndicators[i] = <s.ClockContainer key={key} className='clock-indicator'/>
     }
     const deg = isEnabled ? 90 : 0;
-    const remainingTime = isEnabled ? 90 : 120;
+    const remainingTime = isEnabled ? 90 : 0;
     return(
       <s.ClockContainer className='clock-wrapper'>
         <s.ClockContainer className='clock-base'>
