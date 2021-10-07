@@ -87,6 +87,7 @@ async function currentGameOrNull(address, dispatch) {
     const gameModel = await mainQuery.first();
     if (gameModel != null) {
       dispatch(updateGame({gameModel: gameModel}));
+      await addSubscription(dispatch, gameModel.id);
     }
   } catch (err) {
     console.log(err);
@@ -99,6 +100,7 @@ async function saveNewGameToDatabase(payload) {
     const address = payload.address;
     const lightSquareColor = payload.lightSquareColor;
     const darkSquareColor = payload.darkSquareColor;
+    const gameBoard = payload.gameBoard;
     const gameModel = new GameModelInstance();
     console.table(gameModel);
     const result = await gameModel.save({
@@ -113,7 +115,8 @@ async function saveNewGameToDatabase(payload) {
       lastTurnTime: 0,
       currentTurnAddress: '',
       lightSquareColor: lightSquareColor,
-      darkSquareColor: darkSquareColor
+      darkSquareColor: darkSquareColor,
+      gameBoard: gameBoard
     });
     return result;
   } catch (err) {
@@ -185,12 +188,14 @@ export const createGame = (payload) => {
       const address = payload.address;
       const lightSquareColor = payload.lightSquareColor;
       const darkSquareColor = payload.darkSquareColor;
+      const gameBoard = payload.gameBoard;
       // Save new game to database
       const gameModel = await saveNewGameToDatabase({
         gameFee: gameFee,
         address: address,
         lightSquareColor: lightSquareColor, 
-        darkSquareColor: darkSquareColor
+        darkSquareColor: darkSquareColor,
+        gameBoard: gameBoard
       });
       console.table('GameModel', gameModel);
       if (gameModel != null) {
@@ -210,7 +215,7 @@ export const createGame = (payload) => {
                 gameModel.set('shortId', getShortGameId(gameId));
                 await gameModel.save();
                 dispatch(createNewGame({gameModel: gameModel})); 
-                await addSubscription(dispatch, gameModel.id);
+                await addSubscription(dispatch, gameId);
               });
       } else {
         dispatch(fetchDataFailed('Error creating a new game'));

@@ -16,6 +16,7 @@ import "./styles/clockStyle.css";
 // import styled from "styled-components";
 // import { create } from "ipfs-http-client";
 import logo from "./assets/chessboard_logo.jpg";
+import copyIcon from "./assets/copy_to_clipboard.png";
 
 const gameTitle = "Welcome to CHKMATE!";
 const gameDescription = `First ever chess game built on blockchain. Create a new game or join an existing game using a game code. To read more about the rules of the game press the help icon in the top left corner.`;
@@ -85,13 +86,12 @@ const handleCopyClick = async (text) => {
   }
 };
 
-const gameBoard = Chess();
 
 function App() {
-
+  
   const [gameCode, _setGameCode] = useState('');
   const [gameFee, _setGameFee] = useState('0.05');
-
+  
   const gameCodeInputEvent = (event) => {
     event.preventDefault();
     _setGameCode(event.target.value);
@@ -121,6 +121,7 @@ function App() {
   const createGameDialog = stringValueEqual(dialogType, DialogType.CREATE_GAME);
   const joinGameDialog = stringValueEqual(dialogType, DialogType.JOIN_GAME);
   const infoDialog = stringValueEqual(dialogType, DialogType.INFO);
+  const gameBoard = Chess();
   let baseGameFee = data.baseGameFee;
   let gameCreated = gameModel != null;
   let gameStarted = false;
@@ -129,6 +130,7 @@ function App() {
   let currentTurnAddress = '';
   let gameShortId = '';
   let fenString = 'start';
+  let updatedAt = new Date();
   // let 
   if (gameCreated) {
     gameShortId = getShortGameId(gameModel.id);
@@ -140,6 +142,7 @@ function App() {
     lightSquareColor = gameModel.get('lightSquareColor');
     darkSquareColor = gameModel.get('darkSquareColor');
     baseGameFee = gameModel.get('gameFee');
+    updatedAt = gameModel.updatedAt;
   }
   const isPlayer = stringValueEqual(playerAddress, address);
   const isOpponent = stringValueEqual(opponentAddress, address);
@@ -164,7 +167,7 @@ function App() {
   console.log("App() | showJoinGameDialog: " + joinGameDialog);
   console.log("App() | showInfoDialog: " + infoDialog);
   console.log("App() | baseGameFee: " + baseGameFee);
-  
+  console.log("App() | updatedAt: " + updatedAt);
 
   useEffect(() => {
     if (gameConnected) {
@@ -736,16 +739,21 @@ function App() {
               <s.Container ai={'center'}>
                 <s.TextDescription 
                   style={{
-                    textAlign: 'start',
+                    textAlign: 'justify',
                     fontSize: '18px'
                   }}
-                >The game will begin as soon as the opponent joins. Please share the ID given below with the opponent</s.TextDescription>
-                <s.SpacerMedium />
-                <s.TextPageTitle onClick={(e) => {
-                  e.preventDefault();
-                  handleCopyClick(gameShortId);
-                }}>{gameShortId}</s.TextPageTitle>
-                <s.TextParagraph style={{fontSize: '14px'}}>Click to copy to clipboard</s.TextParagraph>
+                >The game will begin as soon as the opponent joins. Please share the invite code given below with the opponent</s.TextDescription>
+                <s.Container jc={'center'} ai={'center'} fd={'row'} style={{marginTop: '24px'}}>
+                  <s.TextPageTitle>{gameShortId}</s.TextPageTitle>
+                  <s.Identicon 
+                    alt='copy to clipboard' 
+                    src={copyIcon}
+                    style={{marginLeft: '10px'}}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleCopyClick(gameShortId);
+                    }} />
+                </s.Container>
               </s.Container>
             ) 
             : 
@@ -797,14 +805,15 @@ function App() {
 
   function addClock(isEnabled) {
     const clockIndicators = []
-    const currentSeconds = new Date().getSeconds();
-    console.log(`currentSeconds: ${currentSeconds}`)
+    const totalTimeInSeconds = 120;
+    const elapsedTime = (new Date() - updatedAt) / 1000;
+    console.log(`elapsedTime: ${elapsedTime}`)
     for (let i = 0; i < 90; i++) {
       const key = `clock-indicator-${i}`;
       clockIndicators[i] = <s.ClockContainer key={key} className='clock-indicator'/>
     }
-    const deg = isEnabled ? 90 : 0;
-    const remainingTime = isEnabled ? 90 : 0;
+    const deg = isEnabled ? (elapsedTime / totalTimeInSeconds * 360) : 0;
+    const remainingTime = isEnabled ? (totalTimeInSeconds - elapsedTime) : 0;
     return(
       <s.ClockContainer className='clock-wrapper'>
         <s.ClockContainer className='clock-base'>
@@ -833,9 +842,9 @@ function App() {
   function togglePlayer() {
     // Toggle player turn state
     if (playerTurn && isValidString(opponentAddress) && gameModel != null) {
-      //dispatch(togglePlayerState({gameModel: gameModel, address: opponentAddress}))
+      dispatch(togglePlayerState({gameModel: gameModel, address: opponentAddress}))
     } else if (opponentTurn && isValidString(playerAddress) && gameModel != null) {
-      //dispatch(togglePlayerState({gameModel: gameModel, address: playerAddress}))
+      dispatch(togglePlayerState({gameModel: gameModel, address: playerAddress}))
     }
   }
 }

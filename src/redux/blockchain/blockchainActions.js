@@ -162,10 +162,8 @@ export const fetchCachedAccount = () => {
     if (isMetaMaskInstalled()) {
       const userAccount = await Moralis.User.current();
       if (userAccount != null) {
-        console.table("1 account: ", userAccount);
         const address = userAccount.get("ethAddress");
         if (address != null && address !== "") {
-          console.log("Init Account Address: " + address);
           addEventListener(dispatch);
           dispatch(connectGameAndListener({address: address}));
         }
