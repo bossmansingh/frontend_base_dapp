@@ -7,7 +7,7 @@ import DialogContent from "@material-ui/core/DialogContent";
 import Chessboard from "chessboardjsx";
 import Chess from "chess.js";
 
-import { getShortGameId, isValidString } from "./utils/Helpers";
+import { getDarkSquareColor, getLightSquareColor, getShortGameId, isValidString, stringValueEqual } from "./utils/Helpers";
 import { connectWallet, fetchCachedAccount, logout } from "./redux/blockchain/blockchainActions";
 import { DialogType, fetchData, createGame, joinGame, showInfoDialog, showCreateGameDialog, showJoinGameDialog, hideDialog, togglePlayerState } from "./redux/data/dataActions";
 import * as s from "./styles/globalStyles";
@@ -31,52 +31,10 @@ const rule5 = "5. A game finishes when one of the player plays a check-mate move
 // that some default color should be used
 let lightSquareColor = getLightSquareColor();
 let darkSquareColor = getDarkSquareColor();
+
+// Constants
 const youTitle = "YOU";
 const opponentTitle = "OPPONENT";
-
-// Function to generate and return light square color
-function getLightSquareColor() {
-  const min = 160;
-  const max = 255;
-  const r = getRandomNumber(min, max);
-  const g = getRandomNumber(min, max);
-  const b = getRandomNumber(min, max);
-  return `${r},${g},${b}`;
-}
-
-// Function to generate and return dark square color
-function getDarkSquareColor() {
-  const min = 50;
-  const max = 140;
-  const r = getRandomNumber(min, max);
-  const g = getRandomNumber(min, max);
-  const b = getRandomNumber(min, max);
-  return `${r},${g},${b}`;
-}
-
-// Function to generate random number 
-function getRandomNumber(min, max) { 
-  return Math.floor(Math.random() * (max - min) + min);
-}
-
-function stringValueEqual(str1, str2) {
-  if (!isValidString(str1) || !isValidString(str2)) {
-    return false;
-  } else {
-    const result = str1.localeCompare(str2, undefined, { sensitivity: 'base' }) === 0;
-    return result;
-  }
-}
-
-// This is the function we wrote earlier
-async function copyTextToClipboard(text) {
-  if ('clipboard' in navigator) {
-    return await navigator.clipboard.writeText(text);
-  } else {
-    return document.execCommand('copy', true, text);
-  }
-}
-
 const handleCopyClick = async (text) => {
   try {
     await copyTextToClipboard(text);
@@ -86,9 +44,17 @@ const handleCopyClick = async (text) => {
   }
 };
 
+// This is the function we wrote earlier
+async function copyTextToClipboard(text) {
+  if ('clipboard' in navigator) {
+    return await navigator.clipboard.writeText(text);
+  } else {
+    return document.execCommand('copy', true, text);
+  }  
+}  
 
 function App() {
-  
+  const gameBoard = useRef(null);
   const [gameCode, _setGameCode] = useState('');
   const [gameFee, _setGameFee] = useState('0.05');
   
@@ -121,7 +87,7 @@ function App() {
   const createGameDialog = stringValueEqual(dialogType, DialogType.CREATE_GAME);
   const joinGameDialog = stringValueEqual(dialogType, DialogType.JOIN_GAME);
   const infoDialog = stringValueEqual(dialogType, DialogType.INFO);
-  const gameBoard = Chess();
+
   let baseGameFee = data.baseGameFee;
   let gameCreated = gameModel != null;
   let gameStarted = false;
@@ -131,7 +97,7 @@ function App() {
   let gameShortId = '';
   let fenString = 'start';
   let updatedAt = new Date();
-  // let 
+  
   if (gameCreated) {
     gameShortId = getShortGameId(gameModel.id);
     fenString = gameModel.get('fenString');
@@ -144,10 +110,13 @@ function App() {
     baseGameFee = gameModel.get('gameFee');
     updatedAt = gameModel.updatedAt;
   }
-  const isPlayer = stringValueEqual(playerAddress, address);
-  const isOpponent = stringValueEqual(opponentAddress, address);
+  // Init chess board
+  gameBoard.current = new Chess(fenString);
 
+  const isPlayer = stringValueEqual(playerAddress, address);
   const playerTurn = stringValueEqual(currentTurnAddress, playerAddress);
+
+  const isOpponent = stringValueEqual(opponentAddress, address);
   const opponentTurn = stringValueEqual(currentTurnAddress, opponentAddress);
   
   console.log("App() | player: " + playerTurn);
@@ -174,8 +143,6 @@ function App() {
       // TODO: fetch NFT data
       console.log("................Fetch data................");
       dispatch(fetchData(address));
-      // Init chess board
-      // gameBoard.current = new Chess();
       //updateStatus();
     }
   }, [address, gameConnected, dispatch]);
@@ -186,18 +153,17 @@ function App() {
   }
 
   // Chess game methods and constants
-  const onDrop = (payload) => {
+  const onDrop = ({sourceSquare, targetSquare, piece}) => {
     console.log('onDrop');
-    const source = payload.sourceSquare;
-    const target = payload.targetSquare;
     
-    console.log(`source: ${source}`);
-    console.log(`target: ${target}`);
+    console.log(`source: ${sourceSquare}`);
+    console.log(`target: ${targetSquare}`);
+    console.log(`piece: ${piece}`);
     
     // see if the move is legal
-    const move = gameBoard.move({
-      from: source,
-      to: target
+    const move = gameBoard.current.move({
+      from: sourceSquare,
+      to: targetSquare
     });
     console.log(`move: ${move}`);
     // illegal move
@@ -206,16 +172,41 @@ function App() {
     updateStatus();
   };
 
+  const onDragOverSquare = (square) => {
+    console.log('onDragOverSquare');
+    console.log(`square: ${square}`);
+  };
+  
+  // const onMouseOutSquare = (square) => {
+  //   console.log('onMouseOutSquare');
+  //   console.log(`square: ${square}`);
+  // };
+
+  const onMouseOverSquare = (square) => {
+    console.log('onMouseOverSquare');
+    console.log(`square: ${square}`);
+  };
+
+  const onPieceClick = (piece) => {
+    console.log('onPieceClick');
+    console.log(`piece: ${piece}`);
+  };
+
+  const onSquareClick = (piece) => {
+    console.log('onSquareClick');
+    console.log(`piece: ${piece}`);
+  };
+
   const onDragStart = (payload) => {
     console.log('onDragStart');
     const piece = payload.piece;
     // do not pick up pieces if the game is over
-    if (gameBoard.game_over()) return false;
+    if (gameBoard.current.game_over()) return false;
     console.log('Game not over');
-    console.log('Current turn ' + gameBoard.turn());
+    console.log('Current turn ' + gameBoard.current.turn());
     // only pick up pieces for the side to move
-    if ((gameBoard.turn() === 'w' && piece.search(/^b/) !== -1) ||
-        (gameBoard.turn() === 'b' && piece.search(/^w/) !== -1)) {
+    if ((gameBoard.current.turn() === 'w' && piece.search(/^b/) !== -1) ||
+        (gameBoard.current.turn() === 'b' && piece.search(/^w/) !== -1)) {
       return false;
     }
   };
@@ -609,22 +600,22 @@ function App() {
   // update the board position after the piece snap
   // for castling, en passant, pawn promotion
   // function onSnapEnd() {
-  //   board.position(gameBoard.fen());
+  //   board.position(gameBoard.current.fen());
   // }
   
   function updateStatus () {
     let status = "";
   
-    const moveColor = gameBoard.turn() === 'b' ? 'Black' : 'White';
-    const address = gameBoard.turn() === 'w' ? playerAddress : opponentAddress;
+    const moveColor = gameBoard.current.turn() === 'b' ? 'Black' : 'White';
+    const address = gameBoard.current.turn() === 'w' ? playerAddress : opponentAddress;
   
     // checkmate?
-    if (gameBoard.in_checkmate()) {
+    if (gameBoard.current.in_checkmate()) {
       status = 'Game over, ' + moveColor + ' is in checkmate.';
     }
   
     // draw?
-    else if (gameBoard.in_draw()) {
+    else if (gameBoard.current.in_draw()) {
       status = 'Game over, drawn position';
     }
   
@@ -633,15 +624,15 @@ function App() {
       status = moveColor + ' to move';
   
       // check?
-      if (gameBoard.in_check()) {
+      if (gameBoard.current.in_check()) {
         status += ', ' + moveColor + ' is in check';
       }
     }
   
     console.log('Game Status: ' + status);
-    console.log('Game Fen: ' + gameBoard.fen());
+    console.log('Game Fen: ' + gameBoard.current.fen());
     if (gameModel != null) {
-      dispatch(togglePlayerState({gameModel: gameModel, address: address, fen: gameBoard.fen()}))
+      dispatch(togglePlayerState({gameModel: gameModel, address: address, fen: gameBoard.current.fen()}))
     }
     //   $status.html(status);
     //   $fen.html(game.fen());
@@ -657,8 +648,13 @@ function App() {
         lightSquareStyle={{ backgroundColor: `rgb(${lightSquareColor})` }}
         darkSquareStyle={{ backgroundColor: `rgb(${darkSquareColor})` }}
         showNotation={false}
-        onDragStart={onDragStart}
+        //onDragStart={onDragStart}
         onDrop={onDrop}
+        onDragOverSquare={onDragOverSquare}
+        // onMouseOutSquare={onMouseOutSquare}
+        onMouseOverSquare={onMouseOverSquare}
+        onPieceClick={onPieceClick}
+        onSquareClick={onSquareClick}
         // pieces={{
         //   wK: () => (
         //     <img
