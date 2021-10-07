@@ -67,9 +67,10 @@ function stringValueEqual(str1, str2) {
   }
 }
 
+const gameBoard = Chess();
+
 function App() {
 
-  const gameBoard = useRef(null);
   const [gameCode, _setGameCode] = useState('');
   const [gameFee, _setGameFee] = useState('0.05');
 
@@ -149,7 +150,7 @@ function App() {
       console.log("................Fetch data................");
       dispatch(fetchData(address));
       // Init chess board
-      gameBoard.current = new Chess();
+      // gameBoard.current = new Chess();
       //updateStatus();
     }
   }, [address, gameConnected, dispatch]);
@@ -158,6 +159,42 @@ function App() {
   if (!walletConnected) {
     dispatch(fetchCachedAccount());
   }
+
+  // Chess game methods and constants
+  const onDrop = (payload) => {
+    console.log('onDrop');
+    const source = payload.sourceSquare;
+    const target = payload.targetSquare;
+    
+    console.log(`source: ${source}`);
+    console.log(`target: ${target}`);
+    
+    // see if the move is legal
+    const move = gameBoard.move({
+      from: source,
+      to: target
+    });
+    console.log(`move: ${move}`);
+    // illegal move
+    if (move === null) return 'snapback';
+    
+    updateStatus();
+  };
+
+  const onDragStart = (payload) => {
+    console.log('onDragStart');
+    const piece = payload.piece;
+    // do not pick up pieces if the game is over
+    if (gameBoard.game_over()) return false;
+    console.log('Game not over');
+    console.log('Current turn ' + gameBoard.turn());
+    // only pick up pieces for the side to move
+    if ((gameBoard.turn() === 'w' && piece.search(/^b/) !== -1) ||
+        (gameBoard.turn() === 'b' && piece.search(/^w/) !== -1)) {
+      return false;
+    }
+  }
+
   return (
     <s.ResponsiveWrapper>
       {renderToolbar()}
@@ -543,37 +580,6 @@ function App() {
       </Dialog>
     )
   }
-
-  // Chess game functions
-  function onDragStart (payload) {
-    console.log('onDragStart');
-    const piece = payload.piece;
-    // do not pick up pieces if the game is over
-    if (gameBoard.current.game_over()) return false;
-    console.log('Game not over');
-    console.log('Current turn ' + gameBoard.current.turn());
-    // only pick up pieces for the side to move
-    if ((gameBoard.current.turn() === 'w' && piece.search(/^b/) !== -1) ||
-        (gameBoard.current.turn() === 'b' && piece.search(/^w/) !== -1)) {
-      return false;
-    }
-  }
-  
-  function onDrop(payload) {
-    const source = payload.sourceSquare;
-    const target = payload.targetSquare;
-    
-    // see if the move is legal
-    const move = gameBoard.current.move({
-      from: source,
-      to: target
-    });
-    
-    // illegal move
-    if (move === null) return 'snapback';
-  
-    updateStatus();
-  }
   
   // update the board position after the piece snap
   // for castling, en passant, pawn promotion
@@ -584,16 +590,16 @@ function App() {
   function updateStatus () {
     let status = "";
   
-    const moveColor = gameBoard.current.turn() === 'b' ? 'Black' : 'White';
-    const address = gameBoard.current.turn() === 'w' ? playerAddress : opponentAddress;
+    const moveColor = gameBoard.turn() === 'b' ? 'Black' : 'White';
+    const address = gameBoard.turn() === 'w' ? playerAddress : opponentAddress;
   
     // checkmate?
-    if (gameBoard.current.in_checkmate()) {
+    if (gameBoard.in_checkmate()) {
       status = 'Game over, ' + moveColor + ' is in checkmate.';
     }
   
     // draw?
-    else if (gameBoard.current.in_draw()) {
+    else if (gameBoard.in_draw()) {
       status = 'Game over, drawn position';
     }
   
@@ -602,15 +608,15 @@ function App() {
       status = moveColor + ' to move';
   
       // check?
-      if (gameBoard.current.in_check()) {
+      if (gameBoard.in_check()) {
         status += ', ' + moveColor + ' is in check';
       }
     }
   
     console.log('Game Status: ' + status);
-    console.log('Game Fen: ' + gameBoard.current.fen());
+    console.log('Game Fen: ' + gameBoard.fen());
     if (gameModel != null) {
-      dispatch(togglePlayerState({gameModel: gameModel, address: address, fen: gameBoard.current.fen()}))
+      dispatch(togglePlayerState({gameModel: gameModel, address: address, fen: gameBoard.fen()}))
     }
     //   $status.html(status);
     //   $fen.html(game.fen());

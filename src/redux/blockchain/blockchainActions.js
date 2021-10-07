@@ -88,6 +88,7 @@ const connectGameAndListener = (payload) => {
           web3: web3,
         })
       );
+      console.log(`createGameRequest: ${createGameRequest}`);
       if (createGameRequest) {
         dispatch(showCreateGameDialog());
       } else if (joinGameRequest && isValidString(gameId)) {

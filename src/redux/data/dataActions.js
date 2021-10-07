@@ -275,7 +275,7 @@ export const endGame = (gameId, address) => {
 
 export const fetchData = (address) => {
   return async (dispatch) => {
-    dispatch(fetchDataRequest());
+    //dispatch(fetchDataRequest());
     try {
       const contractBalance = await store
         .getState()
