@@ -25,11 +25,6 @@ library Helpers {
         return result;
     }
 
-    function getKey(uint gameId, address addr) internal pure returns (uint) {
-        string memory data = string(abi.encodePacked(gameId, addr));
-        return getEncryptedKey(data);
-    }
-
     function getDNA(uint timestamp, address addr, uint counterValue) internal pure returns (uint) {
         string memory data = string(abi.encodePacked(timestamp, addr, counterValue));
         return getEncryptedKey(data);

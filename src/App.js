@@ -101,7 +101,6 @@ function App() {
   const createGameDialog = stringValueEqual(dialogType, DialogType.CREATE_GAME);
   const joinGameDialog = stringValueEqual(dialogType, DialogType.JOIN_GAME);
   const infoDialog = stringValueEqual(dialogType, DialogType.INFO);
-  let currentCounterValue = data.currentCounterValue;
   let baseGameFee = data.baseGameFee;
   let gameCreated = gameModel != null;
   let gameStarted = false;
@@ -142,7 +141,6 @@ function App() {
   console.log("App() | showJoinGameDialog: " + joinGameDialog);
   console.log("App() | showInfoDialog: " + infoDialog);
   console.log("App() | baseGameFee: " + baseGameFee);
-  console.log("App() | currentCounterValue: " + currentCounterValue);
   
 
   useEffect(() => {
@@ -560,8 +558,7 @@ function App() {
                     if (gameConnected) {
                       dispatch(createGame({
                         gameFee: gameFee,
-                        address: address, 
-                        gameId: currentCounterValue,
+                        address: address,
                         lightSquareColor: lightSquareColor, 
                         darkSquareColor: darkSquareColor,
                         createGameRequest: true,
@@ -569,7 +566,6 @@ function App() {
                     } else {
                       dispatch(connectWallet({
                         gameFee: gameFee,
-                        gameId: currentCounterValue, 
                         lightSquareColor: lightSquareColor, 
                         darkSquareColor: darkSquareColor,
                         createGameRequest: true,

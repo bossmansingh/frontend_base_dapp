@@ -54,13 +54,6 @@ const updateBaseGameFee = (payload) => {
   };
 };
 
-const updateCurrentCounterValue = (payload) => {
-  return {
-    type: 'UPDATE_CURRENT_COUTNER_VALUE',
-    payload: payload
-  };
-};
-
 export const clearGameData = () => {
   return {
     type: "CLEAR_GAME_DATA"
@@ -86,7 +79,6 @@ async function queryGameModel(gameId) {
 
 async function saveNewGameToDatabase(payload) {
   try {
-    const gameId = payload.gameId;
     const gameFee = payload.gameFee;
     const address = payload.address;
     const lightSquareColor = payload.lightSquareColor;
@@ -94,7 +86,6 @@ async function saveNewGameToDatabase(payload) {
     const gameModel = new GameModelInstance();
     console.table(gameModel);
     const result = await gameModel.save({
-      gameId: gameId.toString(),
       gameFee: gameFee,
       playerAddress: address,
       opponentAddress: '',
@@ -175,13 +166,11 @@ export const createGame = (payload) => {
   return async (dispatch) => {
     try {
       const gameFee = payload.gameFee;
-      const gameId = payload.gameId;
       const address = payload.address;
       const lightSquareColor = payload.lightSquareColor;
       const darkSquareColor = payload.darkSquareColor;
       // Save new game to database
       const gameModel = await saveNewGameToDatabase({
-        gameId: gameId, 
         gameFee: gameFee,
         address: address,
         lightSquareColor: lightSquareColor, 
@@ -191,7 +180,7 @@ export const createGame = (payload) => {
       if (gameModel != null) {
         await store
               .getState()
-              .blockchain.gameContract.methods.createGame()
+              .blockchain.gameContract.methods.createGame(gameModel.id)
               .send({
                 from: address,
                 value: web3.utils.toWei(gameFee, 'ether')
@@ -203,7 +192,7 @@ export const createGame = (payload) => {
               }).then(async (receipt) => {
                 //console.log("Game Create Success", receipt);
                 dispatch(createNewGame({gameModel: gameModel})); 
-                await addSubscription(dispatch, gameId);
+                await addSubscription(dispatch, gameModel.id);
               });
       } else {
         dispatch(fetchDataFailed('Error creating a new game'));
@@ -275,10 +264,6 @@ export const fetchData = (account) => {
         .getState()
         .blockchain.gameContract.methods.getBaseGameFee()
         .call();
-      const currentCounterValue = await store
-        .getState()
-        .blockchain.gameContract.methods.getCurrentCounterValue()
-        .call();
       if (isValidString(contractBalance)) {
         const balanceInEth = web3.utils.fromWei(contractBalance, 'ether');
         console.log(`Contract balance in ETH: ${balanceInEth}`);
@@ -287,10 +272,6 @@ export const fetchData = (account) => {
         const baseGameFeeInEth = web3.utils.fromWei(baseGameFee, 'ether');
         console.log(`Base game fee in ETH: ${baseGameFeeInEth}`);
         dispatch(updateBaseGameFee(baseGameFeeInEth));
-      }
-      console.log(`currentCounterValue: ${currentCounterValue}`);
-      if (currentCounterValue != null) {
-        dispatch(updateCurrentCounterValue(currentCounterValue));
       }
     } catch (err) {
       console.log(err);

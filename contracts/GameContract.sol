@@ -17,10 +17,10 @@ contract GameContract is BaseContract {
     using SafeERC20 for IERC20;
     using Address for address;
     
-    event GameCreated(address indexed challengerAddress, uint gameId);
-    event GameJoined(address indexed challengerAddress, address indexed challengeAcceptorAddress, uint gameId);
-    event GameEnd(address indexed winnerAddress, uint gameId);
-    event NFTCreated(address indexed winnerAddress, uint gameId, bool isRare);
+    event GameCreated(address indexed challengerAddress, string gameId);
+    event GameJoined(address indexed challengerAddress, address indexed challengeAcceptorAddress, string gameId);
+    event GameEnd(address indexed winnerAddress, string gameId);
+    event NFTCreated(address indexed winnerAddress, string gameId, bool isRare);
     
     enum ActionType {
         CreateGame,
@@ -83,9 +83,9 @@ contract GameContract is BaseContract {
     //     _;
     // }
 
-    mapping(uint => address) private _gamesMap;
-    mapping(uint => address) private _playersMap;
-    mapping(uint => address) private _winnersMap;
+    mapping(string => address) private _challengerMap;
+    mapping(string => address) private _opponentMap;
+    mapping(string => address) private _winnersMap;
 
     uint private _baseGameFee = 0.05 ether;
     IERC20 private _token = new ERC20("ether", "ETH");
@@ -106,13 +106,6 @@ contract GameContract is BaseContract {
     }
     
     /**
-     * @dev Call this to get the value of current counter 
-     */
-    function getCurrentCounterValue() external view returns (uint) {
-        return currentCounterValue();
-    }
-    
-    /**
      * @dev Call this to update the current base game fee. This method can only be called via owner of this contract.
      *
      * @param newGameFee new fee value to be used for creating a new game.
@@ -125,11 +118,10 @@ contract GameContract is BaseContract {
     * @dev Create a new game by depositing a gameFee.
     * 
     */
-    function createGame() external payable nonReentrant {
+    function createGame(string memory gameId) external payable nonReentrant {
         // Check and verify if the caller address is valid
         require(msg.sender != Helpers.nullAddress(), "Caller address is not valid");
-        uint currentCounter = currentCounterValue();
-        address challengerAddress = _gamesMap[currentCounter];
+        address challengerAddress = _challengerMap[gameId];
         bool gameExists = challengerAddress != Helpers.nullAddress();
         // Check and verify if a game with specified ID  already exists.
         require(!gameExists, "A game with specified ID already exists");
@@ -139,18 +131,17 @@ contract GameContract is BaseContract {
         // Check and verify if a value equal to or greater than `_baseGameFee` was sent along with the transaction.
         require(msg.value >= _baseGameFee, "Sent value should be equal to game fee");
         // Check and verify if the challenge acceptor address exist
-        uint key = Helpers.getKey(currentCounter, challengerAddress);
-        bool challengeAcceptorNotExists = _playersMap[key] == Helpers.nullAddress();
+        bool challengeAcceptorNotExists = _opponentMap[gameId] == Helpers.nullAddress();
         require(challengeAcceptorNotExists, "Challenge acceptor address already exists");
-        bool winnerExists = _winnersMap[currentCounter] != Helpers.nullAddress();
+        bool winnerExists = _winnersMap[gameId] != Helpers.nullAddress();
         // Check and verify if the winner address is not set.
         require(!winnerExists, "Winner address cannot be set before the game starts");
         // Create a new game after the funds are locked
-        _createGame();
+        _createGame(gameId);
         // Safe increase allowance for this contract to spend `_baseGameFee` after the game is finished
         SafeERC20.safeIncreaseAllowance(_token, address(this), msg.value);
         // Emit new game event
-        emit GameCreated(msg.sender, currentCounter);
+        emit GameCreated(msg.sender, gameId);
     }
     
     /**
@@ -158,10 +149,10 @@ contract GameContract is BaseContract {
      * 
      * @param gameId id of game to be ended
      */
-    function joinGame(uint gameId) external payable nonReentrant {
+    function joinGame(string memory gameId) external payable nonReentrant {
         // Check and verify if the caller address is valid
         require(msg.sender != Helpers.nullAddress(), "Caller address is not valid");
-        address challengerAddress = _gamesMap[gameId];
+        address challengerAddress = _challengerMap[gameId];
         bool gameExists = challengerAddress != Helpers.nullAddress();
         // Check and verify if a game with specified ID  already exists.
         require(gameExists, "A game with specified ID does not exist");
@@ -171,8 +162,7 @@ contract GameContract is BaseContract {
         // Check and verify if a value equal to or greater than `_baseGameFee` was sent along with the transaction.
         require(msg.value >= _baseGameFee, "Sent value should be equal to game fee");
         // Check and verify if the challenge acceptor address exist
-        uint key = Helpers.getKey(gameId, challengerAddress);
-        bool challengeAcceptorExists = _playersMap[key] != Helpers.nullAddress();
+        bool challengeAcceptorExists = _opponentMap[gameId] != Helpers.nullAddress();
         require(!challengeAcceptorExists, "Challenge acceptor address already exists");
         // Check and verify if both player address are unique
         require(challengerAddress != msg.sender, "Both player address should be unique");
@@ -196,7 +186,7 @@ contract GameContract is BaseContract {
      * @param winTime time taken (in seconds) to win the game
      */
     function endGame(
-        uint gameId, 
+        string memory gameId, 
         address winnerAddress, 
         uint winTime
     ) external nonReentrant onlyOwner() {
@@ -217,20 +207,19 @@ contract GameContract is BaseContract {
      * @param killScore count of longest consecutive kill by one single piece on board
      */
     function mintNFT(
-        uint gameId, 
+        string memory gameId, 
         bool isRare,
         uint winTime, 
         uint8 killScore
     ) external nonReentrant {
         // Check and verify if the caller address is valid
         require(msg.sender != Helpers.nullAddress(), "Caller address is not valid");
-        address challengerAddress = _gamesMap[gameId];
+        address challengerAddress = _challengerMap[gameId];
         bool gameExists = challengerAddress != Helpers.nullAddress();
         // Check and verify if a game with specified ID  already exists.
         require(gameExists, "A game with specified ID does not exist");
         // Check and verify if the challenge acceptor address exist
-        uint key = Helpers.getKey(gameId, challengerAddress);
-        bool challengeAcceptorExists = _playersMap[key] != Helpers.nullAddress();
+        bool challengeAcceptorExists = _opponentMap[gameId] != Helpers.nullAddress();
         require(challengeAcceptorExists, "Challenge acceptor address is not set");
         address winnerAddress = _winnersMap[gameId];
         bool winnerExists = winnerAddress != Helpers.nullAddress();
@@ -244,9 +233,11 @@ contract GameContract is BaseContract {
     
     /**
      * @dev Create a new game and update the mapping for `games`.
+     * 
+     * @param gameId id of game to be started
      */
-    function _createGame() private increment() {
-        _gamesMap[currentCounterValue()] = msg.sender;
+    function _createGame(string memory gameId) private increment() {
+        _challengerMap[gameId] = msg.sender;
     }
     
     /**
@@ -254,9 +245,8 @@ contract GameContract is BaseContract {
      * 
      * @param gameId id of game to be ended
      */
-    function _joinGame(uint gameId) private {
-        uint key = Helpers.getKey(gameId, _gamesMap[gameId]);
-        _playersMap[key] = msg.sender;
+    function _joinGame(string memory gameId) private {
+        _opponentMap[gameId] = msg.sender;
     }
     
     /**
@@ -265,7 +255,7 @@ contract GameContract is BaseContract {
      * @param winnerAddress address of player who won the game
      * @param gameId id of this game
      */
-    function _endGame(address winnerAddress, uint gameId) private {
+    function _endGame(address winnerAddress, string memory gameId) private {
         _winnersMap[gameId] = winnerAddress;
     }
 
@@ -279,7 +269,7 @@ contract GameContract is BaseContract {
      * @param killScore count of longest consecutive kill by one single piece on board
      */
     function _createAndMintNFT(
-        uint gameId, 
+        string memory gameId, 
         address winnerAddress, 
         bool isRare,
         uint winTime, 

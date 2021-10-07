@@ -30,7 +30,7 @@ contract NFTContract is ERC721, BaseContract {
         bool isRare;
     }
     
-    modifier validRequest(uint gameId, uint winTime) {
+    modifier validRequest(string memory gameId, uint winTime) {
         uint counterValue = currentCounterValue();
         // Check to make sure the `_gameContractAddress` is valid
         require(_gameContractAddress != Helpers.nullAddress(), "GameContract address is not valid"); // This might be moved to GameContract
@@ -109,7 +109,7 @@ contract NFTContract is ERC721, BaseContract {
      * @param isRare true if this token is Rare, false otherwise
      */
     function createAndMintToken(
-        uint gameId,
+        string memory gameId,
         uint winTime,
         uint8 killScore,
         bool isRare
