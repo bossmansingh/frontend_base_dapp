@@ -91,7 +91,6 @@ async function currentGameOrNull(address, dispatch) {
     );
     const gameModel = await mainQuery.first();
     if (gameModel != null) {
-      console.table('GameModel', gameModel);
       dispatch(updateGame({gameModel: gameModel}));
     }
   } catch (err) {
@@ -130,7 +129,7 @@ async function saveNewGameToDatabase(payload) {
 
 async function addSubscription(dispatch, gameId) {
   const subscriptionQuery = getGameModelQuery();
-  subscriptionQuery.equalTo('gameId', gameId.toString());
+  subscriptionQuery.get(gameId);
   const subscription = await subscriptionQuery.subscribe();
   subscription.on('update', (gameModel) => {
     dispatch(updateGame({gameModel: gameModel}));
@@ -139,7 +138,7 @@ async function addSubscription(dispatch, gameId) {
 
 async function removeSubscription(gameId) {
   const subscriptionQuery = getGameModelQuery();
-  subscriptionQuery.equalTo('gameId', gameId.toString());
+  subscriptionQuery.get(gameId);
   await subscriptionQuery.unsubscribe();
   // This will close the WebSocket connection to the LiveQuery server, cancel the auto-reconnect, and unsubscribe all subscriptions based on it.
   Moralis.LiveQuery.close();
