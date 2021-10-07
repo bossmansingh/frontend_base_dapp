@@ -768,7 +768,8 @@ function App() {
       const key = `clock-indicator-${i}`;
       clockIndicators[i] = <s.ClockContainer key={key} className='clock-indicator'/>
     }
-    const deg = isEnabled ? 90 : 0; 
+    const deg = isEnabled ? 90 : 0;
+    const remainingTime = isEnabled ? 90 : 120;
     return(
       <s.ClockContainer className='clock-wrapper'>
         <s.ClockContainer className='clock-base'>
@@ -779,6 +780,7 @@ function App() {
             <s.ClockSecContainer 
               className='clock-second' 
               rotateDeg={deg}
+              rotateDuration={remainingTime}
               onAnimationEnd={() => togglePlayer()} 
             />
           ) : (
@@ -796,9 +798,9 @@ function App() {
   function togglePlayer() {
     // Toggle player turn state
     if (playerTurn && isValidString(opponentAddress) && gameModel != null) {
-      dispatch(togglePlayerState({gameModel: gameModel, address: opponentAddress}))
+      //dispatch(togglePlayerState({gameModel: gameModel, address: opponentAddress}))
     } else if (opponentTurn && isValidString(playerAddress) && gameModel != null) {
-      dispatch(togglePlayerState({gameModel: gameModel, address: playerAddress}))
+      //dispatch(togglePlayerState({gameModel: gameModel, address: playerAddress}))
     }
   }
 }

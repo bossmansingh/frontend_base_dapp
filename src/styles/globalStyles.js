@@ -75,9 +75,9 @@ export const Container = styled.div`
 
 export const ClockContainer = styled.div``;
 export const ClockSecContainer = styled.div`
-  animation: ${props => rotateKeyframe(props.rotateDeg)} 120s linear;
-  -webkit-animation: ${props => rotateKeyframe(props.rotateDeg)} 120s linear;
-  -moz-animation: ${props => rotateKeyframe(props.rotateDeg)} 120s linear;
+  animation: ${props => rotateKeyframe(props.rotateDeg)} ${props => props.rotateDuration}s linear;
+  -webkit-animation: ${props => rotateKeyframe(props.rotateDeg)} ${props => props.rotateDuration}s linear;
+  -moz-animation: ${props => rotateKeyframe(props.rotateDeg)} ${props => props.rotateDuration}s linear;
 `;
 const rotateKeyframe = (y) => keyframes`
   from {
