@@ -1,72 +1,79 @@
+import { DialogType } from "./dataActions";
+
 const initialState = {
   loading: false,
   address: "",
-  error: false,
   errorMsg: "",
-  showInfoDialog: false,
-  showJoinGameDialog: false,
-  gameModel: null
+  dialogType: 'none',
+  gameModel: null,
+  baseGameFee: '0.05',
 };
 
 const dataReducer = (state = initialState, action) => {
   switch (action.type) {
-    case "CHECK_DATA_REQUEST":
+    case 'CHECK_DATA_REQUEST':
       return {
         ...initialState,
         loading: true,
       };
-    case "CHECK_DATA_SUCCESS":
+    case 'CHECK_DATA_SUCCESS':
       return {
         ...state,
         loading: false,
         showAccountChangeAlert: false,
         accountBalance: action.payload.address,
       };
-    case "CHECK_DATA_FAILED":
+    case 'CHECK_DATA_FAILED':
       return {
         ...state,
         loading: false,
-        error: true,
         errorMsg: action.payload,
       };
-    case "TOGGLE_INFO_DIALOG":
+    case 'SHOW_INFO_DIALOG':
       return {
         ...state,
-        showInfoDialog: action.payload
+        dialogType: DialogType.INFO
       };
-    case "TOGGLE_JOIN_GAME_DIALOG":
+    case 'SHOW_JOIN_GAME_DIALOG':
       return {
         ...state,
-        showJoinGameDialog: action.payload
+        dialogType: DialogType.JOIN_GAME
       };
-    case "CREATE_GAME":
+    case 'SHOW_CREATE_GAME_DIALOG':
       return {
         ...state,
-        showInfoDialog: false,
-        showJoinGameDialog: false,
+        dialogType: DialogType.CREATE_GAME
+      };
+    case 'HIDE_DIALOG':
+      return {
+        ...state,
+        dialogType: DialogType.NONE
+      };
+    case 'CREATE_GAME':
+      return {
+        ...state,
+        dialogType: DialogType.NONE,
         gameModel: action.payload.gameModel
       };
-    case "JOIN_GAME":
+    case 'JOIN_GAME':
       return {
         ...state,
-        showInfoDialog: false,
-        showJoinGameDialog: false,
+        dialogType: DialogType.NONE,
         gameModel: action.payload.gameModel
       };
-    case "UPDATE_GAME":
+    case 'UPDATE_GAME':
       return {
         ...state,
-        showInfoDialog: false,
-        showJoinGameDialog: false,
+        dialogType: DialogType.NONE,
         gameModel: action.payload.gameModel
       };
-    case "UPDATE_MOVE":
+    case 'UPDATE_MOVE':
       // const updatedModel = state.gameModel;
       // updatedModel.updateMove(action.payload.move);
       return {
-        ...state.gameModel.updateMove(action.payload.move)
+        // ...state.gameModel.updateMove(action.payload.move)
       };
-    case "CLEAR_GAME_DATA":
+    case 'CLEAR_GAME_DATA':
       return {
         ...initialState
       };

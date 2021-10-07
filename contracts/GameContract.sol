@@ -87,7 +87,7 @@ contract GameContract is BaseContract {
     mapping(uint => address) private _playersMap;
     mapping(uint => address) private _winnersMap;
 
-    uint private _baseGameFee = 0.005 ether;
+    uint private _baseGameFee = 0.05 ether;
     IERC20 private _token = new ERC20("ether", "ETH");
     NFTContract private nftContract = new NFTContract(address(this));
     
@@ -96,6 +96,13 @@ contract GameContract is BaseContract {
      */
     function getContractBalance() external view returns (uint) {
         return address(this).balance;
+    }
+    
+    /**
+     * @dev Call this to get the current `_baseGameFee` 
+     */
+    function getBaseGameFee() external view returns (uint) {
+        return _baseGameFee;
     }
     
     /**

@@ -1,7 +1,8 @@
 // constants
 import GameContract from "../../contracts/GameContract.json";
 import blockies from "../../utils/Blockies";
-import { createGame, joinGame, clearGameData } from "../data/dataActions";
+import { isValidString } from "../../utils/Helpers";
+import { showCreateGameDialog, showJoinGameDialog, createGame, joinGame, clearGameData } from "../data/dataActions";
 
 const Moralis = require('moralis');
 const signingMessage = "Welcome to CHKMATE!\n Please sign this transaction to connect your wallet.\n\nBy signing you agree to terms and condition of CHKMATE.";
@@ -73,8 +74,7 @@ const connectGameAndListener = (payload) => {
     const createGameRequest = payload.createGameRequest;
     const joinGameRequest = payload.joinGameRequest;
     const gameId = payload.gameId;
-    const lightSquareColor = payload.lightSquareColor;
-    const darkSquareColor = payload.darkSquareColor;
+    const gameFee = payload.gameId;
     const identiconUrl = getIdenticonUrl(address);
     // Init Contract
     const web3 = await Moralis.Web3.enable();
@@ -96,9 +96,10 @@ const connectGameAndListener = (payload) => {
           web3: web3,
         })
       );
+      console.log(`createGameRequest: ${createGameRequest}`);
       if (createGameRequest) {
-        dispatch(createGame({address: address, lightSquareColor: lightSquareColor, darkSquareColor: darkSquareColor}));
-      } else if (joinGameRequest && gameId != null && gameId !== "") {
+        dispatch(showCreateGameDialog());
+      } else if (joinGameRequest && isValidString(gameId)) {
         console.log("Join game gameId: " + gameId);
         dispatch(joinGame({address: address, gameId: gameId}));
       }
@@ -122,6 +123,7 @@ export const connectWallet = (payload) => {
         const createGameRequest = payload.createGameRequest;
         const joinGameRequest = payload.joinGameRequest;
         const gameId = payload.gameId;
+        const gameFee = payload.gameFee;
         const lightSquareColor = payload.lightSquareColor;
         const darkSquareColor = payload.darkSquareColor;
         dispatch(connectRequest());
@@ -133,6 +135,7 @@ export const connectWallet = (payload) => {
             createGameRequest: createGameRequest,
             joinGameRequest: joinGameRequest,
             gameId: gameId,
+            gameFee: gameFee,
             address: address,
             lightSquareColor: lightSquareColor,
             darkSquareColor: darkSquareColor

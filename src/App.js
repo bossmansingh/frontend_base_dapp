@@ -7,8 +7,9 @@ import DialogContent from "@material-ui/core/DialogContent";
 import Chessboard from "chessboardjsx";
 import Chess from "chess.js";
 
+import { isValidString } from "./utils/Helpers";
 import { connectWallet, fetchCachedAccount, logout } from "./redux/blockchain/blockchainActions";
-import { fetchData, createGame, joinGame, toggleInfoDialog, toggleJoinGameDialog, togglePlayerState } from "./redux/data/dataActions";
+import { DialogType, fetchData, createGame, joinGame, showInfoDialog, showCreateGameDialog, showJoinGameDialog, hideDialog, togglePlayerState } from "./redux/data/dataActions";
 import * as s from "./styles/globalStyles";
 import "./styles/clockStyle.css";
 
@@ -31,7 +32,6 @@ let lightSquareColor = getLightSquareColor();
 let darkSquareColor = getDarkSquareColor();
 const youTitle = "YOU";
 const opponentTitle = "OPPONENT";
-let gameBoard = null;
 
 // Function to generate and return light square color
 function getLightSquareColor() {
@@ -59,44 +59,73 @@ function getRandomNumber(min, max) {
 }
 
 function stringValueEqual(str1, str2) {
-  if (str1 === "" || str2 === "") {
+  if (!isValidString(str1) || !isValidString(str2)) {
     return false;
   } else {
     const result = str1.localeCompare(str2, undefined, { sensitivity: 'base' }) === 0;
-    console.log(`${str1} and ${str2} are equal: ${result}`);
     return result;
   }
 }
 
 function App() {
-  gameBoard = useRef(null);
+
+  const gameBoard = useRef(null);
+  const [gameCode, _setGameCode] = useState('');
+  const [gameFee, _setGameFee] = useState('0.05');
+
+  const gameCodeInputEvent = (event) => {
+    _setGameCode(event.target.value);
+  };
+  
+  const gameFeeInputEvent = (event) => {
+    event.preventDefault();
+    const newGameFeeValue = event.target.value;
+    const isNewFeeLowerThanBase = newGameFeeValue < baseGameFee;
+    const newGameFee = isNewFeeLowerThanBase ? baseGameFee : newGameFeeValue;
+    if (newGameFee !== gameFee) {
+      console.log('Update Game Fee');
+      _setGameFee(newGameFee);
+    }
+  };
+  
   const dispatch = useDispatch();
   const blockchain = useSelector((state) => state.blockchain);
   const data = useSelector((state) => state.data);
   const address = blockchain.address;
   const contract = blockchain.gameContract;
-  const walletConnected = address != null && address !== "";
+  const walletConnected = isValidString(address);
   const contractFetched = contract != null;
   const gameConnected = walletConnected && contractFetched;
-  let gameModel = data.gameModel;
+  const dialogType = data.dialogType;
+  const gameModel = data.gameModel;
+  const createGameDialog = stringValueEqual(dialogType, DialogType.CREATE_GAME);
+  const joinGameDialog = stringValueEqual(dialogType, DialogType.JOIN_GAME);
+  const infoDialog = stringValueEqual(dialogType, DialogType.INFO);
+  let baseGameFee = data.baseGameFee;
   let gameCreated = gameModel != null;
   let gameStarted = false;
-  let playerAddress = "";
-  let opponentAddress = "";
-  let currentTurnAddress = "";
-  let fenString = "start";
+  let playerAddress = '';
+  let opponentAddress = '';
+  let currentTurnAddress = '';
+  let fenString = 'start';
   if (gameCreated) {
-    fenString = gameModel.get("fenString");
-    gameStarted = gameModel.get("gameStarted");
-    playerAddress = gameModel.get("playerAddress");
-    opponentAddress = gameModel.get("opponentAddress");
-    currentTurnAddress = gameModel.get("currentTurnAddress");
-    lightSquareColor = gameModel.get("lightSquareColor");
-    darkSquareColor = gameModel.get("darkSquareColor");
+    fenString = gameModel.get('fenString');
+    gameStarted = gameModel.get('gameStarted');
+    playerAddress = gameModel.get('playerAddress');
+    opponentAddress = gameModel.get('opponentAddress');
+    currentTurnAddress = gameModel.get('currentTurnAddress');
+    lightSquareColor = gameModel.get('lightSquareColor');
+    darkSquareColor = gameModel.get('darkSquareColor');
+    baseGameFee = gameModel.get('gameFee');
   }
   const isPlayer = stringValueEqual(playerAddress, address);
   const isOpponent = stringValueEqual(opponentAddress, address);
 
+  const playerTurn = stringValueEqual(currentTurnAddress, playerAddress);
+  const opponentTurn = stringValueEqual(currentTurnAddress, opponentAddress);
+  
+  console.log("App() | player: " + playerTurn);
+  console.log("App() | opponent: " + opponentTurn);
   console.log("App() | Address: " + address);
   console.log("App() | walletConnected: " + walletConnected);
   console.log("App() | contractFetched: " + contractFetched);
@@ -107,34 +136,11 @@ function App() {
   console.log("App() | opponentAddress: " + opponentAddress);
   console.log("App() | currentTurnAddress: " + currentTurnAddress);
   console.log("App() | fenString: " + fenString);
+  console.log("App() | dialogType: " + dialogType);
+  console.log("App() | showCreateGameDialog: " + createGameDialog);
+  console.log("App() | showJoinGameDialog: " + joinGameDialog);
+  console.log("App() | showInfoDialog: " + infoDialog);
   
-  const playerTurn = stringValueEqual(currentTurnAddress, playerAddress);
-  const opponentTurn = stringValueEqual(currentTurnAddress, opponentAddress);
-  console.log("App() | player: " + playerTurn);
-  console.log("App() | opponent: " + opponentTurn);
-  
-
-  const showInformationDialog = () => {
-    dispatch(toggleInfoDialog(true));
-  };
-  
-  const hideInformationDialog = () => {
-    dispatch(toggleInfoDialog(false));
-  };
-
-  const showJoinGameDialog = () => {
-    dispatch(toggleJoinGameDialog(true));
-  };
-
-  const hideJoinGameDialog = () => {
-    dispatch(toggleJoinGameDialog(false));
-  };
-
-  const [gameCode, _setGameCode] = useState("");
-
-  const handleInput = (event) => {
-    _setGameCode(event.target.value);
-  };
 
   useEffect(() => {
     if (gameConnected) {
@@ -154,6 +160,7 @@ function App() {
     <s.ResponsiveWrapper>
       {renderToolbar()}
       {renderHelpPopup()}
+      {renderCreateGamePopup()}
       {renderJoinGamePopup()}
       {gameCreated ? renderGameBoard() : renderWelcomePage()}
       {/* 
@@ -166,35 +173,35 @@ function App() {
 
   function renderToolbar() {
     return <s.Container
-      ai={"center"}
-      fd={"row"}
-      style={{padding: "8px"}}
+      ai={'center'}
+      fd={'row'}
+      style={{padding: '8px'}}
     >
-      <s.HelpButton id="help_button"
-        style={{width:"40px", height:"40px", marginLeft: "5px"}}
+      <s.HelpButton id='help_button'
+        style={{width:'40px', height:'40px', marginLeft: '5px'}}
         onClick={(e) => {
           e.preventDefault();
-          showInformationDialog();
+          dispatch(showInfoDialog());
         } 
       }>?</s.HelpButton>
       <s.TextPageTitle
         style={{ 
-          color: "white", 
-          marginLeft: "auto", 
-          paddingLeft: (walletConnected ? "0px" : "60px") 
+          color: 'white', 
+          marginLeft: 'auto', 
+          paddingLeft: (walletConnected ? '0px' : '60px') 
         }}
       >
         CHKMATE
       </s.TextPageTitle>
       <s.Container 
         style={{ 
-          marginLeft: "auto",
-          marginRight: "5px"
+          marginLeft: 'auto',
+          marginRight: '5px'
         }}
       >
         { walletConnected && blockchain.identiconUrl != null ? (
           <s.Identicon 
-            alt="identicon" 
+            alt='user_identicon' 
             src={(blockchain.identiconUrl != null ? blockchain.identiconUrl : logo)}
             onClick={(e) => {
               e.preventDefault();
@@ -219,28 +226,28 @@ function App() {
 
   function renderWelcomePage() {
     return (
-      <s.Container ai={"center"} jc={"center"} fd={"row"} style={{padding: "50px"}}>
+      <s.Container key='welcome_page_container' ai={'center'} jc={'center'} fd={'row'} style={{padding: '50px'}}>
         {setChessboard(false)}
         <s.SpacerXXLarge />
-        <s.Container ai={"center"} jc={"center"} style={{padding: "20px"}}>
-          <s.TextSubTitle style={{textAlign: "center"}}>{gameTitle}</s.TextSubTitle>
+        <s.Container ai={'center'} jc={'center'} style={{padding: '20px'}}>
+          <s.TextSubTitle style={{textAlign: 'center'}}>{gameTitle}</s.TextSubTitle>
           <s.SpacerSmall />
           <s.TextDescription style={{
-            textAlign: "justify",
-            marginLeft: "5px",
-            marginRight: "5px"
+            textAlign: 'justify',
+            marginLeft: '5px',
+            marginRight: '5px'
           }}>{gameDescription}</s.TextDescription>
           <s.SpacerMedium />
           {blockchain.errorMsg !== "" ? (
-            <s.TextParagraph style={{textAlign:"center", color: "red"}}>{blockchain.errorMsg}</s.TextParagraph>
+            <s.TextParagraph style={{textAlign:'center', color: 'red'}}>{blockchain.errorMsg}</s.TextParagraph>
           ) : null}
           <s.SpacerMedium />
-          <s.Container ai={"center"} jc={"center"} fd={"row"}>
-            <s.StyledButton style={{width:"130px", height:"40px"}}
+          <s.Container ai={'center'} jc={'center'} fd={'row'}>
+            <s.StyledButton style={{width:'130px', height:'40px'}}
               onClick={(e) => {
                 e.preventDefault();
                 if (gameConnected) {
-                  dispatch(createGame({address: address, lightSquareColor: lightSquareColor, darkSquareColor: darkSquareColor}));
+                  dispatch(showCreateGameDialog());
                 } else {
                   dispatch(connectWallet({
                     createGameRequest: true, 
@@ -250,9 +257,9 @@ function App() {
                 }
               }}>Create Game</s.StyledButton>
             <s.SpacerMedium />
-            <s.StyledButton style={{width:"130px", height:"40px"}}
+            <s.StyledButton style={{width:'130px', height:'40px'}}
               onClick={(e) => {
-                showJoinGameDialog();
+                dispatch(showJoinGameDialog());
                 e.preventDefault();
               }}
             >
@@ -265,12 +272,12 @@ function App() {
   }
 
   function onDragStart (payload) {
-    console.log("onDragStart");
+    console.log('onDragStart');
     const piece = payload.piece;
     // do not pick up pieces if the game is over
     if (gameBoard.current.game_over()) return false;
-    console.log("Game not over");
-    console.log("Current turn " + gameBoard.current.turn());
+    console.log('Game not over');
+    console.log('Current turn ' + gameBoard.current.turn());
     // only pick up pieces for the side to move
     if ((gameBoard.current.turn() === 'w' && piece.search(/^b/) !== -1) ||
         (gameBoard.current.turn() === 'b' && piece.search(/^w/) !== -1)) {
@@ -326,8 +333,8 @@ function App() {
       }
     }
   
-    console.log("Game Status: " + status);
-    console.log("Game Fen: " + gameBoard.current.fen());
+    console.log('Game Status: ' + status);
+    console.log('Game Fen: ' + gameBoard.current.fen());
     if (gameModel != null) {
       dispatch(togglePlayerState({gameModel: gameModel, address: address, fen: gameBoard.current.fen()}))
     }
@@ -368,17 +375,17 @@ function App() {
 
   function renderHelpPopup() {
     return(
-      <Dialog open={data.showInfoDialog} onClose={hideInformationDialog}>  
+      <Dialog open={infoDialog} onClose={hideDialog}>  
         <DialogContent>
           <s.Container 
-            ai={"center"} 
+            ai={'center'} 
             style={{
-              paddingBottom: "20px"
+              paddingBottom: '20px'
             }}>
             <s.TextTitle 
               style={{
-                color: "black", 
-                textAlign: "center"
+                color: 'black', 
+                textAlign: 'center'
               }}
             >
               Welcome to the world of CHKMATE!
@@ -386,7 +393,7 @@ function App() {
             <s.SpacerXSmall/>
             <s.TextParagraph 
               style={{
-                color: "black"
+                color: 'black'
               }}
             >
               {gameInstructions}
@@ -395,47 +402,47 @@ function App() {
             <s.Container>
               <s.TextSubTitle 
                 style={{
-                  color: "black"
+                  color: 'black'
                 }}
               >
                 Game rules:
               </s.TextSubTitle>
               <s.TextParagraph 
                 style={{
-                  padding: "12px", 
-                  color: "black"
+                  padding: '12px', 
+                  color: 'black'
                 }}
               >
                 {rule1}
               </s.TextParagraph>
               <s.TextParagraph 
                 style={{
-                  padding: "12px", 
-                  color: "black"
+                  padding: '12px', 
+                  color: 'black'
                 }}
                 >
                   {rule2}
                 </s.TextParagraph>
               <s.TextParagraph 
                 style={{
-                  padding: "12px", 
-                  color: "black"
+                  padding: '12px', 
+                  color: 'black'
                 }}
               >
                 {rule3}
               </s.TextParagraph>
               <s.TextParagraph 
                 style={{
-                  padding: "12px",
-                  color: "black"
+                  padding: '12px',
+                  color: 'black'
                 }}
               >
                 {rule4}
               </s.TextParagraph>
               <s.TextParagraph 
                 style={{
-                  padding: "12px", 
-                  color: "black"
+                  padding: '12px', 
+                  color: 'black'
                 }}
               >
                 {rule5}
@@ -443,18 +450,18 @@ function App() {
               <s.SpacerSmall />
               <s.TextParagraph 
                 style={{
-                  color:"black",
-                  paddingLeft:"12px",
-                  fontSize: "14px"
+                  color:'black',
+                  paddingLeft:'12px',
+                  fontSize: '14px'
                 }}
               >
                 [1]Minus the gas fees
               </s.TextParagraph>
               <s.TextParagraph 
                 style={{
-                  color:"black",
-                  paddingLeft:"12px",
-                  fontSize: "14px"
+                  color:'black',
+                  paddingLeft:'12px',
+                  fontSize: '14px'
                 }}
               >
                 [2]The winning NFT card will not include a winning piece
@@ -462,14 +469,14 @@ function App() {
             </s.Container>
             <s.SpacerMedium/>
             <s.StyledButton 
-              bc={"black"}
-              color={"white"}
+              bc={'black'}
+              color={'white'}
               style={{
-                fontSize: "20px"
+                fontSize: '20px'
               }} 
               onClick={(e)=> {
                 e.preventDefault();
-                hideInformationDialog();
+                dispatch(hideDialog());
               }}
             >
               Close
@@ -480,15 +487,119 @@ function App() {
     );
   }
 
+  function renderCreateGamePopup() {
+    return(
+      <Dialog
+        open={createGameDialog}
+        onClose={(e) => {
+          e.preventDefault();
+          dispatch(hideDialog());
+        }}
+      >
+        <DialogContent>
+            <s.Container 
+              ai={"center"} 
+              jc={"center"}
+              style={{
+                paddingBottom: '20px',
+                paddingLeft: '10px',
+                paddingRight: '10px'
+              }}
+            >
+              <s.TextTitle 
+                style={{
+                  color: 'black', 
+                  textAlign: 'center'
+                }}
+              >
+                CREATE NEW GAME
+              </s.TextTitle>
+              <s.TextDescription
+                style={{color: 'black', textAlign: 'center'}}
+              >
+                Set a base game fee that will be paid by both participants. A minimum fee of 0.05 eth is required
+              </s.TextDescription>
+              <s.SpacerMedium />
+              <s.InputContainer 
+                style={{textAlign: 'center'}}
+                value={gameFee}
+                onChange={(e) => {
+                  e.preventDefault();
+                  gameFeeInputEvent(e);
+                }} />
+              {
+                data.errorMsg ? 
+                (
+                  <s.TextParagraph
+                    style={{color: 'red', paddingTop: '10px', textAlign: 'center'}}
+                  >
+                    {data.errorMsg}
+                  </s.TextParagraph>
+                ) : (
+                  null
+                )
+              }
+              <s.SpacerLarge />
+              <s.Container 
+                fd={"row"}
+                jc={"center"}>
+                <s.StyledButton 
+                  flex={1}
+                  bc={'black'}
+                  color={'white'}
+                  style={{
+                    fontSize: '20px',
+                    width: '200px'
+                  }} 
+                  onClick={(e) => {
+                    e.preventDefault();
+                    if (gameConnected) {
+                      dispatch(createGame({
+                        gameFee: gameFee,
+                        address: address, 
+                        lightSquareColor: lightSquareColor, 
+                        darkSquareColor: darkSquareColor
+                      }));
+                    } else {
+                      dispatch(connectWallet({
+                        joinGameRequest: true,
+                        gameFee: gameFee,
+                        gameId: gameCode, 
+                        lightSquareColor: lightSquareColor, 
+                        darkSquareColor: darkSquareColor
+                      }));
+                    }
+                  }}
+                >
+                  Create Game
+                </s.StyledButton>
+                <s.SpacerSmall />
+                <s.StyledButton 
+                  flex={1}
+                  style={{
+                    fontSize: '20px',
+                    width: '200px'
+                  }} onClick={(e) => {
+                    e.preventDefault();
+                    dispatch(hideDialog());
+                  }}
+                >
+                  Cancel
+                </s.StyledButton>
+              </s.Container>
+            </s.Container>
+          </DialogContent>
+      </Dialog>
+    )
+  }
+  
   function renderJoinGamePopup() {
     return(
       <Dialog 
-        open={
-          data.showJoinGameDialog
-        } 
+        open={joinGameDialog} 
         onClose={(e) => {
           e.preventDefault();
-          hideJoinGameDialog();
+          dispatch(hideDialog());
         }}
       >
         <DialogContent>
@@ -496,32 +607,32 @@ function App() {
             ai={"center"} 
             jc={"center"}
             style={{
-              paddingBottom: "20px",
-              paddingLeft: "10px",
-              paddingRight: "10px"
+              paddingBottom: '20px',
+              paddingLeft: '10px',
+              paddingRight: '10px'
             }}
           >
             <s.TextTitle 
               style={{
-                color: "black", 
-                textAlign: "center"
+                color: 'black', 
+                textAlign: 'center'
               }}
             >
               ENTER GAME CODE
             </s.TextTitle>
             <s.SpacerSmall />
             <s.InputContainer 
-              style={{textAlign: "center"}}
-              placeholder={"Game Code"} 
+              style={{textAlign: 'center'}}
+              placeholder={'Game Code'} 
               onChange={(e) => {
                 e.preventDefault();
-                handleInput(e);
+                gameCodeInputEvent(e);
               }} />
             {
               data.errorMsg ? 
               (
                 <s.TextParagraph
-                  style={{color: "red", paddingTop: "10px", textAlign: "center"}}
+                  style={{color: 'red', paddingTop: '10px', textAlign: 'center'}}
                 >
                   {data.errorMsg}
                 </s.TextParagraph>
@@ -535,11 +646,11 @@ function App() {
               jc={"center"}>
               <s.StyledButton 
                 flex={1}
-                bc={"black"}
-                color={"white"}
+                bc={'black'}
+                color={'white'}
                 style={{
-                  fontSize: "20px",
-                  width: "200px"
+                  fontSize: '20px',
+                  width: '200px'
                 }} 
                 onClick={(e) => {
                   e.preventDefault();
@@ -561,11 +672,11 @@ function App() {
               <s.StyledButton 
                 flex={1}
                 style={{
-                  fontSize: "20px",
-                  width: "200px"
+                  fontSize: '20px',
+                  width: '200px'
                 }} onClick={(e) => {
                   e.preventDefault();
-                  hideJoinGameDialog();
+                  dispatch(hideDialog());
                 }}
               >
                 Cancel
@@ -580,24 +691,24 @@ function App() {
   function renderGameBoard() {
     return(
       <s.Container
-        fd={"row"}
+        fd={'row'}
         jc={"center"}
-        ai={"center"}
-        style={{padding: "50px"}}
+        ai={'center'}
+        style={{padding: '50px'}}
       >
         {setChessboard(gameStarted && ((isPlayer && playerTurn) || (isOpponent && opponentTurn)))}
         <s.SpacerXXLarge/>
         <s.Container
-          ai={"center"}
-          jd={"center"}
-          style={{opacity: gameStarted ? "1" : "0.25"}}
+          ai={'center'}
+          jd={'center'}
+          style={{opacity: gameStarted ? '1' : '0.25'}}
         >
           {addClock(playerTurn)}
           <s.SpacerMedium/>
           <s.TextSubTitle
             style={{
-              textAlign: "center", 
-              fontFamily: "default-font"
+              textAlign: 'center', 
+              fontFamily: 'default-font'
             }}
           >
             {isPlayer ? (youTitle) : (opponentTitle)}
@@ -627,19 +738,19 @@ function App() {
   function addClock(isEnabled) {
     const clockIndicators = []
     for (let i = 0; i < 90; i++) {
-      const key = "clock-indicator-"+i;
-      clockIndicators[i] = <s.ClockContainer key={key} className="clock-indicator"/>
+      const key = `clock-indicator-${i}`;
+      clockIndicators[i] = <s.ClockContainer key={key} className='clock-indicator'/>
     }
     return(
-      <s.ClockContainer className="clock-wrapper">
-        <s.ClockContainer className="clock-base">
-          <s.ClockContainer className="clock-dial">
+      <s.ClockContainer className='clock-wrapper'>
+        <s.ClockContainer className='clock-base'>
+          <s.ClockContainer className='clock-dial'>
             {clockIndicators}
           </s.ClockContainer>
-          <s.ClockContainer className="clock-second" rotate={isEnabled ? 1 : 0} 
+          <s.ClockContainer className='clock-second' rotate={isEnabled ? 1 : 0} 
             onAnimationEnd={() => togglePlayer()} 
           />
-          <s.ClockContainer className="clock-center"/>
+          <s.ClockContainer className='clock-center'/>
         </s.ClockContainer>
       </s.ClockContainer>
     );
@@ -647,9 +758,9 @@ function App() {
 
   function togglePlayer() {
     // Toggle player turn state
-    if (playerTurn && opponentAddress !== "" && gameModel != null) {
+    if (playerTurn && isValidString(opponentAddress) && gameModel != null) {
       dispatch(togglePlayerState({gameModel: gameModel, address: opponentAddress}))
-    } else if (opponentTurn && playerAddress !== "" && gameModel != null) {
+    } else if (opponentTurn && isValidString(playerAddress) && gameModel != null) {
       dispatch(togglePlayerState({gameModel: gameModel, address: playerAddress}))
     }
   }

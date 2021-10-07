@@ -4,7 +4,7 @@ const initialState = {
   identiconUrl: null,
   gameContract: null,
   web3: null,
-  errorMsg: ""
+  errorMsg: ''
 };
 
 const blockchainReducer = (state = initialState, action) => {

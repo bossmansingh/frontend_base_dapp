@@ -1,7 +1,17 @@
-import web3 from "web3";
+import { isValidString } from "../../utils/Helpers";
 import store from "../store";
 
 const Moralis = require('moralis');
+const web3 = new Moralis.Web3();
+
+export const DialogType = {
+  INFO: 'info',
+  CREATE_GAME: 'create_game',
+  JOIN_GAME: 'join_game',
+  NONE: 'none'
+};
+
+const GameModelInstance = Moralis.Object.extend('GameModel');
 
 const fetchDataRequest = () => {
   return {
@@ -44,14 +54,13 @@ export const clearGameData = () => {
 };
 
 function getGameModelQuery() {
-  const gameModel = Moralis.Object.extend("GameModel");
-  return new Moralis.Query(gameModel);
+  return new Moralis.Query(GameModelInstance);
 }
 
 async function queryGameModel(gameId) {
   try {
     const query = getGameModelQuery();
-    query.equalTo("gameId", gameId.toString());
+    query.equalTo('gameId', gameId.toString());
     const gameModel = await query.first();
     console.table(gameModel);
     return gameModel;
@@ -64,23 +73,24 @@ async function queryGameModel(gameId) {
 async function saveNewGameToDatabase(payload) {
   try {
     const gameId = payload.gameId;
+    const gameFee = payload.gameFee;
     const address = payload.address;
     const lightSquareColor = payload.lightSquareColor;
     const darkSquareColor = payload.darkSquareColor;
-    const GameModel = Moralis.Object.extend("GameModel");
-    const gameModel = new GameModel();
+    const gameModel = new GameModelInstance();
     console.table(gameModel);
     const result = await gameModel.save({
       gameId: gameId.toString(),
+      gameFee: gameFee,
       playerAddress: address,
-      opponentAddress: "",
-      winnerAddress: "",
+      opponentAddress: '',
+      winnerAddress: '',
       gameStarted: false,
       gameEnded: false,
-      fenString: "start",
+      fenString: 'start',
       gameCreateTime: 0,
       lastTurnTime: 0,
-      currentTurnAddress: "",
+      currentTurnAddress: '',
       lightSquareColor: lightSquareColor,
       darkSquareColor: darkSquareColor
     });
@@ -93,32 +103,42 @@ async function saveNewGameToDatabase(payload) {
 
 async function addSubscription(dispatch, gameId) {
   const subscriptionQuery = getGameModelQuery();
-  subscriptionQuery.equalTo("gameId", gameId.toString());
+  subscriptionQuery.equalTo('gameId', gameId.toString());
   const subscription = await subscriptionQuery.subscribe();
-  subscription.on("update", (gameModel) => {
+  subscription.on('update', (gameModel) => {
     dispatch(updateGame({gameModel: gameModel}));
   });
 }
 
 async function removeSubscription(gameId) {
   const subscriptionQuery = getGameModelQuery();
-  subscriptionQuery.equalTo("gameId", gameId.toString());
+  subscriptionQuery.equalTo('gameId', gameId.toString());
   await subscriptionQuery.unsubscribe();
   // This will close the WebSocket connection to the LiveQuery server, cancel the auto-reconnect, and unsubscribe all subscriptions based on it.
   Moralis.LiveQuery.close();
 }
 
-export const toggleInfoDialog = (payload) => {
+export const showInfoDialog = () => {
   return {
-    type: "TOGGLE_INFO_DIALOG",
-    payload: payload
+    type: 'SHOW_INFO_DIALOG'
   };
 };
 
-export const toggleJoinGameDialog = (payload) => {
+export const showJoinGameDialog = () => {
   return {
-    type: "TOGGLE_JOIN_GAME_DIALOG",
-    payload: payload
+    type: 'SHOW_JOIN_GAME_DIALOG'
+  };
+};
+
+export const showCreateGameDialog = () => {
+  return {
+    type: 'SHOW_CREATE_GAME_DIALOG'
+  };
+};
+
+export const hideDialog = () => {
+  return {
+    type: 'HIDE_DIALOG'
   };
 };
 
@@ -129,9 +149,9 @@ export const togglePlayerState = (payload) => {
     const address = payload.address;
     const fenString = payload.fen;
     if (fenString != null && fenString !== "") {
-      gameModel.set("fenString", fenString);
+      gameModel.set('fenString', fenString);
     }
-    gameModel.set("currentTurnAddress", address);
+    gameModel.set('currentTurnAddress', address);
     const result = await gameModel.save();
     dispatch(updateGame({gameModel: result}));
   };
@@ -140,6 +160,7 @@ export const togglePlayerState = (payload) => {
 export const createGame = (payload) => {
   return async (dispatch) => {
     try {
+      const gameFee = payload.gameFee;
       const address = payload.address;
       const lightSquareColor = payload.lightSquareColor;
       const darkSquareColor = payload.darkSquareColor;
@@ -147,20 +168,23 @@ export const createGame = (payload) => {
       const currentGameCounter = await getGameModelQuery().count();
       const gameModel = await saveNewGameToDatabase({
         gameId: currentGameCounter, 
-        address: address, 
+        gameFee: gameFee,
+        address: address,
         lightSquareColor: lightSquareColor, 
         darkSquareColor: darkSquareColor
       });
+      console.table('GameModel', gameModel);
+      console.log(`gameId: ${gameModel.get('objectId')}`);
       if (gameModel != null) {
         await store
               .getState()
               .blockchain.gameContract.methods.createGame()
               .send({
                 from: address,
-                value: web3.utils.toWei("0.05", "ether")
-              }).once("error", async (err) => {
+                value: web3.utils.toWei(gameFee, 'ether')
+              }).once('error', async (err) => {
                 console.log(err);
-                dispatch(fetchDataFailed("Error creating a new game"));
+                dispatch(fetchDataFailed('Error creating a new game'));
                 // Delete saved game model from database
                 await gameModel.destroy();
               }).then(async (receipt) => {
@@ -169,11 +193,11 @@ export const createGame = (payload) => {
                 await addSubscription(dispatch, currentGameCounter);
               });
       } else {
-        dispatch(fetchDataFailed("Error creating a new game"));
+        dispatch(fetchDataFailed('Error creating a new game'));
       }
     } catch (err) {
       console.log(err);
-      dispatch(fetchDataFailed("Error creating a new game"));
+      dispatch(fetchDataFailed('Error creating a new game'));
     }
   };
 };
@@ -185,36 +209,37 @@ export const joinGame = (payload) => {
       const gameId = payload.gameId;
       const address = payload.address;
       const gameModel = await queryGameModel(gameId, address);
+      const gameFee = gameModel.get('gameFee');
       if (gameModel != null) {
         await store
             .getState()
             .blockchain.gameContract.methods.joinGame(gameId)
             .send({
               from: address,
-              value: web3.utils.toWei("0.05", "ether")
+              value: web3.utils.toWei(gameFee, 'ether')
             }).once("error", (err) => {
               console.log(err);
-              dispatch(fetchDataFailed("Error joining game with code: " + gameId));
+              dispatch(fetchDataFailed(`Error joining game with code: ${gameId}`));
             }).then(async (receipt) => {
               //console.log("Game Joined Success", receipt);
               console.table(gameModel);
               // Update game data after opponent joins
-              const playerAddress = gameModel.get("playerAddress");
-              gameModel.set("opponentAddress", address);
-              gameModel.set("gameStarted", true);
-              gameModel.set("currentTurnAddress", playerAddress);
+              const playerAddress = gameModel.get('playerAddress');
+              gameModel.set('opponentAddress', address);
+              gameModel.set('gameStarted', true);
+              gameModel.set('currentTurnAddress', playerAddress);
               await gameModel.save();
               dispatch(joinNewGame({gameModel: gameModel})); 
               await addSubscription(dispatch, gameId);
             });
       } else {
-        dispatch(fetchDataFailed("Either the game does not exists or some network error occurred."));
-        dispatch(toggleJoinGameDialog(true));
+        dispatch(showJoinGameDialog());
+        dispatch(fetchDataFailed('Either the game does not exists or some network error occurred.'));
       }
     } catch (err) {
       console.log(err);
-      dispatch(fetchDataFailed("Error joining the game"));
-      dispatch(toggleJoinGameDialog(true));
+      dispatch(showJoinGameDialog());
+      dispatch(fetchDataFailed('Error joining the game'));
     }
   };
 };
@@ -233,13 +258,21 @@ export const fetchData = (account) => {
         .getState()
         .blockchain.gameContract.methods.getContractBalance()
         .call();
-        if (contractBalance !== null) {
-          const balanceInEth = web3.utils.fromWei(contractBalance, "ether");
-          console.log("Contract balance in ETH: ", balanceInEth);
-        }
+      if (isValidString(contractBalance)) {
+        const balanceInEth = web3.utils.fromWei(contractBalance, 'ether');
+        console.log(`Contract balance in ETH: ${balanceInEth}`);
+      }
+      const baseGameFee = await store
+        .getState()
+        .blockchain.gameContract.methods.getBaseGameFee()
+        .call();
+      if (isValidString(baseGameFee)) {
+        const baseGameFeeInEth = web3.utils.fromWei(baseGameFee, 'ether');
+        console.log(`Base game fee in ETH: ${baseGameFeeInEth}`);
+      }
     } catch (err) {
       console.log(err);
-      dispatch(fetchDataFailed("Could not load data from contract."));
+      dispatch(fetchDataFailed('Could not load data from contract.'));
     }
   };
 };
