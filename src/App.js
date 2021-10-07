@@ -101,6 +101,7 @@ function App() {
   const createGameDialog = stringValueEqual(dialogType, DialogType.CREATE_GAME);
   const joinGameDialog = stringValueEqual(dialogType, DialogType.JOIN_GAME);
   const infoDialog = stringValueEqual(dialogType, DialogType.INFO);
+  let currentCounterValue = data.currentCounterValue;
   let baseGameFee = data.baseGameFee;
   let gameCreated = gameModel != null;
   let gameStarted = false;
@@ -140,11 +141,14 @@ function App() {
   console.log("App() | showCreateGameDialog: " + createGameDialog);
   console.log("App() | showJoinGameDialog: " + joinGameDialog);
   console.log("App() | showInfoDialog: " + infoDialog);
+  console.log("App() | baseGameFee: " + baseGameFee);
+  console.log("App() | currentCounterValue: " + currentCounterValue);
   
 
   useEffect(() => {
     if (gameConnected) {
       // TODO: fetch NFT data
+      console.log("Fetch data................");
       dispatch(fetchData(address));
       // Init chess board
       gameBoard.current = new Chess();
@@ -517,7 +521,7 @@ function App() {
               <s.TextDescription
                 style={{color: 'black', textAlign: 'center'}}
               >
-                Set a base game fee that will be paid by both participants. A minimum fee of 0.05 eth is required
+                {`Set a base game fee that will be paid by both participants.\nA minimum fee of ${baseGameFee} ETH is required`}
               </s.TextDescription>
               <s.SpacerMedium />
               <s.InputContainer 
@@ -557,16 +561,18 @@ function App() {
                       dispatch(createGame({
                         gameFee: gameFee,
                         address: address, 
+                        gameId: currentCounterValue,
                         lightSquareColor: lightSquareColor, 
-                        darkSquareColor: darkSquareColor
+                        darkSquareColor: darkSquareColor,
+                        createGameRequest: true,
                       }));
                     } else {
                       dispatch(connectWallet({
-                        joinGameRequest: true,
                         gameFee: gameFee,
-                        gameId: gameCode, 
+                        gameId: currentCounterValue, 
                         lightSquareColor: lightSquareColor, 
-                        darkSquareColor: darkSquareColor
+                        darkSquareColor: darkSquareColor,
+                        createGameRequest: true,
                       }));
                     }
                   }}

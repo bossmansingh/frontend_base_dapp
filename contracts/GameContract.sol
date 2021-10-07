@@ -106,11 +106,18 @@ contract GameContract is BaseContract {
     }
     
     /**
+     * @dev Call this to get the value of current counter 
+     */
+    function getCurrentCounterValue() external view returns (uint) {
+        return currentCounterValue();
+    }
+    
+    /**
      * @dev Call this to update the current base game fee. This method can only be called via owner of this contract.
      *
      * @param newGameFee new fee value to be used for creating a new game.
      */
-    function updateGameFees(uint newGameFee) external onlyOwner() {
+    function updateBaseGameFees(uint newGameFee) external onlyOwner() {
       _baseGameFee = newGameFee;
     }
     

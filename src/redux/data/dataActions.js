@@ -47,6 +47,20 @@ const updateGame = (payload) => {
   };
 };
 
+const updateBaseGameFee = (payload) => {
+  return {
+    type: 'UPDATE_BASE_GAME_FEE',
+    payload: payload
+  };
+};
+
+const updateCurrentCounterValue = (payload) => {
+  return {
+    type: 'UPDATE_CURRENT_COUTNER_VALUE',
+    payload: payload
+  };
+};
+
 export const clearGameData = () => {
   return {
     type: "CLEAR_GAME_DATA"
@@ -161,20 +175,19 @@ export const createGame = (payload) => {
   return async (dispatch) => {
     try {
       const gameFee = payload.gameFee;
+      const gameId = payload.gameId;
       const address = payload.address;
       const lightSquareColor = payload.lightSquareColor;
       const darkSquareColor = payload.darkSquareColor;
       // Save new game to database
-      const currentGameCounter = await getGameModelQuery().count();
       const gameModel = await saveNewGameToDatabase({
-        gameId: currentGameCounter, 
+        gameId: gameId, 
         gameFee: gameFee,
         address: address,
         lightSquareColor: lightSquareColor, 
         darkSquareColor: darkSquareColor
       });
       console.table('GameModel', gameModel);
-      console.log(`gameId: ${gameModel.get('objectId')}`);
       if (gameModel != null) {
         await store
               .getState()
@@ -190,7 +203,7 @@ export const createGame = (payload) => {
               }).then(async (receipt) => {
                 //console.log("Game Create Success", receipt);
                 dispatch(createNewGame({gameModel: gameModel})); 
-                await addSubscription(dispatch, currentGameCounter);
+                await addSubscription(dispatch, gameId);
               });
       } else {
         dispatch(fetchDataFailed('Error creating a new game'));
@@ -258,17 +271,26 @@ export const fetchData = (account) => {
         .getState()
         .blockchain.gameContract.methods.getContractBalance()
         .call();
-      if (isValidString(contractBalance)) {
-        const balanceInEth = web3.utils.fromWei(contractBalance, 'ether');
-        console.log(`Contract balance in ETH: ${balanceInEth}`);
-      }
       const baseGameFee = await store
         .getState()
         .blockchain.gameContract.methods.getBaseGameFee()
         .call();
+      const currentCounterValue = await store
+        .getState()
+        .blockchain.gameContract.methods.getCurrentCounterValue()
+        .call();
+      if (isValidString(contractBalance)) {
+        const balanceInEth = web3.utils.fromWei(contractBalance, 'ether');
+        console.log(`Contract balance in ETH: ${balanceInEth}`);
+      }
       if (isValidString(baseGameFee)) {
         const baseGameFeeInEth = web3.utils.fromWei(baseGameFee, 'ether');
         console.log(`Base game fee in ETH: ${baseGameFeeInEth}`);
+        dispatch(updateBaseGameFee(baseGameFeeInEth));
+      }
+      console.log(`currentCounterValue: ${currentCounterValue}`);
+      if (currentCounterValue != null) {
+        dispatch(updateCurrentCounterValue(currentCounterValue));
       }
     } catch (err) {
       console.log(err);

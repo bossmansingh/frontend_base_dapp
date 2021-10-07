@@ -6,6 +6,7 @@ const initialState = {
   errorMsg: "",
   dialogType: 'none',
   gameModel: null,
+  currentCounterValue: 0,
   baseGameFee: '0.05',
 };
 
@@ -72,6 +73,16 @@ const dataReducer = (state = initialState, action) => {
       // updatedModel.updateMove(action.payload.move);
       return {
         // ...state.gameModel.updateMove(action.payload.move)
+      };
+    case 'UPDATE_BASE_GAME_FEE':
+      return {
+        ...state,
+        baseGameFee: action.payload
+      };
+    case 'UPDATE_CURRENT_COUTNER_VALUE':
+      return {
+        ...state,
+        currentCounterValue: action.payload
       };
     case 'CLEAR_GAME_DATA':
       return {
