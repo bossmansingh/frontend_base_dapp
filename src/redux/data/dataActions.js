@@ -19,7 +19,7 @@ const fetchDataRequest = () => {
   };
 };
 
-const fetchDataFailed = (payload) => {
+export const fetchDataFailed = (payload) => {
   return {
     type: "CHECK_DATA_FAILED",
     payload: payload,

@@ -2,7 +2,7 @@
 import GameContract from "../../contracts/GameContract.json";
 import blockies from "../../utils/Blockies";
 import { isValidString } from "../../utils/Helpers";
-import { showCreateGameDialog, joinGame, clearGameData } from "../data/dataActions";
+import { showCreateGameDialog, joinGame, clearGameData, fetchDataFailed } from "../data/dataActions";
 
 const Moralis = require('moralis');
 const signingMessage = "Welcome to CHKMATE!\n Please sign this transaction to connect your wallet.\n\nBy signing you agree to terms and condition of CHKMATE.";
@@ -16,13 +16,6 @@ const connectRequest = () => {
 const connectSuccess = (payload) => {
   return {
     type: "CONNECTION_SUCCESS",
-    payload: payload,
-  };
-};
-
-const connectFailed = (payload) => {
-  return {
-    type: "CONNECTION_FAILED",
     payload: payload,
   };
 };
@@ -101,7 +94,7 @@ const connectGameAndListener = (payload) => {
         dispatch(joinGame({address: address, gameId: gameId}));
       }
     } else {
-      dispatch(connectFailed("Change network to CHKMATE."));
+      dispatch(fetchDataFailed("Change network to CHKMATE."));
       dispatch(
         connectSuccess({
           address: address,
@@ -140,10 +133,10 @@ export const connectWallet = (payload) => {
         }
       } catch (err) {
         console.log(err);
-        dispatch(connectFailed("No web3 enabled wallet found. Please install one and then try again"));
+        dispatch(fetchDataFailed("No web3 enabled wallet found. Please install one and then try again"));
       }
     } else {
-      dispatch(connectFailed("Please install a web3 enabled wallet"));
+      dispatch(fetchDataFailed("Please install a web3 enabled wallet"));
     }
   };
 };
@@ -157,7 +150,7 @@ export const logout = () => {
         dispatch(clearBlockchainData());
       } catch (err) {
         console.log(err);
-        dispatch(connectFailed("Logout Failed."));
+        dispatch(fetchDataFailed("Logout Failed."));
       }
     }
   };

@@ -3,7 +3,7 @@ import { DialogType } from "./dataActions";
 const initialState = {
   loading: false,
   address: "",
-  errorMsg: "",
+  errorMessage: "",
   dialogType: 'none',
   gameModel: null,
   baseGameFee: '0.05',
@@ -27,7 +27,7 @@ const dataReducer = (state = initialState, action) => {
       return {
         ...state,
         loading: false,
-        errorMsg: action.payload,
+        errorMessage: action.payload,
       };
     case 'SHOW_INFO_DIALOG':
       return {

@@ -164,7 +164,9 @@ function App() {
       {renderHelpPopup()}
       {renderCreateGamePopup()}
       {renderJoinGamePopup()}
-      {gameCreated ? renderGameBoard() : renderWelcomePage()}
+      <s.Container jc={"center"} style={{margin: "50px"}}>
+        {gameCreated ? renderGameBoard() : renderWelcomePage()}
+      </s.Container>
       {/* 
         If account connected or not-connected and no NFTs minted show the chessboard with start game button
         If account connected or not-connected and NFTs minted show minted NFTs with start game button
@@ -226,155 +228,7 @@ function App() {
     </s.Container>;
   }
 
-  function renderWelcomePage() {
-    return (
-      <s.Container key='welcome_page_container' ai={'center'} jc={'center'} fd={'row'} style={{padding: '50px'}}>
-        {setChessboard(false)}
-        <s.SpacerXXLarge />
-        <s.Container ai={'center'} jc={'center'} style={{padding: '20px'}}>
-          <s.TextSubTitle style={{textAlign: 'center'}}>{gameTitle}</s.TextSubTitle>
-          <s.SpacerSmall />
-          <s.TextDescription style={{
-            textAlign: 'justify',
-            marginLeft: '5px',
-            marginRight: '5px'
-          }}>{gameDescription}</s.TextDescription>
-          <s.SpacerMedium />
-          {blockchain.errorMsg !== "" ? (
-            <s.TextParagraph style={{textAlign:'center', color: 'red'}}>{blockchain.errorMsg}</s.TextParagraph>
-          ) : null}
-          <s.SpacerMedium />
-          <s.Container ai={'center'} jc={'center'} fd={'row'}>
-            <s.StyledButton style={{width:'130px', height:'40px'}}
-              onClick={(e) => {
-                e.preventDefault();
-                if (gameConnected) {
-                  dispatch(showCreateGameDialog());
-                } else {
-                  dispatch(connectWallet({
-                    createGameRequest: true, 
-                    lightSquareColor: lightSquareColor, 
-                    darkSquareColor: darkSquareColor
-                  }));
-                }
-              }}>Create Game</s.StyledButton>
-            <s.SpacerMedium />
-            <s.StyledButton style={{width:'130px', height:'40px'}}
-              onClick={(e) => {
-                dispatch(showJoinGameDialog());
-                e.preventDefault();
-              }}
-            >
-              Join Game
-            </s.StyledButton>
-          </s.Container>
-        </s.Container>
-      </s.Container>
-    );
-  }
-
-  function onDragStart (payload) {
-    console.log('onDragStart');
-    const piece = payload.piece;
-    // do not pick up pieces if the game is over
-    if (gameBoard.current.game_over()) return false;
-    console.log('Game not over');
-    console.log('Current turn ' + gameBoard.current.turn());
-    // only pick up pieces for the side to move
-    if ((gameBoard.current.turn() === 'w' && piece.search(/^b/) !== -1) ||
-        (gameBoard.current.turn() === 'b' && piece.search(/^w/) !== -1)) {
-      return false;
-    }
-  }
-  
-  function onDrop(payload) {
-    const source = payload.sourceSquare;
-    const target = payload.targetSquare;
-    
-    // see if the move is legal
-    const move = gameBoard.current.move({
-      from: source,
-      to: target
-    });
-    
-    // illegal move
-    if (move === null) return 'snapback';
-  
-    updateStatus();
-  }
-  
-  // update the board position after the piece snap
-  // for castling, en passant, pawn promotion
-  // function onSnapEnd() {
-  //   board.position(gameBoard.fen());
-  // }
-  
-  function updateStatus () {
-    let status = "";
-  
-    const moveColor = gameBoard.current.turn() === 'b' ? 'Black' : 'White';
-    const address = gameBoard.current.turn() === 'w' ? playerAddress : opponentAddress;
-  
-    // checkmate?
-    if (gameBoard.current.in_checkmate()) {
-      status = 'Game over, ' + moveColor + ' is in checkmate.';
-    }
-  
-    // draw?
-    else if (gameBoard.current.in_draw()) {
-      status = 'Game over, drawn position';
-    }
-  
-    // game still on
-    else {
-      status = moveColor + ' to move';
-  
-      // check?
-      if (gameBoard.current.in_check()) {
-        status += ', ' + moveColor + ' is in check';
-      }
-    }
-  
-    console.log('Game Status: ' + status);
-    console.log('Game Fen: ' + gameBoard.current.fen());
-    if (gameModel != null) {
-      dispatch(togglePlayerState({gameModel: gameModel, address: address, fen: gameBoard.current.fen()}))
-    }
-    //   $status.html(status);
-    //   $fen.html(game.fen());
-    //   $pgn.html(game.pgn());
-  }
-
-  function setChessboard(isEnable) {
-    return(
-      <Chessboard
-        position={fenString}
-        draggable={isEnable}
-        lightSquareStyle={{ backgroundColor: `rgb(${lightSquareColor})` }}
-        darkSquareStyle={{ backgroundColor: `rgb(${darkSquareColor})` }}
-        showNotation={false}
-        onDragStart={onDragStart}
-        onDrop={onDrop}
-        // pieces={{
-        //   wK: () => (
-        //     <img
-        //       style={{
-        //         alignItems: "center",
-        //         justifyContent: "center",
-        //         flexDirection: "center",
-        //         borderRadius: "35px",
-        //         width: "70px",
-        //         height: "70px"
-        //       }}
-        //       src={blockchain.identiconUrl}
-        //       alt={"player1"}
-        //     />
-        //   )
-        // }} 
-        />
-    );
-  }
-
+  // Dialogs
   function renderHelpPopup() {
     return(
       <Dialog open={infoDialog} onClose={hideDialog}>  
@@ -530,12 +384,12 @@ function App() {
                   gameFeeInputEvent(e);
                 }} />
               {
-                data.errorMsg ? 
+                data.errorMessage ? 
                 (
                   <s.TextParagraph
                     style={{color: 'red', paddingTop: '10px', textAlign: 'center'}}
                   >
-                    {data.errorMsg}
+                    {data.errorMessage}
                   </s.TextParagraph>
                 ) : (
                   null
@@ -631,12 +485,12 @@ function App() {
                 gameCodeInputEvent(e);
               }} />
             {
-              data.errorMsg ? 
+              data.errorMessage ? 
               (
                 <s.TextParagraph
                   style={{color: 'red', paddingTop: '10px', textAlign: 'center'}}
                 >
-                  {data.errorMsg}
+                  {data.errorMessage}
                 </s.TextParagraph>
               ) : (
                 null
@@ -690,48 +544,213 @@ function App() {
     )
   }
 
+  // Chess game functions
+  function onDragStart (payload) {
+    console.log('onDragStart');
+    const piece = payload.piece;
+    // do not pick up pieces if the game is over
+    if (gameBoard.current.game_over()) return false;
+    console.log('Game not over');
+    console.log('Current turn ' + gameBoard.current.turn());
+    // only pick up pieces for the side to move
+    if ((gameBoard.current.turn() === 'w' && piece.search(/^b/) !== -1) ||
+        (gameBoard.current.turn() === 'b' && piece.search(/^w/) !== -1)) {
+      return false;
+    }
+  }
+  
+  function onDrop(payload) {
+    const source = payload.sourceSquare;
+    const target = payload.targetSquare;
+    
+    // see if the move is legal
+    const move = gameBoard.current.move({
+      from: source,
+      to: target
+    });
+    
+    // illegal move
+    if (move === null) return 'snapback';
+  
+    updateStatus();
+  }
+  
+  // update the board position after the piece snap
+  // for castling, en passant, pawn promotion
+  // function onSnapEnd() {
+  //   board.position(gameBoard.fen());
+  // }
+  
+  function updateStatus () {
+    let status = "";
+  
+    const moveColor = gameBoard.current.turn() === 'b' ? 'Black' : 'White';
+    const address = gameBoard.current.turn() === 'w' ? playerAddress : opponentAddress;
+  
+    // checkmate?
+    if (gameBoard.current.in_checkmate()) {
+      status = 'Game over, ' + moveColor + ' is in checkmate.';
+    }
+  
+    // draw?
+    else if (gameBoard.current.in_draw()) {
+      status = 'Game over, drawn position';
+    }
+  
+    // game still on
+    else {
+      status = moveColor + ' to move';
+  
+      // check?
+      if (gameBoard.current.in_check()) {
+        status += ', ' + moveColor + ' is in check';
+      }
+    }
+  
+    console.log('Game Status: ' + status);
+    console.log('Game Fen: ' + gameBoard.current.fen());
+    if (gameModel != null) {
+      dispatch(togglePlayerState({gameModel: gameModel, address: address, fen: gameBoard.current.fen()}))
+    }
+    //   $status.html(status);
+    //   $fen.html(game.fen());
+    //   $pgn.html(game.pgn());
+  }
+
+  // Chess Board functions
+  function setChessboard(isEnable) {
+    return(
+      <Chessboard
+        position={fenString}
+        draggable={isEnable}
+        lightSquareStyle={{ backgroundColor: `rgb(${lightSquareColor})` }}
+        darkSquareStyle={{ backgroundColor: `rgb(${darkSquareColor})` }}
+        showNotation={false}
+        onDragStart={onDragStart}
+        onDrop={onDrop}
+        // pieces={{
+        //   wK: () => (
+        //     <img
+        //       style={{
+        //         alignItems: "center",
+        //         justifyContent: "center",
+        //         flexDirection: "center",
+        //         borderRadius: "35px",
+        //         width: "70px",
+        //         height: "70px"
+        //       }}
+        //       src={blockchain.identiconUrl}
+        //       alt={"player1"}
+        //     />
+        //   )
+        // }} 
+        />
+    );
+  }
+
+  function renderWelcomePage() {
+    return (
+      <s.Container key='welcome_page_container' ai={'center'} jc={'center'} fd={'row'} >
+        {setChessboard(false)}
+        <s.SpacerXXLarge />
+        <s.Container ai={'center'} jc={'center'} style={{padding: '20px'}}>
+          <s.TextSubTitle style={{textAlign: 'center'}}>{gameTitle}</s.TextSubTitle>
+          <s.SpacerSmall />
+          <s.TextDescription style={{
+            textAlign: 'justify',
+            marginLeft: '5px',
+            marginRight: '5px'
+          }}>{gameDescription}</s.TextDescription>
+          <s.SpacerMedium />
+          {data.errorMessage !== "" ? (
+            <s.TextParagraph style={{textAlign:'center', color: 'red'}}>{data.errorMessage}</s.TextParagraph>
+          ) : null}
+          <s.SpacerMedium />
+          <s.Container ai={'center'} jc={'center'} fd={'row'}>
+            <s.StyledButton style={{width:'130px', height:'40px'}}
+              onClick={(e) => {
+                e.preventDefault();
+                if (gameConnected) {
+                  dispatch(showCreateGameDialog());
+                } else {
+                  dispatch(connectWallet({
+                    createGameRequest: true, 
+                    lightSquareColor: lightSquareColor, 
+                    darkSquareColor: darkSquareColor
+                  }));
+                }
+              }}>Create Game</s.StyledButton>
+            <s.SpacerMedium />
+            <s.StyledButton style={{width:'130px', height:'40px'}}
+              onClick={(e) => {
+                dispatch(showJoinGameDialog());
+                e.preventDefault();
+              }}
+            >
+              Join Game
+            </s.StyledButton>
+          </s.Container>
+        </s.Container>
+      </s.Container>
+    );
+  }
+
   function renderGameBoard() {
     return(
       <s.Container
         fd={'row'}
         jc={"center"}
         ai={'center'}
-        style={{padding: '50px'}}
       >
         {setChessboard(gameStarted && ((isPlayer && playerTurn) || (isOpponent && opponentTurn)))}
         <s.SpacerXXLarge/>
-        <s.Container
-          ai={'center'}
-          jd={'center'}
-          style={{opacity: gameStarted ? '1' : '0.25'}}
-        >
-          {addClock(playerTurn)}
-          <s.SpacerMedium/>
-          <s.TextSubTitle
-            style={{
-              textAlign: 'center', 
-              fontFamily: 'default-font'
-            }}
-          >
-            {isPlayer ? (youTitle) : (opponentTitle)}
-          </s.TextSubTitle>
-        </s.Container>
-        <s.SpacerLarge/>
-        <s.Container
-          ai={"center"}
-          jd={"center"}
-          style={{opacity: gameStarted ? "1" : "0.25"}}
-        >
-          {addClock(opponentTurn)}
-          <s.SpacerMedium/>
-          <s.TextSubTitle
-            style={{
-              textAlign: "center", 
-              fontFamily: "default-font"
-            }}
-          >
-            {isOpponent ? (youTitle) : (opponentTitle)}
-          </s.TextSubTitle>
+        <s.Container>
+          {!gameStarted ? (<s.TextDescription style={{
+            textAlign: 'center',
+            marginLeft: '5px',
+            marginRight: '5px',
+            fontSize: '18px'
+          }}>The game will begin as soon as the opponent joins</s.TextDescription>) : (null)}
+          <s.SpacerMedium />
+          {data.errorMessage !== "" ? (
+            <s.TextParagraph style={{textAlign:'center', color: 'red'}}>{data.errorMessage}</s.TextParagraph>
+          ) : null}
+          <s.SpacerMedium />
+          <s.Container fd={'row'}>
+            <s.Container
+              ai={'center'}
+              jd={'center'}
+              style={{opacity: gameStarted ? '1' : '0.25'}}
+            >
+              {addClock(playerTurn)}
+              <s.SpacerMedium/>
+              <s.TextSubTitle
+                style={{
+                  textAlign: 'center', 
+                  fontFamily: 'default-font'
+                }}
+              >
+                {isPlayer ? (youTitle) : (opponentTitle)}
+              </s.TextSubTitle>
+            </s.Container>
+            <s.SpacerLarge/>
+            <s.Container
+              ai={"center"}
+              jd={"center"}
+              style={{opacity: gameStarted ? "1" : "0.25"}}
+            >
+              {addClock(opponentTurn)}
+              <s.SpacerMedium/>
+              <s.TextSubTitle
+                style={{
+                  textAlign: "center", 
+                  fontFamily: "default-font"
+                }}
+              >
+                {isOpponent ? (youTitle) : (opponentTitle)}
+              </s.TextSubTitle>
+            </s.Container>
+          </s.Container>
         </s.Container>
       </s.Container>
     );
