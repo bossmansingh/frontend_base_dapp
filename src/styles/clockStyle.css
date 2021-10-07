@@ -396,19 +396,6 @@
   box-shadow: 0 0 2px rgba(119, 0, 0, 0.2);
   transform-origin: 1px 65px;
 }
-.clock-second[rotate='1'] {
-  animation: rotateSecond 120s linear;
-  -webkit-animation: rotateSecond 120s linear;
-  -moz-animation: rotateSecond 120s linear;
-}
-@keyframes rotateSecond {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
 .clock-second:after{
   content: "";
   display: block;

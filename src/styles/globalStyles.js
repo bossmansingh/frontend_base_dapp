@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
 
 // Used for wrapping a page component
 export const Screen = styled.div`
@@ -73,8 +73,19 @@ export const Container = styled.div`
   background-position: center;
 `;
 
-export const ClockContainer = styled.div`
-  rotateSecond: ${({ ra }) => (ra ? ra : 0)}
+export const ClockContainer = styled.div``;
+export const ClockSecContainer = styled.div`
+  animation: ${props => rotateKeyframe(props.rotateDeg)} 120s linear;
+  -webkit-animation: ${props => rotateKeyframe(props.rotateDeg)} 120s linear;
+  -moz-animation: ${props => rotateKeyframe(props.rotateDeg)} 120s linear;
+`;
+const rotateKeyframe = (y) => keyframes`
+  from {
+      transform : rotate(${y}deg) 
+  }
+  to {
+      transform : rotate(360deg)
+  }
 `;
 
 export const TextPageTitle = styled.p`

@@ -768,15 +768,25 @@ function App() {
       const key = `clock-indicator-${i}`;
       clockIndicators[i] = <s.ClockContainer key={key} className='clock-indicator'/>
     }
+    const deg = isEnabled ? 90 : 0; 
     return(
       <s.ClockContainer className='clock-wrapper'>
         <s.ClockContainer className='clock-base'>
           <s.ClockContainer className='clock-dial'>
             {clockIndicators}
           </s.ClockContainer>
-          <s.ClockContainer className='clock-second' rotate={isEnabled ? 1 : 0} 
-            onAnimationEnd={() => togglePlayer()} 
-          />
+          {isEnabled ? (
+            <s.ClockSecContainer 
+              className='clock-second' 
+              rotateDeg={deg}
+              onAnimationEnd={() => togglePlayer()} 
+            />
+          ) : (
+            <s.ClockContainer 
+              className='clock-second' 
+              onAnimationEnd={() => togglePlayer()} 
+            />
+          )}
           <s.ClockContainer className='clock-center'/>
         </s.ClockContainer>
       </s.ClockContainer>
