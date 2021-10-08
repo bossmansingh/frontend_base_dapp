@@ -160,6 +160,8 @@ function App() {
   // Chess game methods and constants
   const allowDrag = ({piece, sourceSquare}) => {
     if (gameBoard.current == null) return false;
+    if (isPlayer && !playerTurn) return false;
+    if (isOpponent && !opponentTurn) return false;
     
     const isGameOver = gameBoard.current.game_over();
     // do not pick up pieces if the game is over
