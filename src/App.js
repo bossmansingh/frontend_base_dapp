@@ -119,24 +119,24 @@ function App() {
   const isOpponent = stringValueEqual(opponentAddress, address);
   const opponentTurn = stringValueEqual(currentTurnAddress, opponentAddress);
   
-  console.log("App() | player: " + playerTurn);
-  console.log("App() | opponent: " + opponentTurn);
-  console.log("App() | Address: " + address);
-  console.log("App() | walletConnected: " + walletConnected);
-  console.log("App() | contractFetched: " + contractFetched);
-  console.log("App() | gameConnected: " + gameConnected);
-  console.log("App() | gameCreated: " + gameCreated);
-  console.log("App() | gameStarted: " + gameStarted);
-  console.log("App() | playerAddress: " + playerAddress);
-  console.log("App() | opponentAddress: " + opponentAddress);
-  console.log("App() | currentTurnAddress: " + currentTurnAddress);
-  console.log("App() | fenString: " + fenString);
-  console.log("App() | dialogType: " + dialogType);
-  console.log("App() | showCreateGameDialog: " + createGameDialog);
-  console.log("App() | showJoinGameDialog: " + joinGameDialog);
-  console.log("App() | showInfoDialog: " + infoDialog);
-  console.log("App() | baseGameFee: " + baseGameFee);
-  console.log("App() | updatedAt: " + updatedAt);
+  // console.log("App() | player: " + playerTurn);
+  // console.log("App() | opponent: " + opponentTurn);
+  // console.log("App() | Address: " + address);
+  // console.log("App() | walletConnected: " + walletConnected);
+  // console.log("App() | contractFetched: " + contractFetched);
+  // console.log("App() | gameConnected: " + gameConnected);
+  // console.log("App() | gameCreated: " + gameCreated);
+  // console.log("App() | gameStarted: " + gameStarted);
+  // console.log("App() | playerAddress: " + playerAddress);
+  // console.log("App() | opponentAddress: " + opponentAddress);
+  // console.log("App() | currentTurnAddress: " + currentTurnAddress);
+  // console.log("App() | fenString: " + fenString);
+  // console.log("App() | dialogType: " + dialogType);
+  // console.log("App() | showCreateGameDialog: " + createGameDialog);
+  // console.log("App() | showJoinGameDialog: " + joinGameDialog);
+  // console.log("App() | showInfoDialog: " + infoDialog);
+  // console.log("App() | baseGameFee: " + baseGameFee);
+  // console.log("App() | updatedAt: " + updatedAt);
 
   useEffect(() => {
     if (gameConnected) {
@@ -153,62 +153,28 @@ function App() {
   }
 
   // Chess game methods and constants
+  const allowDrag = ({piece, squareSource}) => {
+    // do not pick up pieces if the game is over
+    if (gameBoard.current.game_over()) return false;
+    // console.log('Game not over');
+    // console.log('Current turn ' + gameBoard.current.turn());
+    // only pick up pieces for the side to move
+    if ((gameBoard.current.turn() === 'w' && piece.search(/^b/) !== -1) ||
+    (gameBoard.current.turn() === 'b' && piece.search(/^w/) !== -1)) {
+      return false;
+    }
+    return true;
+  };
+
   const onDrop = ({sourceSquare, targetSquare, piece}) => {
-    console.log('onDrop');
-    
-    console.log(`source: ${sourceSquare}`);
-    console.log(`target: ${targetSquare}`);
-    console.log(`piece: ${piece}`);
-    
     // see if the move is legal
     const move = gameBoard.current.move({
       from: sourceSquare,
       to: targetSquare
     });
-    console.log(`move: ${move}`);
     // illegal move
     if (move === null) return 'snapback';
-    
     updateStatus();
-  };
-
-  const onDragOverSquare = (square) => {
-    console.log('onDragOverSquare');
-    console.log(`square: ${square}`);
-  };
-  
-  // const onMouseOutSquare = (square) => {
-  //   console.log('onMouseOutSquare');
-  //   console.log(`square: ${square}`);
-  // };
-
-  const onMouseOverSquare = (square) => {
-    console.log('onMouseOverSquare');
-    console.log(`square: ${square}`);
-  };
-
-  const onPieceClick = (piece) => {
-    console.log('onPieceClick');
-    console.log(`piece: ${piece}`);
-  };
-
-  const onSquareClick = (piece) => {
-    console.log('onSquareClick');
-    console.log(`piece: ${piece}`);
-  };
-
-  const onDragStart = (payload) => {
-    console.log('onDragStart');
-    const piece = payload.piece;
-    // do not pick up pieces if the game is over
-    if (gameBoard.current.game_over()) return false;
-    console.log('Game not over');
-    console.log('Current turn ' + gameBoard.current.turn());
-    // only pick up pieces for the side to move
-    if ((gameBoard.current.turn() === 'w' && piece.search(/^b/) !== -1) ||
-        (gameBoard.current.turn() === 'b' && piece.search(/^w/) !== -1)) {
-      return false;
-    }
   };
 
   return (
@@ -645,16 +611,16 @@ function App() {
       <Chessboard
         position={fenString}
         draggable={isEnable}
+        allowDrag={allowDrag}
         lightSquareStyle={{ backgroundColor: `rgb(${lightSquareColor})` }}
         darkSquareStyle={{ backgroundColor: `rgb(${darkSquareColor})` }}
         showNotation={false}
-        //onDragStart={onDragStart}
         onDrop={onDrop}
-        onDragOverSquare={onDragOverSquare}
+        // onDragOverSquare={onDragOverSquare}
         // onMouseOutSquare={onMouseOutSquare}
-        onMouseOverSquare={onMouseOverSquare}
-        onPieceClick={onPieceClick}
-        onSquareClick={onSquareClick}
+        // onMouseOverSquare={onMouseOverSquare}
+        // onPieceClick={onPieceClick}
+        // onSquareClick={onSquareClick}
         // pieces={{
         //   wK: () => (
         //     <img
