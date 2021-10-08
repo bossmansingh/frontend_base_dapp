@@ -54,7 +54,7 @@ async function copyTextToClipboard(text) {
   } else {
     return document.execCommand('copy', true, text);
   }  
-}  
+}
 
 function App() {
   const gameBoard = useRef(chessGameInstance);
@@ -157,42 +157,9 @@ function App() {
     dispatch(fetchCachedAccount());
   }
 
-  // Chess game methods and constants
-  const allowDrag = ({piece, sourceSquare}) => {
-    if (gameBoard.current == null) return false;
-    if (isPlayer && !playerTurn) return false;
-    if (isOpponent && !opponentTurn) return false;
-    
-    const isGameOver = gameBoard.current.game_over();
-    // do not pick up pieces if the game is over
-    if (isGameOver) return false;
-    // only pick up pieces for the side to move
-    if ((isPlayer && piece.search(/^b/) !== -1) ||
-    (isOpponent && piece.search(/^w/) !== -1)) {
-      console.log(`Disable drag `);
-      return false;
-    }
-    console.log(`Enable drag`);
-    return true;
-  };
-
-  const onDrop = ({sourceSquare, targetSquare, piece}) => {
-    // see if the move is legal
-    const move = gameBoard.current.move({
-      from: sourceSquare,
-      to: targetSquare
-    });
-    // illegal move
-    if (move === null) return 'snapback';
-    updateStatus();
-  };
-  
-  function updateStatus () {
+  function getLatestStatus() {
     let status = "";
-  
     const moveColor = gameBoard.current.turn() === 'b' ? 'Black' : 'White';
-    const address = gameBoard.current.turn() === 'w' ? playerAddress : opponentAddress;
-  
     // checkmate?
     if (gameBoard.current.in_checkmate()) {
       status = 'Game over, ' + moveColor + ' is in checkmate.';
@@ -212,11 +179,37 @@ function App() {
         status += ', ' + moveColor + ' is in check';
       }
     }
-  
     console.log('Game Status: ' + status);
-    console.log('Game Fen: ' + gameBoard.current.fen());
-    updateGameState(address);
+    return status;
   }
+
+  // Chess game methods and constants
+  const allowDrag = ({piece, sourceSquare}) => {
+    if (gameBoard.current == null) return false;
+    if (isPlayer && !playerTurn) return false;
+    if (isOpponent && !opponentTurn) return false;
+    
+    const isGameOver = gameBoard.current.game_over();
+    // do not pick up pieces if the game is over
+    if (isGameOver) return false;
+    // only pick up pieces for the side to move
+    if ((isPlayer && piece.search(/^b/) !== -1) || (isOpponent && piece.search(/^w/) !== -1)) return false;  
+
+    return true;
+  };
+
+  const onDrop = ({sourceSquare, targetSquare, piece}) => {
+    // see if the move is legal
+    const move = gameBoard.current.move({
+      from: sourceSquare,
+      to: targetSquare
+    });
+    // illegal move
+    if (move === null) return 'snapback';
+    
+    const address = gameBoard.current.turn() === 'w' ? playerAddress : opponentAddress;
+    updateGameState(address);
+  };
 
   return (
     <s.ResponsiveWrapper>
@@ -688,7 +681,7 @@ function App() {
                     textAlign: 'center',
                     fontSize: '38px'
                   }}
-                >{ (isPlayer && playerTurn) ? yourTurnTitle : opponentTurnTitle }</s.TextPageTitle>
+                >{ getLatestStatus() }</s.TextPageTitle>
             </s.Container>)
           }
           {data.errorMessage !== "" ? (
@@ -800,7 +793,6 @@ function App() {
   }
 
   function togglePlayer() {
-    console.log('Animation ended');
     // If the total time of animation has ended that means the user has not played a move. Play a random move instead
     if (isPlayer && playerTurn) {
       playRandomMove(opponentAddress)
@@ -810,14 +802,11 @@ function App() {
   }
 
   function playRandomMove(address) {
-    console.log('Play random move');
     // Return if game is over
     if (gameBoard.current.game_over()) return
 
     const moves = gameBoard.current.moves();
     const move = moves[Math.floor(Math.random() * moves.length)]
-    console.log(`moves length: ${moves.length}`);
-    console.log(`move: ${move}`);
     gameBoard.current.move(move);
     updateGameState(address)
   }
