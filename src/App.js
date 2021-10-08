@@ -33,11 +33,8 @@ let lightSquareColor = getLightSquareColor();
 let darkSquareColor = getDarkSquareColor();
 
 // Constants
-const chessGameInstance = new Chess();
 const youTitle = "YOU";
-const yourTurnTitle = "YOUR TURN";
 const opponentTitle = "OPPONENT";
-const opponentTurnTitle = "OPPONENT'S TURN";
 const handleCopyClick = async (text) => {
   try {
     await copyTextToClipboard(text);
@@ -57,7 +54,6 @@ async function copyTextToClipboard(text) {
 }
 
 function App() {
-  const gameBoard = useRef(chessGameInstance);
   const [gameCode, _setGameCode] = useState('');
   const [gameFee, _setGameFee] = useState('0.05');
   
@@ -115,9 +111,7 @@ function App() {
     updatedAt = gameModel.updatedAt;
   }
   // Init chess board
-  if (gameBoard.current != null) {
-    gameBoard.current.load(fenString);
-  }
+  const gameBoard = stringValueEqual(fenString, 'start') ? new Chess() : Chess(fenString);
 
   const isPlayer = stringValueEqual(playerAddress, address);
   const playerTurn = stringValueEqual(currentTurnAddress, playerAddress);
@@ -159,14 +153,14 @@ function App() {
 
   function getLatestStatus() {
     let status = "";
-    const moveColor = gameBoard.current.turn() === 'b' ? 'Black' : 'White';
+    const moveColor = gameBoard.turn() === 'b' ? 'Black' : 'White';
     // checkmate?
-    if (gameBoard.current.in_checkmate()) {
+    if (gameBoard.in_checkmate()) {
       status = 'Game over, ' + moveColor + ' is in checkmate.';
     }
   
     // draw?
-    else if (gameBoard.current.in_draw()) {
+    else if (gameBoard.in_draw()) {
       status = 'Game over, drawn position';
     }
   
@@ -175,7 +169,7 @@ function App() {
       status = moveColor + ' to move';
   
       // check?
-      if (gameBoard.current.in_check()) {
+      if (gameBoard.in_check()) {
         status += ', ' + moveColor + ' is in check';
       }
     }
@@ -184,32 +178,33 @@ function App() {
   }
 
   // Chess game methods and constants
-  const allowDrag = ({piece, sourceSquare}) => {
-    if (gameBoard.current == null) return false;
+  function allowDrag({piece, sourceSquare}) {
+    if (gameBoard == null) return false;
+    console.log(`piece: ${piece}`);
     if (isPlayer && !playerTurn) return false;
     if (isOpponent && !opponentTurn) return false;
     
-    const isGameOver = gameBoard.current.game_over();
+    const isGameOver = gameBoard.game_over();
     // do not pick up pieces if the game is over
     if (isGameOver) return false;
     // only pick up pieces for the side to move
-    if ((isPlayer && piece.search(/^b/) !== -1) || (isOpponent && piece.search(/^w/) !== -1)) return false;  
-
+    if ((isPlayer && playerTurn && piece.search(/^b/) !== -1) || (isOpponent && opponentTurn && piece.search(/^w/) !== -1)) return false;
+    console.log(`Allow drag`);
     return true;
-  };
+  }
 
-  const onDrop = ({sourceSquare, targetSquare, piece}) => {
+  function onDrop({sourceSquare, targetSquare, piece}) {
     // see if the move is legal
-    const move = gameBoard.current.move({
+    const move = gameBoard.move({
       from: sourceSquare,
       to: targetSquare
     });
     // illegal move
     if (move === null) return 'snapback';
     
-    const address = gameBoard.current.turn() === 'w' ? playerAddress : opponentAddress;
+    const address = gameBoard.turn() === 'w' ? playerAddress : opponentAddress;
     updateGameState(address);
-  };
+  }
 
   return (
     <s.ResponsiveWrapper>
@@ -763,7 +758,6 @@ function App() {
     const clockIndicators = []
     const totalTimeInSeconds = 120;
     const elapsedTime = (new Date() - updatedAt) / 1000;
-    console.log(`elapsedTime: ${elapsedTime}`)
     for (let i = 0; i < 90; i++) {
       const key = `clock-indicator-${i}`;
       clockIndicators[i] = <s.ClockContainer key={key} className='clock-indicator'/>
@@ -803,17 +797,17 @@ function App() {
 
   function playRandomMove(address) {
     // Return if game is over
-    if (gameBoard.current.game_over()) return
+    if (gameBoard.game_over()) return
 
-    const moves = gameBoard.current.moves();
+    const moves = gameBoard.moves();
     const move = moves[Math.floor(Math.random() * moves.length)]
-    gameBoard.current.move(move);
+    gameBoard.move(move);
     updateGameState(address)
   }
 
   function updateGameState(address) {
-    if (gameModel != null && gameBoard.current != null && isValidString(address)) {
-      dispatch(togglePlayerState({gameModel: gameModel, address: address, fen: gameBoard.current.fen()}))
+    if (gameModel != null && gameBoard != null && isValidString(address)) {
+      dispatch(togglePlayerState({gameModel: gameModel, address: address, fen: gameBoard.fen()}))
     }
   }
 }
