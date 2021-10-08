@@ -33,8 +33,11 @@ let lightSquareColor = getLightSquareColor();
 let darkSquareColor = getDarkSquareColor();
 
 // Constants
+const chessGameInstance = new Chess();
 const youTitle = "YOU";
+const yourTurnTitle = "YOUR TURN";
 const opponentTitle = "OPPONENT";
+const opponentTurnTitle = "OPPONENT'S TURN";
 const handleCopyClick = async (text) => {
   try {
     await copyTextToClipboard(text);
@@ -54,7 +57,7 @@ async function copyTextToClipboard(text) {
 }  
 
 function App() {
-  const gameBoard = useRef(null);
+  const gameBoard = useRef(chessGameInstance);
   const [gameCode, _setGameCode] = useState('');
   const [gameFee, _setGameFee] = useState('0.05');
   
@@ -69,7 +72,6 @@ function App() {
     const isNewFeeLowerThanBase = newGameFeeValue < baseGameFee;
     const newGameFee = isNewFeeLowerThanBase ? baseGameFee : newGameFeeValue;
     if (newGameFee !== gameFee) {
-      console.log('Update Game Fee');
       _setGameFee(newGameFee);
     }
   };
@@ -147,7 +149,6 @@ function App() {
       // TODO: fetch NFT data
       console.log("................Fetch data................");
       dispatch(fetchData(address));
-      gameBoard.current = new Chess();
     }
   }, [address, gameConnected, dispatch]);
 
@@ -157,19 +158,19 @@ function App() {
   }
 
   // Chess game methods and constants
-  const allowDrag = ({piece, squareSource}) => {
+  const allowDrag = ({piece, sourceSquare}) => {
     if (gameBoard.current == null) return false;
     
     const isGameOver = gameBoard.current.game_over();
     // do not pick up pieces if the game is over
     if (isGameOver) return false;
     // only pick up pieces for the side to move
-    if ((gameBoard.current.turn() === 'w' && piece.search(/^b/) !== -1) ||
-    (gameBoard.current.turn() === 'b' && piece.search(/^w/) !== -1)) {
-      console.log('Disable drag');
+    if ((isPlayer && piece.search(/^b/) !== -1) ||
+    (isOpponent && piece.search(/^w/) !== -1)) {
+      console.log(`Disable drag `);
       return false;
     }
-    console.log('Enable drag');
+    console.log(`Enable drag`);
     return true;
   };
 
@@ -183,12 +184,6 @@ function App() {
     if (move === null) return 'snapback';
     updateStatus();
   };
-
-  // update the board position after the piece snap
-  // for castling, en passant, pawn promotion
-  // function onSnapEnd() {
-  //   board.position(gameBoard.current.fen());
-  // }
   
   function updateStatus () {
     let status = "";
@@ -219,10 +214,6 @@ function App() {
     console.log('Game Status: ' + status);
     console.log('Game Fen: ' + gameBoard.current.fen());
     updateGameState(address);
-
-    //   $status.html(status);
-    //   $fen.html(game.fen());
-    //   $pgn.html(game.pgn());
   }
 
   return (
@@ -689,7 +680,14 @@ function App() {
               </s.Container>
             ) 
             : 
-            (null)
+            (<s.Container ai={'center'} style={{marginBottom: '20px'}}>
+              <s.TextPageTitle 
+                  style={{
+                    textAlign: 'center',
+                    fontSize: '38px'
+                  }}
+                >{ (isPlayer && playerTurn) ? yourTurnTitle : opponentTurnTitle }</s.TextPageTitle>
+            </s.Container>)
           }
           {data.errorMessage !== "" ? (
             <s.TextParagraph style={{textAlign:'center', color: 'red', marginTop: '24px'}}>{data.errorMessage}</s.TextParagraph>
@@ -740,17 +738,12 @@ function App() {
       <Chessboard
         position={fenString}
         draggable={isEnable}
-        orientation={isPlayer ? 'white' : 'black'}
+        orientation={isOpponent ? 'black' : 'white'}
         allowDrag={allowDrag}
         lightSquareStyle={{ backgroundColor: `rgb(${lightSquareColor})` }}
         darkSquareStyle={{ backgroundColor: `rgb(${darkSquareColor})` }}
         showNotation={false}
         onDrop={onDrop}
-        // onDragOverSquare={onDragOverSquare}
-        // onMouseOutSquare={onMouseOutSquare}
-        // onMouseOverSquare={onMouseOverSquare}
-        // onPieceClick={onPieceClick}
-        // onSquareClick={onSquareClick}
         // pieces={{
         //   wK: () => (
         //     <img
@@ -812,13 +805,6 @@ function App() {
     } else if (isOpponent && opponentTurn) {
       playRandomMove(playerAddress)
     }
-    
-    // // Toggle player turn state
-    // if (playerTurn && isValidString(opponentAddress) && gameModel != null) {
-    //   updateGameState(opponentAddress)
-    // } else if (opponentTurn && isValidString(playerAddress) && gameModel != null) {
-    //   updateGameState(playerAddress)
-    // }
   }
 
   function playRandomMove(address) {
