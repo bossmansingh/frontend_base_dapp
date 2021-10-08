@@ -183,15 +183,30 @@ contract GameContract is BaseContract {
      * 
      * @param gameId id of this game
      * @param winnerAddress address of player who won the game
-     * @param winTime time taken (in seconds) to win the game
+     * @param gameTime time taken (in seconds) to win the game
      */
     function endGame(
         string memory gameId, 
         address winnerAddress, 
-        uint winTime
+        uint gameTime
     ) external nonReentrant onlyOwner() {
+        // Check and verify if the caller address is valid
+        require(msg.sender != Helpers.nullAddress(), "Caller address is not valid");
+        address challengerAddress = _challengerMap[gameId];
+        bool gameExists = challengerAddress != Helpers.nullAddress();
+        // Check and verify if a game with specified ID  already exists.
+        require(gameExists, "A game with specified ID does not exist");
+        // Check and verify if a challenger address exists.
+        bool challengerExists = challengerAddress != Helpers.nullAddress();
+        require(challengerExists, "Challenger address does not exists");
+        // Check and verify if the challenge acceptor address exist
+        bool challengeAcceptorExists = _opponentMap[gameId] != Helpers.nullAddress();
+        require(challengeAcceptorExists, "Challenge acceptor address does not exists");
+        // Check and verify if the winner address is not set.
+        bool winnerExists = _winnersMap[gameId] != Helpers.nullAddress();
+        require(!winnerExists, "Winner address already exists");
         // Check and verify if the `winTime` is greater than 0
-        require(winTime > 0, "WinTime has to be greater than 0");
+        require(gameTime > 0, "WinTime has to be greater than 0");
         // End the current game and update winner address
         _endGame(winnerAddress, gameId);
         // Emit end game event

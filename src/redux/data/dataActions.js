@@ -273,9 +273,35 @@ export const joinGame = (payload) => {
   };
 };
 
-export const endGame = (gameId, address) => {
-  return async () => {
-    await removeSubscription(gameId);
+export const endGame = (gameShortId, address) => {
+  return async (dispatch) => {
+    try {
+      const gameModel = await queryGameModel(gameShortId);
+      if (gameModel != null) {
+        const gameId = gameModel.id;
+        const currentTime = new Date();
+        const gameTime = currentTime - gameModel.createdAt;
+        await store
+          .getState()
+          .blockchain.gameContract.methods.endGame(gameId, address, gameTime)
+          .call()
+          .once('error', (err) => {
+            console.log(err);
+            // TODO: Handle error case
+          }).then(async (receipt) => {
+            console.table(gameModel);
+            gameModel.set('winnerAddress', address);
+            gameModel.set('gameEnded', true);
+            gameModel.set('gameTime', gameTime);
+            await gameModel.save();
+            //dispatch(showNFTDialog());
+            await removeSubscription(gameShortId);
+          });
+      }
+    } catch (err) {
+      console.log(err);
+      // TODO: Handle error case
+    }
   };
 };
 

@@ -9,7 +9,7 @@ import Chess from "chess.js";
 
 import { getDarkSquareColor, getLightSquareColor, getShortGameId, isValidString, stringValueEqual } from "./utils/Helpers";
 import { connectWallet, fetchCachedAccount, logout } from "./redux/blockchain/blockchainActions";
-import { DialogType, fetchData, createGame, joinGame, showInfoDialog, showCreateGameDialog, showJoinGameDialog, hideDialog, togglePlayerState } from "./redux/data/dataActions";
+import { DialogType, fetchData, createGame, joinGame, showInfoDialog, showCreateGameDialog, showJoinGameDialog, hideDialog, togglePlayerState, endGame } from "./redux/data/dataActions";
 import * as s from "./styles/globalStyles";
 import "./styles/clockStyle.css";
 
@@ -157,6 +157,7 @@ function App() {
     // checkmate?
     if (gameBoard.in_checkmate()) {
       status = 'Game over, ' + moveColor + ' is in checkmate.';
+      dispatch(endGame({gameShortId: gameShortId, address: currentTurnAddress}));
     }
   
     // draw?
