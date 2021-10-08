@@ -60,6 +60,30 @@ export const clearGameData = () => {
   };
 };
 
+export const showInfoDialog = () => {
+  return {
+    type: 'SHOW_INFO_DIALOG'
+  };
+};
+
+export const showJoinGameDialog = () => {
+  return {
+    type: 'SHOW_JOIN_GAME_DIALOG'
+  };
+};
+
+export const showCreateGameDialog = () => {
+  return {
+    type: 'SHOW_CREATE_GAME_DIALOG'
+  };
+};
+
+export const hideDialog = () => {
+  return {
+    type: 'HIDE_DIALOG'
+  };
+};
+
 function getGameModelQuery() {
   return new Moralis.Query(GameModelInstance);
 }
@@ -79,11 +103,19 @@ async function queryGameModel(shortId) {
 
 async function currentGameOrNull(address, dispatch) {
   try {
+    const onGoingGameQuery = getGameModelQuery();
+    onGoingGameQuery.equalTo('gameEnded', false);
     const playerAddressMatchQuery = getGameModelQuery();
     playerAddressMatchQuery.equalTo('playerAddress', address);
     const opponentAddressMatchQuery = getGameModelQuery();
     opponentAddressMatchQuery.equalTo('opponentAddress', address);
-    const mainQuery = Moralis.Query.or(playerAddressMatchQuery, opponentAddressMatchQuery);
+    const mainQuery = Moralis.Query.and(
+      Moralis.Query.or(
+        playerAddressMatchQuery, 
+        opponentAddressMatchQuery
+      ),
+      onGoingGameQuery
+    );
     const gameModel = await mainQuery.first();
     if (gameModel != null) {
       dispatch(updateGame({gameModel: gameModel}));
@@ -106,14 +138,9 @@ async function saveNewGameToDatabase(payload) {
     const result = await gameModel.save({
       gameFee: gameFee,
       playerAddress: address,
-      opponentAddress: '',
-      winnerAddress: '',
       gameStarted: false,
       gameEnded: false,
       fenString: 'start',
-      gameCreateTime: 0,
-      lastTurnTime: 0,
-      currentTurnAddress: '',
       lightSquareColor: lightSquareColor,
       darkSquareColor: darkSquareColor,
       gameBoard: gameBoard
@@ -141,30 +168,6 @@ async function removeSubscription(gameId) {
   // This will close the WebSocket connection to the LiveQuery server, cancel the auto-reconnect, and unsubscribe all subscriptions based on it.
   Moralis.LiveQuery.close();
 }
-
-export const showInfoDialog = () => {
-  return {
-    type: 'SHOW_INFO_DIALOG'
-  };
-};
-
-export const showJoinGameDialog = () => {
-  return {
-    type: 'SHOW_JOIN_GAME_DIALOG'
-  };
-};
-
-export const showCreateGameDialog = () => {
-  return {
-    type: 'SHOW_CREATE_GAME_DIALOG'
-  };
-};
-
-export const hideDialog = () => {
-  return {
-    type: 'HIDE_DIALOG'
-  };
-};
 
 export const togglePlayerState = (payload) => {
   return async (dispatch) => {

@@ -91,6 +91,7 @@ function App() {
   let baseGameFee = data.baseGameFee;
   let gameCreated = gameModel != null;
   let gameStarted = false;
+  let gameEnded = false;
   let playerAddress = '';
   let opponentAddress = '';
   let currentTurnAddress = '';
@@ -102,6 +103,7 @@ function App() {
     gameShortId = getShortGameId(gameModel.id);
     fenString = gameModel.get('fenString');
     gameStarted = gameModel.get('gameStarted');
+    gameEnded = gameModel.get('gameEnded');
     playerAddress = gameModel.get('playerAddress');
     opponentAddress = gameModel.get('opponentAddress');
     currentTurnAddress = gameModel.get('currentTurnAddress');
@@ -111,7 +113,9 @@ function App() {
     updatedAt = gameModel.updatedAt;
   }
   // Init chess board
-  gameBoard.current = new Chess(fenString);
+  if (gameBoard.current != null) {
+    gameBoard.current.load(fenString);
+  }
 
   const isPlayer = stringValueEqual(playerAddress, address);
   const playerTurn = stringValueEqual(currentTurnAddress, playerAddress);
@@ -143,7 +147,7 @@ function App() {
       // TODO: fetch NFT data
       console.log("................Fetch data................");
       dispatch(fetchData(address));
-      //updateStatus();
+      gameBoard.current = new Chess();
     }
   }, [address, gameConnected, dispatch]);
 
@@ -154,15 +158,18 @@ function App() {
 
   // Chess game methods and constants
   const allowDrag = ({piece, squareSource}) => {
+    if (gameBoard.current == null) return false;
+    
+    const isGameOver = gameBoard.current.game_over();
     // do not pick up pieces if the game is over
-    if (gameBoard.current.game_over()) return false;
-    // console.log('Game not over');
-    // console.log('Current turn ' + gameBoard.current.turn());
+    if (isGameOver) return false;
     // only pick up pieces for the side to move
     if ((gameBoard.current.turn() === 'w' && piece.search(/^b/) !== -1) ||
     (gameBoard.current.turn() === 'b' && piece.search(/^w/) !== -1)) {
+      console.log('Disable drag');
       return false;
     }
+    console.log('Enable drag');
     return true;
   };
 
@@ -176,6 +183,47 @@ function App() {
     if (move === null) return 'snapback';
     updateStatus();
   };
+
+  // update the board position after the piece snap
+  // for castling, en passant, pawn promotion
+  // function onSnapEnd() {
+  //   board.position(gameBoard.current.fen());
+  // }
+  
+  function updateStatus () {
+    let status = "";
+  
+    const moveColor = gameBoard.current.turn() === 'b' ? 'Black' : 'White';
+    const address = gameBoard.current.turn() === 'w' ? playerAddress : opponentAddress;
+  
+    // checkmate?
+    if (gameBoard.current.in_checkmate()) {
+      status = 'Game over, ' + moveColor + ' is in checkmate.';
+    }
+  
+    // draw?
+    else if (gameBoard.current.in_draw()) {
+      status = 'Game over, drawn position';
+    }
+  
+    // game still on
+    else {
+      status = moveColor + ' to move';
+  
+      // check?
+      if (gameBoard.current.in_check()) {
+        status += ', ' + moveColor + ' is in check';
+      }
+    }
+  
+    console.log('Game Status: ' + status);
+    console.log('Game Fen: ' + gameBoard.current.fen());
+    updateGameState(address);
+
+    //   $status.html(status);
+    //   $fen.html(game.fen());
+    //   $pgn.html(game.pgn());
+  }
 
   return (
     <s.ResponsiveWrapper>
@@ -562,84 +610,6 @@ function App() {
       </Dialog>
     )
   }
-  
-  // update the board position after the piece snap
-  // for castling, en passant, pawn promotion
-  // function onSnapEnd() {
-  //   board.position(gameBoard.current.fen());
-  // }
-  
-  function updateStatus () {
-    let status = "";
-  
-    const moveColor = gameBoard.current.turn() === 'b' ? 'Black' : 'White';
-    const address = gameBoard.current.turn() === 'w' ? playerAddress : opponentAddress;
-  
-    // checkmate?
-    if (gameBoard.current.in_checkmate()) {
-      status = 'Game over, ' + moveColor + ' is in checkmate.';
-    }
-  
-    // draw?
-    else if (gameBoard.current.in_draw()) {
-      status = 'Game over, drawn position';
-    }
-  
-    // game still on
-    else {
-      status = moveColor + ' to move';
-  
-      // check?
-      if (gameBoard.current.in_check()) {
-        status += ', ' + moveColor + ' is in check';
-      }
-    }
-  
-    console.log('Game Status: ' + status);
-    console.log('Game Fen: ' + gameBoard.current.fen());
-    if (gameModel != null) {
-      dispatch(togglePlayerState({gameModel: gameModel, address: address, fen: gameBoard.current.fen()}))
-    }
-    //   $status.html(status);
-    //   $fen.html(game.fen());
-    //   $pgn.html(game.pgn());
-  }
-
-  // Chess Board functions
-  function setChessboard(isEnable) {
-    return(
-      <Chessboard
-        position={fenString}
-        draggable={isEnable}
-        allowDrag={allowDrag}
-        lightSquareStyle={{ backgroundColor: `rgb(${lightSquareColor})` }}
-        darkSquareStyle={{ backgroundColor: `rgb(${darkSquareColor})` }}
-        showNotation={false}
-        onDrop={onDrop}
-        // onDragOverSquare={onDragOverSquare}
-        // onMouseOutSquare={onMouseOutSquare}
-        // onMouseOverSquare={onMouseOverSquare}
-        // onPieceClick={onPieceClick}
-        // onSquareClick={onSquareClick}
-        // pieces={{
-        //   wK: () => (
-        //     <img
-        //       style={{
-        //         alignItems: "center",
-        //         justifyContent: "center",
-        //         flexDirection: "center",
-        //         borderRadius: "35px",
-        //         width: "70px",
-        //         height: "70px"
-        //       }}
-        //       src={blockchain.identiconUrl}
-        //       alt={"player1"}
-        //     />
-        //   )
-        // }} 
-        />
-    );
-  }
 
   function renderWelcomePage() {
     return (
@@ -765,6 +735,42 @@ function App() {
     );
   }
 
+  function setChessboard(isEnable) {
+    return(
+      <Chessboard
+        position={fenString}
+        draggable={isEnable}
+        orientation={isPlayer ? 'white' : 'black'}
+        allowDrag={allowDrag}
+        lightSquareStyle={{ backgroundColor: `rgb(${lightSquareColor})` }}
+        darkSquareStyle={{ backgroundColor: `rgb(${darkSquareColor})` }}
+        showNotation={false}
+        onDrop={onDrop}
+        // onDragOverSquare={onDragOverSquare}
+        // onMouseOutSquare={onMouseOutSquare}
+        // onMouseOverSquare={onMouseOverSquare}
+        // onPieceClick={onPieceClick}
+        // onSquareClick={onSquareClick}
+        // pieces={{
+        //   wK: () => (
+        //     <img
+        //       style={{
+        //         alignItems: "center",
+        //         justifyContent: "center",
+        //         flexDirection: "center",
+        //         borderRadius: "35px",
+        //         width: "70px",
+        //         height: "70px"
+        //       }}
+        //       src={blockchain.identiconUrl}
+        //       alt={"player1"}
+        //     />
+        //   )
+        // }} 
+        />
+    );
+  }
+
   function addClock(isEnabled) {
     const clockIndicators = []
     const totalTimeInSeconds = 120;
@@ -790,10 +796,7 @@ function App() {
               onAnimationEnd={() => togglePlayer()} 
             />
           ) : (
-            <s.ClockContainer 
-              className='clock-second' 
-              onAnimationEnd={() => togglePlayer()} 
-            />
+            <s.ClockContainer className='clock-second'/>
           )}
           <s.ClockContainer className='clock-center'/>
         </s.ClockContainer>
@@ -802,11 +805,38 @@ function App() {
   }
 
   function togglePlayer() {
-    // Toggle player turn state
-    if (playerTurn && isValidString(opponentAddress) && gameModel != null) {
-      dispatch(togglePlayerState({gameModel: gameModel, address: opponentAddress}))
-    } else if (opponentTurn && isValidString(playerAddress) && gameModel != null) {
-      dispatch(togglePlayerState({gameModel: gameModel, address: playerAddress}))
+    console.log('Animation ended');
+    // If the total time of animation has ended that means the user has not played a move. Play a random move instead
+    if (isPlayer && playerTurn) {
+      playRandomMove(opponentAddress)
+    } else if (isOpponent && opponentTurn) {
+      playRandomMove(playerAddress)
+    }
+    
+    // // Toggle player turn state
+    // if (playerTurn && isValidString(opponentAddress) && gameModel != null) {
+    //   updateGameState(opponentAddress)
+    // } else if (opponentTurn && isValidString(playerAddress) && gameModel != null) {
+    //   updateGameState(playerAddress)
+    // }
+  }
+
+  function playRandomMove(address) {
+    console.log('Play random move');
+    // Return if game is over
+    if (gameBoard.current.game_over()) return
+
+    const moves = gameBoard.current.moves();
+    const move = moves[Math.floor(Math.random() * moves.length)]
+    console.log(`moves length: ${moves.length}`);
+    console.log(`move: ${move}`);
+    gameBoard.current.move(move);
+    updateGameState(address)
+  }
+
+  function updateGameState(address) {
+    if (gameModel != null && gameBoard.current != null && isValidString(address)) {
+      dispatch(togglePlayerState({gameModel: gameModel, address: address, fen: gameBoard.current.fen()}))
     }
   }
 }
