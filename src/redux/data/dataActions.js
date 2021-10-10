@@ -1,4 +1,4 @@
-import { getShortGameId, isValidString } from "../../utils/Helpers";
+import { getDateDifferenceInSeconds, getShortGameId, isValidString } from "../../utils/Helpers";
 import store from "../store";
 
 const Moralis = require('moralis');
@@ -93,7 +93,9 @@ async function queryGameModel(shortId) {
     const query = getGameModelQuery();
     query.equalTo('shortId', shortId);
     const gameModel = await query.first();
-    console.table(gameModel);
+    if (gameModel != null) {
+      console.table(gameModel);
+    }
     return gameModel;
   } catch (err) {
     console.log(err);
@@ -118,7 +120,7 @@ async function currentGameOrNull(address, dispatch) {
     );
     const gameModel = await mainQuery.first();
     if (gameModel != null) {
-      dispatch(updateGame({gameModel: gameModel}));
+      dispatch(updateGame({gameModel: gameModel, missedTurnCount: 0}));
       await addSubscription(dispatch, gameModel.id);
     }
   } catch (err) {
@@ -164,9 +166,10 @@ async function addSubscription(dispatch, gameId) {
 async function removeSubscription(gameId) {
   const subscriptionQuery = getGameModelQuery();
   subscriptionQuery.get(gameId);
-  await subscriptionQuery.unsubscribe();
+  const subscription = await subscriptionQuery.subscribe();
+  subscription.unsubscribe();
   // This will close the WebSocket connection to the LiveQuery server, cancel the auto-reconnect, and unsubscribe all subscriptions based on it.
-  Moralis.LiveQuery.close();
+  // Moralis.LiveQuery.close();
 }
 
 export const togglePlayerState = (payload) => {
@@ -175,12 +178,14 @@ export const togglePlayerState = (payload) => {
     const gameModel = payload.gameModel;
     const address = payload.address;
     const fenString = payload.fen;
+    const missedTurnCount = payload.missedTurnCount;
+    console.log(`missedTurnCount: ${missedTurnCount}`);
     if (fenString != null && fenString !== "") {
       gameModel.set('fenString', fenString);
     }
     gameModel.set('currentTurnAddress', address);
     const result = await gameModel.save();
-    dispatch(updateGame({gameModel: result}));
+    dispatch(updateGame({gameModel: result, missedTurnCount: missedTurnCount}));
   };
 };
 
@@ -273,7 +278,7 @@ export const joinGame = (payload) => {
   };
 };
 
-export const endGame = (gameShortId, address) => {
+export const endGame = ({gameShortId, winnerAddress}) => {
   return async (dispatch) => {
     try {
       const gameModel = await queryGameModel(gameShortId);
@@ -281,22 +286,34 @@ export const endGame = (gameShortId, address) => {
         const gameId = gameModel.id;
         const currentTime = new Date();
         const gameTime = currentTime - gameModel.createdAt;
-        await store
-          .getState()
-          .blockchain.gameContract.methods.endGame(gameId, address, gameTime)
-          .call()
-          .once('error', (err) => {
-            console.log(err);
-            // TODO: Handle error case
-          }).then(async (receipt) => {
-            console.table(gameModel);
-            gameModel.set('winnerAddress', address);
-            gameModel.set('gameEnded', true);
-            gameModel.set('gameTime', gameTime);
-            await gameModel.save();
-            //dispatch(showNFTDialog());
-            await removeSubscription(gameShortId);
-          });
+        const checkSumAddress = web3.utils.toChecksumAddress(winnerAddress);
+        console.log(`winnerAddress: ${winnerAddress}`);
+        console.log(`gameTime: ${gameTime}`);
+        console.log(`checkSumAddress: ${checkSumAddress}`);
+
+        gameModel.set('winnerAddress', winnerAddress);
+        gameModel.set('gameTime', gameTime);
+        gameModel.set('gameEnded', true);
+        await removeSubscription(gameId);
+        await gameModel.save();
+        console.log(`clear game data`);
+        dispatch(clearGameData());
+        // await store
+        //   .getState()
+        //   .blockchain.gameContract.methods.endGame(gameId, gameTime)
+        //   .send({
+        //     from: checkSumAddress
+        //   })
+        //   .once('error', (err) => {
+        //     console.log(err);
+        //     // TODO: Handle error case
+        //   }).then(async (receipt) => {
+        //     console.table(gameModel);
+        //     gameModel.set('gameEnded', true);
+        //     await gameModel.save();
+        //     //dispatch(showNFTDialog());
+        //     await removeSubscription(gameShortId);
+        //   });
       }
     } catch (err) {
       console.log(err);

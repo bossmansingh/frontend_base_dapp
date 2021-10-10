@@ -7,9 +7,9 @@ import DialogContent from "@material-ui/core/DialogContent";
 import Chessboard from "chessboardjsx";
 import Chess from "chess.js";
 
-import { getDarkSquareColor, getLightSquareColor, getShortGameId, isValidString, stringValueEqual } from "./utils/Helpers";
+import { getDarkSquareColor, getDateDifferenceInSeconds, getLightSquareColor, getShortGameId, isValidString, stringValueEqual } from "./utils/Helpers";
 import { connectWallet, fetchCachedAccount, logout } from "./redux/blockchain/blockchainActions";
-import { DialogType, fetchData, createGame, joinGame, showInfoDialog, showCreateGameDialog, showJoinGameDialog, hideDialog, togglePlayerState, endGame } from "./redux/data/dataActions";
+import { DialogType, fetchData, createGame, joinGame, showInfoDialog, showCreateGameDialog, showJoinGameDialog, hideDialog, togglePlayerState, endGame, endGameFun } from "./redux/data/dataActions";
 import * as s from "./styles/globalStyles";
 import "./styles/clockStyle.css";
 
@@ -85,7 +85,8 @@ function App() {
   const createGameDialog = stringValueEqual(dialogType, DialogType.CREATE_GAME);
   const joinGameDialog = stringValueEqual(dialogType, DialogType.JOIN_GAME);
   const infoDialog = stringValueEqual(dialogType, DialogType.INFO);
-
+  const missedTurnCount = data.missedTurnCount;
+  
   let baseGameFee = data.baseGameFee;
   let gameCreated = gameModel != null;
   let gameStarted = false;
@@ -111,16 +112,18 @@ function App() {
     updatedAt = gameModel.updatedAt;
   }
   // Init chess board
-  const gameBoard = stringValueEqual(fenString, 'start') ? new Chess() : Chess(fenString);
+  const gameBoard = gameEnded || stringValueEqual(fenString, 'start') ? new Chess() : Chess(fenString);
 
+  const isCurrentTurn = stringValueEqual(currentTurnAddress, address);
   const isPlayer = stringValueEqual(playerAddress, address);
-  const playerTurn = stringValueEqual(currentTurnAddress, playerAddress);
+  const isPlayerTurn = stringValueEqual(currentTurnAddress, playerAddress);
 
   const isOpponent = stringValueEqual(opponentAddress, address);
-  const opponentTurn = stringValueEqual(currentTurnAddress, opponentAddress);
+  const isOpponentTurn = stringValueEqual(currentTurnAddress, opponentAddress);
   
-  // console.log("App() | player: " + playerTurn);
-  // console.log("App() | opponent: " + opponentTurn);
+  console.log("App() | missedTurnCount: " + missedTurnCount);
+  // console.log("App() | player: " + isPlayerTurn);
+  // console.log("App() | opponent: " + isOpponentTurn);
   // console.log("App() | Address: " + address);
   // console.log("App() | walletConnected: " + walletConnected);
   // console.log("App() | contractFetched: " + contractFetched);
@@ -139,9 +142,9 @@ function App() {
   // console.log("App() | updatedAt: " + updatedAt);
 
   useEffect(() => {
+    console.log("................Use effect................");
     if (gameConnected) {
       // TODO: fetch NFT data
-      console.log("................Fetch data................");
       dispatch(fetchData(address));
     }
   }, [address, gameConnected, dispatch]);
@@ -151,6 +154,57 @@ function App() {
     dispatch(fetchCachedAccount());
   }
 
+  // Window lifecycle events
+  window.onload = async () => {
+    console.log('onLoad');
+    // console.log(`gameStarted: ${gameStarted}`);
+    // console.log(`gameEnded: ${gameEnded}`);
+    // console.log(`opponentAddress: ${opponentAddress}`);
+    // console.log(`playerAddress: ${playerAddress}`);
+    // if (gameStarted && !gameEnded && isValidString(opponentAddress) && isValidString(playerAddress)) {
+    //   //const address = isPlayer ? opponentAddress : playerAddress;
+    //   await endGameFun({gameShortId: gameShortId, address: address});
+    //   //dispatch(endGame({gameShortId: gameShortId, address: address}));
+      
+    // }
+  };
+
+  // window.onbeforeunload = async () => {
+  //   console.log('onBeforeUnLoad');
+  //   // console.log(`gameStarted: ${gameStarted}`);
+  //   // console.log(`gameEnded: ${gameEnded}`);
+  //   // console.log(`opponentAddress: ${opponentAddress}`);
+  //   // console.log(`playerAddress: ${playerAddress}`);
+  //   // if (gameStarted && !gameEnded && isValidString(opponentAddress) && isValidString(playerAddress)) {
+  //   //   //const address = isPlayer ? opponentAddress : playerAddress;
+  //   //   await endGameFun({gameShortId: gameShortId, address: address});
+  //   //   //dispatch(endGame({gameShortId: gameShortId, address: address}));
+  //   //   return null;
+  //   // }
+  // };
+
+  window.onpagehide = () => {
+    console.log('onPageHide');
+  };
+
+  window.onpageshow = async () => {
+    console.log('onPageShow');
+  };
+
+  window.onunload = async () => {
+    console.log('onUnLoad');
+    // console.log(`gameStarted: ${gameStarted}`);
+    // console.log(`gameEnded: ${gameEnded}`);
+    // console.log(`opponentAddress: ${opponentAddress}`);
+    // console.log(`playerAddress: ${playerAddress}`);
+    // if (gameStarted && !gameEnded && isValidString(opponentAddress) && isValidString(playerAddress)) {
+    //   const address = isPlayer ? opponentAddress : playerAddress;
+    //   await endGameFun({gameShortId: gameShortId, address: address});
+    //   //dispatch(endGame({gameShortId: gameShortId, address: address}));
+    // }
+    alert("confirm exit is being called");
+    return false;
+  };
   function getLatestStatus() {
     let status = "";
     const moveColor = gameBoard.turn() === 'b' ? 'Black' : 'White';
@@ -174,23 +228,21 @@ function App() {
         status += ', ' + moveColor + ' is in check';
       }
     }
-    console.log('Game Status: ' + status);
+    //console.log('Game Status: ' + status);
     return status;
   }
 
   // Chess game methods and constants
   function allowDrag({piece, sourceSquare}) {
     if (gameBoard == null) return false;
-    console.log(`piece: ${piece}`);
-    if (isPlayer && !playerTurn) return false;
-    if (isOpponent && !opponentTurn) return false;
+
+    if (!isCurrentTurn) return false;
     
-    const isGameOver = gameBoard.game_over();
     // do not pick up pieces if the game is over
-    if (isGameOver) return false;
+    if (gameBoard.game_over()) return false;
     // only pick up pieces for the side to move
-    if ((isPlayer && playerTurn && piece.search(/^b/) !== -1) || (isOpponent && opponentTurn && piece.search(/^w/) !== -1)) return false;
-    console.log(`Allow drag`);
+    if ((isPlayerTurn && piece.search(/^b/) !== -1) || (isOpponentTurn && piece.search(/^w/) !== -1)) return false;
+    //console.log(`Allow drag`);
     return true;
   }
 
@@ -204,7 +256,7 @@ function App() {
     if (move === null) return 'snapback';
     
     const address = gameBoard.turn() === 'w' ? playerAddress : opponentAddress;
-    updateGameState(address);
+    updateGameState({address: address, missedCounts: 0});
   }
 
   return (
@@ -214,7 +266,7 @@ function App() {
       {renderCreateGamePopup()}
       {renderJoinGamePopup()}
       <s.Container jc={"center"} style={{marginTop: "50px"}}>
-        {gameCreated ? renderGameBoard() : renderWelcomePage()}
+        {gameCreated && !gameEnded ? renderGameBoard() : renderWelcomePage()}
       </s.Container>
       {/* 
         If account connected or not-connected and no NFTs minted show the chessboard with start game button
@@ -646,7 +698,7 @@ function App() {
         jc={"center"}
         ai={'center'}
       >
-        {setChessboard(gameStarted && ((isPlayer && playerTurn) || (isOpponent && opponentTurn)))}
+        {setChessboard(gameStarted && isCurrentTurn)}
         <s.SpacerXXLarge/>
         <s.Container>
           {!gameStarted ? (
@@ -690,7 +742,7 @@ function App() {
               jd={'center'}
               style={{opacity: gameStarted ? '1' : '0.25'}}
             >
-              {addClock(playerTurn)}
+              {addClock({showAnimation: isPlayerTurn})}
               <s.SpacerMedium/>
               <s.TextSubTitle
                 style={{
@@ -707,7 +759,7 @@ function App() {
               jd={"center"}
               style={{opacity: gameStarted ? "1" : "0.25"}}
             >
-              {addClock(opponentTurn)}
+              {addClock({showAnimation: isOpponentTurn})}
               <s.SpacerMedium/>
               <s.TextSubTitle
                 style={{
@@ -755,28 +807,34 @@ function App() {
     );
   }
 
-  function addClock(isEnabled) {
+  function addClock({showAnimation}) {
+    console.log(`isPlayer: ${isPlayer}`)
+    console.log(`isPlayerTurn: ${isPlayerTurn}`)
+    console.log(`showAnimation: ${showAnimation}`)
     const clockIndicators = []
-    const totalTimeInSeconds = 120;
-    const elapsedTime = (new Date() - updatedAt) / 1000;
+    const totalTimeInSeconds = 30;
+    const elapsedTime = getDateDifferenceInSeconds(new Date(), updatedAt);
     for (let i = 0; i < 90; i++) {
       const key = `clock-indicator-${i}`;
       clockIndicators[i] = <s.ClockContainer key={key} className='clock-indicator'/>
     }
-    const deg = isEnabled ? (elapsedTime / totalTimeInSeconds * 360) : 0;
-    const remainingTime = isEnabled ? (totalTimeInSeconds - elapsedTime) : 0;
+    const deg = showAnimation ? (elapsedTime / totalTimeInSeconds * 360) : 0;
+    const remainingTime = showAnimation ? (totalTimeInSeconds - elapsedTime) : 0;
     return(
       <s.ClockContainer className='clock-wrapper'>
         <s.ClockContainer className='clock-base'>
           <s.ClockContainer className='clock-dial'>
             {clockIndicators}
           </s.ClockContainer>
-          {isEnabled ? (
+          {showAnimation ? (
             <s.ClockSecContainer 
               className='clock-second' 
               rotateDeg={deg}
               rotateDuration={remainingTime}
-              onAnimationEnd={() => togglePlayer()} 
+              onAnimationEnd={(e) => {
+                e.preventDefault();
+                togglePlayer();
+              }} 
             />
           ) : (
             <s.ClockContainer className='clock-second'/>
@@ -787,28 +845,55 @@ function App() {
     );
   }
 
-  function togglePlayer() {
+  async function togglePlayer() {
+    console.log('togglePlayer');
+    if (!isCurrentTurn) return null;
     // If the total time of animation has ended that means the user has not played a move. Play a random move instead
-    if (isPlayer && playerTurn) {
-      playRandomMove(opponentAddress)
-    } else if (isOpponent && opponentTurn) {
-      playRandomMove(playerAddress)
+    console.log(`missedTurnCount: ${missedTurnCount}`);
+    if (missedTurnCount > 2) {
+      //gameBoard.game_over();
+      await endGame1();
+    } else {
+      playRandomMove()
     }
   }
 
-  function playRandomMove(address) {
+  function playRandomMove() {
+    console.log('play random move');
     // Return if game is over
     if (gameBoard.game_over()) return
 
     const moves = gameBoard.moves();
     const move = moves[Math.floor(Math.random() * moves.length)]
     gameBoard.move(move);
-    updateGameState(address)
+    const newMissedCount = missedTurnCount + 1;
+    console.log(`newMissedCount: ${newMissedCount}`);
+    const address = isPlayerTurn ? opponentAddress : playerAddress;
+    updateGameState({address: address, missedCounts: newMissedCount})
   }
 
-  function updateGameState(address) {
+  function updateGameState({address, missedCounts}) {
     if (gameModel != null && gameBoard != null && isValidString(address)) {
-      dispatch(togglePlayerState({gameModel: gameModel, address: address, fen: gameBoard.fen()}))
+      dispatch(togglePlayerState({
+        gameModel: gameModel, 
+        address: address, 
+        fen: gameBoard.fen(),
+        missedTurnCount: missedCounts
+      }))
+    }
+  }
+
+  async function endGame1() {
+    console.log(`gameStarted: ${gameStarted}`);
+    console.log(`gameEnded: ${gameEnded}`);
+    console.log(`opponentAddress: ${opponentAddress}`);
+    console.log(`playerAddress: ${playerAddress}`);
+    if (gameStarted && !gameEnded && isValidString(opponentAddress) && isValidString(playerAddress)) {
+      const address = isPlayer ? opponentAddress : playerAddress;
+      console.log(`address: ${address}`);
+      console.log(`gameShortId: ${gameShortId}`);
+      // await endGameFun({gameShortId: gameShortId, winnerAddress: address});
+      dispatch(endGame({gameShortId: gameShortId, winnerAddress: address})); 
     }
   }
 }

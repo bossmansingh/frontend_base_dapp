@@ -42,3 +42,7 @@ export function stringValueEqual(str1, str2) {
       return result;
     }
 }
+
+export function getDateDifferenceInSeconds(fromDate, toDate) {
+  return (fromDate - toDate) / 1000;
+}

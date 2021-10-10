@@ -182,12 +182,10 @@ contract GameContract is BaseContract {
      * player accepts a challenge within 30 minutes.
      * 
      * @param gameId id of this game
-     * @param winnerAddress address of player who won the game
      * @param gameTime time taken (in seconds) to win the game
      */
     function endGame(
-        string memory gameId, 
-        address winnerAddress, 
+        string memory gameId,
         uint gameTime
     ) external nonReentrant onlyOwner() {
         // Check and verify if the caller address is valid
@@ -208,9 +206,9 @@ contract GameContract is BaseContract {
         // Check and verify if the `winTime` is greater than 0
         require(gameTime > 0, "WinTime has to be greater than 0");
         // End the current game and update winner address
-        _endGame(winnerAddress, gameId);
+        _endGame(msg.sender, gameId);
         // Emit end game event
-        emit GameEnd(winnerAddress, gameId);
+        emit GameEnd(msg.sender, gameId);
     }
     
     /**
