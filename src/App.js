@@ -507,6 +507,19 @@ function App() {
                 jc={"center"}>
                 <s.StyledButton 
                   flex={1}
+                  style={{
+                    fontSize: '20px',
+                    width: '200px'
+                  }} onClick={(e) => {
+                    e.preventDefault();
+                    dispatch(hideDialog());
+                  }}
+                >
+                  Cancel
+                </s.StyledButton>
+                <s.SpacerSmall />
+                <s.StyledButton 
+                  flex={1}
                   bc={'black'}
                   color={'white'}
                   style={{
@@ -534,19 +547,6 @@ function App() {
                   }}
                 >
                   Create Game
-                </s.StyledButton>
-                <s.SpacerSmall />
-                <s.StyledButton 
-                  flex={1}
-                  style={{
-                    fontSize: '20px',
-                    width: '200px'
-                  }} onClick={(e) => {
-                    e.preventDefault();
-                    dispatch(hideDialog());
-                  }}
-                >
-                  Cancel
                 </s.StyledButton>
               </s.Container>
             </s.Container>
@@ -608,6 +608,19 @@ function App() {
               jc={"center"}>
               <s.StyledButton 
                 flex={1}
+                style={{
+                  fontSize: '20px',
+                  width: '200px'
+                }} onClick={(e) => {
+                  e.preventDefault();
+                  dispatch(hideDialog());
+                }}
+              >
+                Cancel
+              </s.StyledButton>
+              <s.SpacerSmall />
+              <s.StyledButton 
+                flex={1}
                 bc={'black'}
                 color={'white'}
                 style={{
@@ -629,19 +642,6 @@ function App() {
                 }}
               >
                 Join Game
-              </s.StyledButton>
-              <s.SpacerSmall />
-              <s.StyledButton 
-                flex={1}
-                style={{
-                  fontSize: '20px',
-                  width: '200px'
-                }} onClick={(e) => {
-                  e.preventDefault();
-                  dispatch(hideDialog());
-                }}
-              >
-                Cancel
               </s.StyledButton>
             </s.Container>
           </s.Container>
@@ -787,7 +787,7 @@ function App() {
       <Chessboard
         position={fenString}
         draggable={isEnable}
-        orientation={isOpponent ? 'black' : 'white'}
+        orientation={gameEnded || !isOpponent ? 'white' : 'black'}
         lightSquareStyle={{ backgroundColor: `rgb(${lightSquareColor})` }}
         darkSquareStyle={{ backgroundColor: `rgb(${darkSquareColor})` }}
         showNotation={false}
