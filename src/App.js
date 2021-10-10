@@ -814,9 +814,6 @@ function App() {
   }
 
   function addClock({showAnimation}) {
-    console.log(`isPlayer: ${isPlayer}`)
-    console.log(`isPlayerTurn: ${isPlayerTurn}`)
-    console.log(`showAnimation: ${showAnimation}`)
     const clockIndicators = []
     const totalTimeInSeconds = 120;
     const elapsedTime = getDateDifferenceInSeconds(new Date(), updatedAt);
@@ -845,7 +842,6 @@ function App() {
           ) : (
             <s.ClockContainer className='clock-second'/>
           )}
-          <s.ClockContainer className='clock-center'/>
         </s.ClockContainer>
       </s.ClockContainer>
     );
@@ -855,7 +851,6 @@ function App() {
     console.log('togglePlayer');
     if (!isCurrentTurn) return null;
     // If the total time of animation has ended that means the user has not played a move. Play a random move instead
-    console.log(`missedTurnCount: ${missedTurnCount}`);
     if (missedTurnCount > 2) {
       _endGame();
     } else {
@@ -864,7 +859,6 @@ function App() {
   }
 
   function playRandomMove() {
-    console.log('play random move');
     // Return if game is over
     if (gameBoard.game_over()) return
 
