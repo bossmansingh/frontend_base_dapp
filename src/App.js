@@ -114,7 +114,8 @@ function App() {
   // Init chess board
   const gameBoard = (gameEnded || (stringValueEqual(fenString, 'start'))) ? new Chess() : Chess(fenString);
   if (gameEnded) {
-    gameBoard.load('start');
+    fenString = 'start';
+    gameBoard.load(fenString);
   }
 
   const isCurrentTurn = stringValueEqual(currentTurnAddress, address);
