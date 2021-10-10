@@ -112,7 +112,10 @@ function App() {
     updatedAt = gameModel.updatedAt;
   }
   // Init chess board
-  const gameBoard = gameEnded || stringValueEqual(fenString, 'start') ? new Chess() : Chess(fenString);
+  const gameBoard = (gameEnded || (stringValueEqual(fenString, 'start'))) ? new Chess() : Chess(fenString);
+  if (gameEnded) {
+    gameBoard.load('start');
+  }
 
   const isCurrentTurn = stringValueEqual(currentTurnAddress, address);
   const isPlayer = stringValueEqual(playerAddress, address);
@@ -121,25 +124,25 @@ function App() {
   const isOpponent = stringValueEqual(opponentAddress, address);
   const isOpponentTurn = stringValueEqual(currentTurnAddress, opponentAddress);
   
-  console.log("App() | missedTurnCount: " + missedTurnCount);
-  // console.log("App() | player: " + isPlayerTurn);
-  // console.log("App() | opponent: " + isOpponentTurn);
-  // console.log("App() | Address: " + address);
-  // console.log("App() | walletConnected: " + walletConnected);
-  // console.log("App() | contractFetched: " + contractFetched);
-  // console.log("App() | gameConnected: " + gameConnected);
-  // console.log("App() | gameCreated: " + gameCreated);
-  // console.log("App() | gameStarted: " + gameStarted);
-  // console.log("App() | playerAddress: " + playerAddress);
-  // console.log("App() | opponentAddress: " + opponentAddress);
-  // console.log("App() | currentTurnAddress: " + currentTurnAddress);
-  // console.log("App() | fenString: " + fenString);
-  // console.log("App() | dialogType: " + dialogType);
-  // console.log("App() | showCreateGameDialog: " + createGameDialog);
-  // console.log("App() | showJoinGameDialog: " + joinGameDialog);
-  // console.log("App() | showInfoDialog: " + infoDialog);
-  // console.log("App() | baseGameFee: " + baseGameFee);
-  // console.log("App() | updatedAt: " + updatedAt);
+  console.log("App() | player: " + isPlayerTurn);
+  console.log("App() | opponent: " + isOpponentTurn);
+  console.log("App() | Address: " + address);
+  console.log("App() | walletConnected: " + walletConnected);
+  console.log("App() | contractFetched: " + contractFetched);
+  console.log("App() | gameConnected: " + gameConnected);
+  console.log("App() | gameCreated: " + gameCreated);
+  console.log("App() | gameStarted: " + gameStarted);
+  console.log("App() | gameEnded: " + gameEnded);
+  console.log("App() | playerAddress: " + playerAddress);
+  console.log("App() | opponentAddress: " + opponentAddress);
+  console.log("App() | currentTurnAddress: " + currentTurnAddress);
+  console.log("App() | fenString: " + fenString);
+  console.log("App() | dialogType: " + dialogType);
+  console.log("App() | showCreateGameDialog: " + createGameDialog);
+  console.log("App() | showJoinGameDialog: " + joinGameDialog);
+  console.log("App() | showInfoDialog: " + infoDialog);
+  console.log("App() | baseGameFee: " + baseGameFee);
+  console.log("App() | updatedAt: " + updatedAt);
 
   useEffect(() => {
     console.log("................Use effect................");
@@ -147,12 +150,12 @@ function App() {
       // TODO: fetch NFT data
       dispatch(fetchData(address));
     }
-  }, [address, gameConnected, dispatch]);
+    // Init account from cache
+    if (!walletConnected) {
+      dispatch(fetchCachedAccount());
+    }
+  }, [address, walletConnected, gameConnected, dispatch]);
 
-  // Init account from cache
-  if (!walletConnected) {
-    dispatch(fetchCachedAccount());
-  }
 
   // Window lifecycle events
   window.onload = async () => {
@@ -205,6 +208,7 @@ function App() {
     alert("confirm exit is being called");
     return false;
   };
+
   function getLatestStatus() {
     let status = "";
     const moveColor = gameBoard.turn() === 'b' ? 'Black' : 'White';
@@ -233,7 +237,7 @@ function App() {
   }
 
   // Chess game methods and constants
-  function allowDrag({piece, sourceSquare}) {
+  const allowDrag = ({piece, sourceSquare}) => {
     if (gameBoard == null) return false;
 
     if (!isCurrentTurn) return false;
@@ -242,11 +246,11 @@ function App() {
     if (gameBoard.game_over()) return false;
     // only pick up pieces for the side to move
     if ((isPlayerTurn && piece.search(/^b/) !== -1) || (isOpponentTurn && piece.search(/^w/) !== -1)) return false;
-    //console.log(`Allow drag`);
+    console.log(`Allow drag for piece: ${piece}`);
     return true;
-  }
+  };
 
-  function onDrop({sourceSquare, targetSquare, piece}) {
+  const onDrop = ({sourceSquare, targetSquare, piece}) => {
     // see if the move is legal
     const move = gameBoard.move({
       from: sourceSquare,
@@ -257,7 +261,7 @@ function App() {
     
     const address = gameBoard.turn() === 'w' ? playerAddress : opponentAddress;
     updateGameState({address: address, missedCounts: 0});
-  }
+  };
 
   return (
     <s.ResponsiveWrapper>
@@ -700,6 +704,7 @@ function App() {
       >
         {setChessboard(gameStarted && isCurrentTurn)}
         <s.SpacerXXLarge/>
+        <s.SpacerXXLarge/>
         <s.Container>
           {!gameStarted ? (
               <s.Container ai={'center'}>
@@ -782,10 +787,10 @@ function App() {
         position={fenString}
         draggable={isEnable}
         orientation={isOpponent ? 'black' : 'white'}
-        allowDrag={allowDrag}
         lightSquareStyle={{ backgroundColor: `rgb(${lightSquareColor})` }}
         darkSquareStyle={{ backgroundColor: `rgb(${darkSquareColor})` }}
         showNotation={false}
+        allowDrag={allowDrag}
         onDrop={onDrop}
         // pieces={{
         //   wK: () => (
@@ -812,7 +817,7 @@ function App() {
     console.log(`isPlayerTurn: ${isPlayerTurn}`)
     console.log(`showAnimation: ${showAnimation}`)
     const clockIndicators = []
-    const totalTimeInSeconds = 30;
+    const totalTimeInSeconds = 120;
     const elapsedTime = getDateDifferenceInSeconds(new Date(), updatedAt);
     for (let i = 0; i < 90; i++) {
       const key = `clock-indicator-${i}`;
@@ -831,9 +836,9 @@ function App() {
               className='clock-second' 
               rotateDeg={deg}
               rotateDuration={remainingTime}
-              onAnimationEnd={(e) => {
+              onAnimationEnd={async (e) => {
                 e.preventDefault();
-                togglePlayer();
+                await togglePlayer();
               }} 
             />
           ) : (
@@ -851,8 +856,7 @@ function App() {
     // If the total time of animation has ended that means the user has not played a move. Play a random move instead
     console.log(`missedTurnCount: ${missedTurnCount}`);
     if (missedTurnCount > 2) {
-      //gameBoard.game_over();
-      await endGame1();
+      _endGame();
     } else {
       playRandomMove()
     }
@@ -866,10 +870,9 @@ function App() {
     const moves = gameBoard.moves();
     const move = moves[Math.floor(Math.random() * moves.length)]
     gameBoard.move(move);
-    const newMissedCount = missedTurnCount + 1;
-    console.log(`newMissedCount: ${newMissedCount}`);
+
     const address = isPlayerTurn ? opponentAddress : playerAddress;
-    updateGameState({address: address, missedCounts: newMissedCount})
+    updateGameState({address: address, missedCounts: missedTurnCount + 1})
   }
 
   function updateGameState({address, missedCounts}) {
@@ -883,16 +886,9 @@ function App() {
     }
   }
 
-  async function endGame1() {
-    console.log(`gameStarted: ${gameStarted}`);
-    console.log(`gameEnded: ${gameEnded}`);
-    console.log(`opponentAddress: ${opponentAddress}`);
-    console.log(`playerAddress: ${playerAddress}`);
+  function _endGame() {
     if (gameStarted && !gameEnded && isValidString(opponentAddress) && isValidString(playerAddress)) {
       const address = isPlayer ? opponentAddress : playerAddress;
-      console.log(`address: ${address}`);
-      console.log(`gameShortId: ${gameShortId}`);
-      // await endGameFun({gameShortId: gameShortId, winnerAddress: address});
       dispatch(endGame({gameShortId: gameShortId, winnerAddress: address})); 
     }
   }
