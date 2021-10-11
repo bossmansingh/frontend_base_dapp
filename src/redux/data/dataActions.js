@@ -4,6 +4,19 @@ import store from "../store";
 const Moralis = require('moralis');
 const web3 = new Moralis.Web3();
 
+export const GameModelDataType = {
+  SHORT_ID: 'shortId',
+  GAME_FEE: 'gameFee',
+  PLAYER_ADDR: 'playerAddress',
+  OPPONENT_ADDR: 'opponentAddress',
+  WINNER_ADDR: 'winnerAddress',
+  CURRENT_TURN_ADDR: 'currentTurnAddress',
+  FEN_STRING: 'fenString',
+  GAME_TIME: 'gameTime',
+  LIGHT_SQUARE_COLOR: 'lightSquareColor',
+  DARK_SQUARE_COLOR: 'darkSquareColor'
+};
+
 export const DialogType = {
   INFO: 'info',
   CREATE_GAME: 'create_game',
@@ -98,8 +111,9 @@ function getGameModelQuery() {
 async function queryGameModel(shortId) {
   try {
     const query = getGameModelQuery();
-    query.equalTo('shortId', shortId);
-    query.equalTo('gameEnded', false);
+    query.equalTo(GameModelDataType.SHORT_ID, shortId);
+    // query.doesNotExist(GameModelDataType.OPPONENT_ADDR);
+    query.doesNotExist(GameModelDataType.WINNER_ADDR);
     return await query.first();
   } catch (err) {
     console.log(err);
@@ -110,11 +124,11 @@ async function queryGameModel(shortId) {
 async function currentGameOrNull(address, dispatch) {
   try {
     const onGoingGameQuery = getGameModelQuery();
-    onGoingGameQuery.equalTo('gameEnded', false);
+    onGoingGameQuery.doesNotExist(GameModelDataType.WINNER_ADDR);
     const playerAddressMatchQuery = getGameModelQuery();
-    playerAddressMatchQuery.equalTo('playerAddress', address);
+    playerAddressMatchQuery.equalTo(GameModelDataType.PLAYER_ADDR, address);
     const opponentAddressMatchQuery = getGameModelQuery();
-    opponentAddressMatchQuery.equalTo('opponentAddress', address);
+    opponentAddressMatchQuery.equalTo(GameModelDataType.OPPONENT_ADDR, address);
     const mainQuery = Moralis.Query.and(
       Moralis.Query.or(
         playerAddressMatchQuery, 
@@ -138,19 +152,13 @@ async function saveNewGameToDatabase(payload) {
     const address = payload.address;
     const lightSquareColor = payload.lightSquareColor;
     const darkSquareColor = payload.darkSquareColor;
-    const gameBoard = payload.gameBoard;
     const gameModel = new GameModelInstance();
-    console.table(gameModel);
-    const result = await gameModel.save({
-      gameFee: gameFee,
-      playerAddress: address,
-      gameStarted: false,
-      gameEnded: false,
-      fenString: 'start',
-      lightSquareColor: lightSquareColor,
-      darkSquareColor: darkSquareColor,
-      gameBoard: gameBoard
-    });
+    gameModel.set(GameModelDataType.GAME_FEE, gameFee);
+    gameModel.set(GameModelDataType.PLAYER_ADDR, address);
+    gameModel.set(GameModelDataType.FEN_STRING, 'start');
+    gameModel.set(GameModelDataType.LIGHT_SQUARE_COLOR, lightSquareColor);
+    gameModel.set(GameModelDataType.DARK_SQUARE_COLOR, darkSquareColor);
+    const result = await gameModel.save();
     return result;
   } catch (err) {
     console.log(err);
@@ -163,11 +171,10 @@ async function addSubscription(dispatch, gameId) {
   subscriptionQuery.get(gameId);
   const subscription = await subscriptionQuery.subscribe();
   subscription.on('update', (gameModel) => {
-    if (gameModel.get('gameEnded')) {
+    dispatch(updateGame({gameModel: gameModel}));
+    if (isValidString(gameModel.get(GameModelDataType.WINNER_ADDR))) {
       dispatch(endGameEvent());
       subscription.unsubscribe();
-    } else {
-      dispatch(updateGame({gameModel: gameModel}));
     }
   });
 }
@@ -190,11 +197,11 @@ export const togglePlayerState = (payload) => {
     const missedTurnCount = payload.missedTurnCount;
     console.log(`missedTurnCount: ${missedTurnCount}`);
     if (fenString != null && fenString !== "") {
-      gameModel.set('fenString', fenString);
+      gameModel.set(GameModelDataType.FEN_STRING, fenString);
     }
-    gameModel.set('currentTurnAddress', address);
-    const result = await gameModel.save();
-    dispatch(updateGame({gameModel: result, missedTurnCount: missedTurnCount}));
+    gameModel.set(GameModelDataType.CURRENT_TURN_ADDR, address);
+    dispatch(updateGame({missedTurnCount: missedTurnCount}));
+    await gameModel.save();
   };
 };
 
@@ -205,16 +212,13 @@ export const createGame = (payload) => {
       const address = payload.address;
       const lightSquareColor = payload.lightSquareColor;
       const darkSquareColor = payload.darkSquareColor;
-      const gameBoard = payload.gameBoard;
       // Save new game to database
       const gameModel = await saveNewGameToDatabase({
         gameFee: gameFee,
         address: address,
         lightSquareColor: lightSquareColor, 
-        darkSquareColor: darkSquareColor,
-        gameBoard: gameBoard
+        darkSquareColor: darkSquareColor
       });
-      console.table('GameModel', gameModel);
       if (gameModel != null) {
         const gameId = gameModel.id;
         await store
@@ -229,7 +233,7 @@ export const createGame = (payload) => {
                 // Delete saved game model from database
                 await gameModel.destroy();
               }).then(async (receipt) => {
-                gameModel.set('shortId', getShortGameId(gameId));
+                gameModel.set(GameModelDataType.SHORT_ID, getShortGameId(gameId));
                 await gameModel.save();
                 dispatch(createNewGame({gameModel: gameModel})); 
                 await addSubscription(dispatch, gameId);
@@ -252,7 +256,7 @@ export const joinGame = (payload) => {
       const address = payload.address;
       const gameModel = await queryGameModel(shortId);
       if (gameModel != null) {
-        const gameFee = gameModel.get('gameFee');
+        const gameFee = gameModel.get(GameModelDataType.GAME_FEE);
         const gameId = gameModel.id;
         await store
             .getState()
@@ -267,10 +271,9 @@ export const joinGame = (payload) => {
               //console.log("Game Joined Success", receipt);
               console.table(gameModel);
               // Update game data after opponent joins
-              const playerAddress = gameModel.get('playerAddress');
-              gameModel.set('opponentAddress', address);
-              gameModel.set('gameStarted', true);
-              gameModel.set('currentTurnAddress', playerAddress);
+              const playerAddress = gameModel.get(GameModelDataType.PLAYER_ADDR);
+              gameModel.set(GameModelDataType.OPPONENT_ADDR, address);
+              gameModel.set(GameModelDataType.CURRENT_TURN_ADDR, playerAddress);
               await gameModel.save();
               dispatch(joinNewGame({gameModel: gameModel})); 
               await addSubscription(dispatch, gameId);
@@ -299,9 +302,8 @@ export const endGame = ({gameShortId, winnerAddress}) => {
         console.log(`gameTime: ${gameTime}`);
         console.log(`checkSumAddress: ${checkSumAddress}`);
 
-        gameModel.set('winnerAddress', winnerAddress);
-        gameModel.set('gameTime', gameTime);
-        gameModel.set('gameEnded', true);
+        gameModel.set(GameModelDataType.WINNER_ADDR, winnerAddress);
+        gameModel.set(GameModelDataType.GAME_TIME, gameTime);
         await gameModel.save();
         // await store
         //   .getState()

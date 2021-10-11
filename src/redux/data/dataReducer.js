@@ -1,3 +1,4 @@
+import { getDarkSquareColor, getLightSquareColor } from "../../utils/Helpers";
 import { DialogType } from "./dataActions";
 
 const initialState = {
@@ -7,7 +8,9 @@ const initialState = {
   dialogType: 'none',
   gameModel: null,
   baseGameFee: '0.05',
-  missedTurnCount: 0
+  missedTurnCount: 0,
+  lightSquareColor: getLightSquareColor(),
+  darkSquareColor: getDarkSquareColor()
 };
 
 const dataReducer = (state = initialState, action) => {
@@ -84,17 +87,18 @@ const dataReducer = (state = initialState, action) => {
       console.log('Update game');
       const payloadMissedCount = action.payload.missedTurnCount;
       const newMissedCount = payloadMissedCount ? payloadMissedCount : state.missedTurnCount;
+      const gameModel = action.payload.gameModel;
       return {
         ...state,
         errorMessage: '',
         dialogType: DialogType.NONE,
         missedTurnCount: newMissedCount,
-        gameModel: action.payload.gameModel
+        gameModel: gameModel ? gameModel : state.gameModel
       };
     case 'END_GAME':
       console.log('End game');
       return {
-        ...initialState,
+        ...state,
         dialogType: DialogType.ENG_GAME
       };
     case 'UPDATE_MOVE':
@@ -114,7 +118,9 @@ const dataReducer = (state = initialState, action) => {
     case 'CLEAR_GAME_DATA':
       console.log('Clear game data');
       return {
-        ...initialState
+        ...initialState,
+        lightSquareColor: getLightSquareColor(),
+        darkSquareColor: getDarkSquareColor()
       };
     default:
       return state;

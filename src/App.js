@@ -31,11 +31,6 @@ const rule3 = '3. Once a game is started each player will have a two minute wind
 const rule4 = '4. If any player for any reason disconnects from the game, it will be considered as a forfeit and the other player will win CHKMATE NFT card[2].';
 const rule5 = '5. A game finishes when one of the player plays a check-mate move. The piece that makes the final move will be considered as the winning piece.';
 
-// The random color should be generated when the game starts, before 
-// that some default color should be used
-let lightSquareColor = h.getLightSquareColor();
-let darkSquareColor = h.getDarkSquareColor();
-
 // Constants
 const youTitle = "YOU";
 const opponentTitle = "OPPONENT";
@@ -143,38 +138,37 @@ function App() {
   const showEndGameDialog = h.stringValueEqual(dialogType, d.DialogType.ENG_GAME);
   const showInfoDialog = h.stringValueEqual(dialogType, d.DialogType.INFO);
   const missedTurnCount = data.missedTurnCount;
-  
+  let lightSquareColor = data.lightSquareColor;
+  let darkSquareColor = data.darkSquareColor;
+
   let baseGameFee = data.baseGameFee;
-  let gameCreated = gameModel != null;
+  let gameExists = gameModel != null;
   let gameStarted = false;
   let gameEnded = false;
   let playerAddress = null;
   let opponentAddress = null;
   let currentTurnAddress = null;
+  let winnerAddress = null;
   let gameShortId = null;
   let fenString = defaultFenString;
   let updatedAt = new Date();
   
-  if (gameCreated) {
+  if (gameExists) {
     gameShortId = h.getShortGameId(gameModel.id);
-    gameStarted = gameModel.get('gameStarted');
-    gameEnded = gameModel.get('gameEnded');
-    fenString = gameModel.get('fenString');
-    playerAddress = gameModel.get('playerAddress');
-    opponentAddress = gameModel.get('opponentAddress');
-    currentTurnAddress = gameModel.get('currentTurnAddress');
-    lightSquareColor = gameModel.get('lightSquareColor');
-    darkSquareColor = gameModel.get('darkSquareColor');
-    baseGameFee = gameModel.get('gameFee');
+    playerAddress = gameModel.get(d.GameModelDataType.PLAYER_ADDR);
+    opponentAddress = gameModel.get(d.GameModelDataType.OPPONENT_ADDR);
+    winnerAddress = gameModel.get(d.GameModelDataType.WINNER_ADDR);
+    gameStarted = h.isValidString(opponentAddress);
+    gameEnded = h.isValidString(winnerAddress);
+    fenString = gameModel.get(d.GameModelDataType.FEN_STRING);
+    currentTurnAddress = gameModel.get(d.GameModelDataType.CURRENT_TURN_ADDR);
+    lightSquareColor = gameModel.get(d.GameModelDataType.LIGHT_SQUARE_COLOR);
+    darkSquareColor = gameModel.get(d.GameModelDataType.DARK_SQUARE_COLOR);
+    baseGameFee = gameModel.get(d.GameModelDataType.GAME_FEE);
     updatedAt = gameModel.updatedAt;
   }
   // Init chess board
   gameBoard.load(fenString);
-  // Reset square color if the game has ended
-  if (showEndGameDialog) {
-    lightSquareColor = h.getLightSquareColor();
-    darkSquareColor = h.getDarkSquareColor();
-  }
   
   const isCurrentTurn = h.stringValueEqual(currentTurnAddress, loggedInAddress);
   const isPlayer = h.stringValueEqual(playerAddress, loggedInAddress);
@@ -182,25 +176,18 @@ function App() {
   const isOpponent = h.stringValueEqual(opponentAddress, loggedInAddress);
   const isOpponentTurn = h.stringValueEqual(currentTurnAddress, opponentAddress);
   
+  
   console.log("App() | player: " + isPlayerTurn);
   console.log("App() | opponent: " + isOpponentTurn);
   console.log("App() | LoggedInAddress: " + loggedInAddress);
   console.log("App() | walletConnected: " + walletConnected);
   console.log("App() | contractFetched: " + contractFetched);
   console.log("App() | gameConnected: " + gameConnected);
-  console.log("App() | gameCreated: " + gameCreated);
-  console.log("App() | gameStarted: " + gameStarted);
-  console.log("App() | gameEnded: " + gameEnded);
-  console.log("App() | playerAddress: " + playerAddress);
-  console.log("App() | opponentAddress: " + opponentAddress);
-  console.log("App() | currentTurnAddress: " + currentTurnAddress);
-  console.log("App() | fenString: " + fenString);
   console.log("App() | dialogType: " + dialogType);
   console.log("App() | showCreateGameDialog: " + showCreateGameDialog);
   console.log("App() | showJoinGameDialog: " + showJoinGameDialog);
   console.log("App() | showInfoDialog: " + showInfoDialog);
   console.log("App() | baseGameFee: " + baseGameFee);
-  console.log("App() | updatedAt: " + updatedAt);
   console.log("App() | endGameDialog: " + showEndGameDialog);
   console.log("App() | missedTurnCount: " + missedTurnCount);
 
@@ -217,6 +204,8 @@ function App() {
   }, [loggedInAddress, walletConnected, gameConnected, dispatch]);
 
   function getLatestStatus() {
+    if (showEndGameDialog) return 'Auto-Forfeit';
+
     let status = "";
     const moveColor = gameBoard.turn() === 'b' ? 'Black' : 'White';
     // checkmate?
@@ -244,7 +233,7 @@ function App() {
   }
 
   function getForfeitDialogTitle() {
-    return `The game was auto-forfeit because one of the player left the game. No one won, sorry :(`;
+    return `The game was auto-forfeit because ${h.stringValueEqual(winnerAddress, loggedInAddress) ? 'other player' : 'you'} left the game. No one won, sorry :(`;
   }
 
   function reachedMaxMissedTurns() {
@@ -671,7 +660,7 @@ function App() {
         open={showEndGameDialog} 
         onClose={(e) => {
           e.preventDefault();
-          dispatch(d.hideDialog());
+          dispatch(d.clearGameData());
         }}
       >
         <DialogContent>
@@ -687,7 +676,7 @@ function App() {
               style={{marginTop: '20px', marginBottom: '5px'}}
               onClick={(e) => {
                 e.preventDefault();
-                dispatch(d.hideDialog());
+                dispatch(d.clearGameData());
               }}
             >Okay</s.StyledButton>
           </s.Container>
@@ -699,7 +688,7 @@ function App() {
   function renderWelcomePageOrGameBoard() {
     return(
       <s.Container jc={"center"} style={{marginTop: "50px"}}>
-        {gameCreated && !gameEnded ? renderGameBoard() : renderWelcomePage()}
+        {gameExists ? renderGameBoard() : renderWelcomePage()}
       </s.Container>
     )
   }
@@ -800,9 +789,9 @@ function App() {
             <s.Container
               ai={'center'}
               jd={'center'}
-              style={{opacity: gameStarted ? '1' : '0.25'}}
+              style={{opacity: gameStarted && !gameEnded ? '1' : '0.25'}}
             >
-              {addClock({showAnimation: isPlayerTurn})}
+              {addClock({showAnimation: isPlayerTurn && !gameEnded})}
               <s.SpacerMedium/>
               <s.TextSubTitle
                 style={{
@@ -817,9 +806,9 @@ function App() {
             <s.Container
               ai={"center"}
               jd={"center"}
-              style={{opacity: gameStarted ? "1" : "0.25"}}
+              style={{opacity: gameStarted && !gameEnded ? "1" : "0.25"}}
             >
-              {addClock({showAnimation: isOpponentTurn})}
+              {addClock({showAnimation: isOpponentTurn && !gameEnded})}
               <s.SpacerMedium/>
               <s.TextSubTitle
                 style={{
@@ -841,7 +830,7 @@ function App() {
       <Chessboard
         position={fenString}
         draggable={isEnable}
-        orientation={gameEnded || !isOpponent ? 'white' : 'black'}
+        orientation={!isOpponent ? 'white' : 'black'}
         lightSquareStyle={{ backgroundColor: `rgb(${lightSquareColor})` }}
         darkSquareStyle={{ backgroundColor: `rgb(${darkSquareColor})` }}
         showNotation={false}
