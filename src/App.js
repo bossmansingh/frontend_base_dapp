@@ -7,9 +7,9 @@ import DialogContent from "@material-ui/core/DialogContent";
 import Chessboard from "chessboardjsx";
 import Chess from "chess.js";
 
-import { getDarkSquareColor, getDateDifferenceInSeconds, getLightSquareColor, getShortGameId, isValidString, stringValueEqual } from "./utils/Helpers";
-import { connectWallet, fetchCachedAccount, logout } from "./redux/blockchain/blockchainActions";
-import { DialogType, fetchData, createGame, joinGame, showInfoDialog, showCreateGameDialog, showJoinGameDialog, hideDialog, togglePlayerState, endGame, endGameFun } from "./redux/data/dataActions";
+import * as h from "./utils/Helpers";
+import * as b from "./redux/blockchain/blockchainActions";
+import * as d from "./redux/data/dataActions";
 import * as s from "./styles/globalStyles";
 import "./styles/clockStyle.css";
 
@@ -18,19 +18,23 @@ import "./styles/clockStyle.css";
 import logo from "./assets/chessboard_logo.jpg";
 import copyIcon from "./assets/copy_to_clipboard.png";
 
-const gameTitle = "Welcome to CHKMATE!";
-const gameDescription = `First ever chess game built on blockchain. Create a new game or join an existing game using a game code. To read more about the rules of the game press the help icon in the top left corner.`;
-const gameInstructions = "It is a NFT based game of chess where every player have a chance to mint a unique CHKMATE NFT win card, in half the price. Rules are simple here, to create a new game or to join an existing game it would cost you 0.05 eth. Each player has to deposits the same amount into the contract and the winner receives the CHKMATE NFT. Each card has unique characteristics about the game which includes winning piece, winning board, winning time and total kills.";
-const rule1 = "1. To create a new game a fee of 0.05 eth is to be deposited into the contract."; 
-const rule2 = "2. Once a game is created a unique code will be generated that you can share with the other player for them to join. The other player will have 30 minutes to join before the game auto-forfeits. In that case, the deposited eth will be returned to your wallet[1].";
-const rule3 = "3. Once a game is started each player will have a two minute window to make a move. If no move is made within the given timeframe the turn will skip to the next player.";
-const rule4 = "4. If any player for any reason disconnects from the game, it will be considered as a forfeit and the other player will win CHKMATE NFT card[2].";
-const rule5 = "5. A game finishes when one of the player plays a check-mate move. The piece that makes the final move will be considered as the winning piece.";
+const gameBoard = new Chess();
+const defaultFenString = 'start';
+const maxTurnTimeInSeconds = 120;
+const maxMissedTurnCount = 2;
+const gameTitle = 'Welcome to CHKMATE!';
+const gameDescription = 'First ever chess game built on blockchain. Create a new game or join an existing game using a game code. To read more about the rules of the game press the help icon in the top left corner.';
+const gameInstructions = 'It is a NFT based game of chess where every player have a chance to mint a unique CHKMATE NFT win card, in half the price. Rules are simple here, to create a new game or to join an existing game it would cost you 0.05 eth. Each player has to deposits the same amount into the contract and the winner receives the CHKMATE NFT. Each card has unique characteristics about the game which includes winning piece, winning board, winning time and total kills.';
+const rule1 = '1. To create a new game a fee of 0.05 eth is to be deposited into the contract.'; 
+const rule2 = '2. Once a game is created a unique code will be generated that you can share with the other player for them to join. The other player will have 30 minutes to join before the game auto-forfeits. In that case, the deposited eth will be returned to your wallet[1].';
+const rule3 = '3. Once a game is started each player will have a two minute window to make a move. If no move is made within the given timeframe the turn will skip to the next player.';
+const rule4 = '4. If any player for any reason disconnects from the game, it will be considered as a forfeit and the other player will win CHKMATE NFT card[2].';
+const rule5 = '5. A game finishes when one of the player plays a check-mate move. The piece that makes the final move will be considered as the winning piece.';
 
 // The random color should be generated when the game starts, before 
 // that some default color should be used
-let lightSquareColor = getLightSquareColor();
-let darkSquareColor = getDarkSquareColor();
+let lightSquareColor = h.getLightSquareColor();
+let darkSquareColor = h.getDarkSquareColor();
 
 // Constants
 const youTitle = "YOU";
@@ -52,6 +56,58 @@ async function copyTextToClipboard(text) {
     return document.execCommand('copy', true, text);
   }  
 }
+
+// Window lifecycle events
+window.onload = async () => {
+  console.log('onLoad');
+  // console.log(`gameStarted: ${gameStarted}`);
+  // console.log(`gameEnded: ${gameEnded}`);
+  // console.log(`opponentAddress: ${opponentAddress}`);
+  // console.log(`playerAddress: ${playerAddress}`);
+  // if (gameStarted && !gameEnded && isValidString(opponentAddress) && isValidString(playerAddress)) {
+  //   //const address = isPlayer ? opponentAddress : playerAddress;
+  //   await endGameFun({gameShortId: gameShortId, address: address});
+  //   //dispatch(endGame({gameShortId: gameShortId, address: address}));
+    
+  // }
+};
+
+// window.onbeforeunload = async () => {
+//   console.log('onBeforeUnLoad');
+//   // console.log(`gameStarted: ${gameStarted}`);
+//   // console.log(`gameEnded: ${gameEnded}`);
+//   // console.log(`opponentAddress: ${opponentAddress}`);
+//   // console.log(`playerAddress: ${playerAddress}`);
+//   // if (gameStarted && !gameEnded && isValidString(opponentAddress) && isValidString(playerAddress)) {
+//   //   //const address = isPlayer ? opponentAddress : playerAddress;
+//   //   await endGameFun({gameShortId: gameShortId, address: address});
+//   //   //dispatch(endGame({gameShortId: gameShortId, address: address}));
+//   //   return null;
+//   // }
+// };
+
+window.onpagehide = () => {
+  console.log('onPageHide');
+};
+
+window.onpageshow = async () => {
+  console.log('onPageShow');
+};
+
+// window.onunload = async () => {
+//   console.log('onUnLoad');
+//   // console.log(`gameStarted: ${gameStarted}`);
+//   // console.log(`gameEnded: ${gameEnded}`);
+//   // console.log(`opponentAddress: ${opponentAddress}`);
+//   // console.log(`playerAddress: ${playerAddress}`);
+//   // if (gameStarted && !gameEnded && isValidString(opponentAddress) && isValidString(playerAddress)) {
+//   //   const address = isPlayer ? opponentAddress : playerAddress;
+//   //   await endGameFun({gameShortId: gameShortId, address: address});
+//   //   //dispatch(endGame({gameShortId: gameShortId, address: address}));
+//   // }
+//   alert("confirm exit is being called");
+//   return false;
+// };
 
 function App() {
   const [gameCode, _setGameCode] = useState('');
@@ -75,34 +131,35 @@ function App() {
   const dispatch = useDispatch();
   const blockchain = useSelector((state) => state.blockchain);
   const data = useSelector((state) => state.data);
-  const address = blockchain.address;
+  const loggedInAddress = blockchain.address;
   const contract = blockchain.gameContract;
-  const walletConnected = isValidString(address);
+  const walletConnected = h.isValidString(loggedInAddress);
   const contractFetched = contract != null;
   const gameConnected = walletConnected && contractFetched;
   const dialogType = data.dialogType;
   const gameModel = data.gameModel;
-  const createGameDialog = stringValueEqual(dialogType, DialogType.CREATE_GAME);
-  const joinGameDialog = stringValueEqual(dialogType, DialogType.JOIN_GAME);
-  const infoDialog = stringValueEqual(dialogType, DialogType.INFO);
+  const showCreateGameDialog = h.stringValueEqual(dialogType, d.DialogType.CREATE_GAME);
+  const showJoinGameDialog = h.stringValueEqual(dialogType, d.DialogType.JOIN_GAME);
+  const showEndGameDialog = h.stringValueEqual(dialogType, d.DialogType.ENG_GAME);
+  const showInfoDialog = h.stringValueEqual(dialogType, d.DialogType.INFO);
   const missedTurnCount = data.missedTurnCount;
   
   let baseGameFee = data.baseGameFee;
   let gameCreated = gameModel != null;
   let gameStarted = false;
   let gameEnded = false;
-  let playerAddress = '';
-  let opponentAddress = '';
-  let currentTurnAddress = '';
-  let gameShortId = '';
-  let fenString = 'start';
+  let playerAddress = null;
+  let opponentAddress = null;
+  let currentTurnAddress = null;
+  let gameShortId = null;
+  let fenString = defaultFenString;
   let updatedAt = new Date();
   
   if (gameCreated) {
-    gameShortId = getShortGameId(gameModel.id);
-    fenString = gameModel.get('fenString');
+    gameShortId = h.getShortGameId(gameModel.id);
     gameStarted = gameModel.get('gameStarted');
     gameEnded = gameModel.get('gameEnded');
+    fenString = gameModel.get('fenString');
     playerAddress = gameModel.get('playerAddress');
     opponentAddress = gameModel.get('opponentAddress');
     currentTurnAddress = gameModel.get('currentTurnAddress');
@@ -112,22 +169,22 @@ function App() {
     updatedAt = gameModel.updatedAt;
   }
   // Init chess board
-  const gameBoard = (gameEnded || (stringValueEqual(fenString, 'start'))) ? new Chess() : Chess(fenString);
-  if (gameEnded) {
-    fenString = 'start';
-    gameBoard.load(fenString);
+  gameBoard.load(fenString);
+  // Reset square color if the game has ended
+  if (showEndGameDialog) {
+    lightSquareColor = h.getLightSquareColor();
+    darkSquareColor = h.getDarkSquareColor();
   }
-
-  const isCurrentTurn = stringValueEqual(currentTurnAddress, address);
-  const isPlayer = stringValueEqual(playerAddress, address);
-  const isPlayerTurn = stringValueEqual(currentTurnAddress, playerAddress);
-
-  const isOpponent = stringValueEqual(opponentAddress, address);
-  const isOpponentTurn = stringValueEqual(currentTurnAddress, opponentAddress);
+  
+  const isCurrentTurn = h.stringValueEqual(currentTurnAddress, loggedInAddress);
+  const isPlayer = h.stringValueEqual(playerAddress, loggedInAddress);
+  const isPlayerTurn = h.stringValueEqual(currentTurnAddress, playerAddress);
+  const isOpponent = h.stringValueEqual(opponentAddress, loggedInAddress);
+  const isOpponentTurn = h.stringValueEqual(currentTurnAddress, opponentAddress);
   
   console.log("App() | player: " + isPlayerTurn);
   console.log("App() | opponent: " + isOpponentTurn);
-  console.log("App() | Address: " + address);
+  console.log("App() | LoggedInAddress: " + loggedInAddress);
   console.log("App() | walletConnected: " + walletConnected);
   console.log("App() | contractFetched: " + contractFetched);
   console.log("App() | gameConnected: " + gameConnected);
@@ -139,76 +196,25 @@ function App() {
   console.log("App() | currentTurnAddress: " + currentTurnAddress);
   console.log("App() | fenString: " + fenString);
   console.log("App() | dialogType: " + dialogType);
-  console.log("App() | showCreateGameDialog: " + createGameDialog);
-  console.log("App() | showJoinGameDialog: " + joinGameDialog);
-  console.log("App() | showInfoDialog: " + infoDialog);
+  console.log("App() | showCreateGameDialog: " + showCreateGameDialog);
+  console.log("App() | showJoinGameDialog: " + showJoinGameDialog);
+  console.log("App() | showInfoDialog: " + showInfoDialog);
   console.log("App() | baseGameFee: " + baseGameFee);
   console.log("App() | updatedAt: " + updatedAt);
+  console.log("App() | endGameDialog: " + showEndGameDialog);
+  console.log("App() | missedTurnCount: " + missedTurnCount);
 
   useEffect(() => {
     console.log("................Use effect................");
     if (gameConnected) {
       // TODO: fetch NFT data
-      dispatch(fetchData(address));
+      dispatch(d.fetchData(loggedInAddress));
     }
     // Init account from cache
     if (!walletConnected) {
-      dispatch(fetchCachedAccount());
+      dispatch(b.fetchCachedAccount());
     }
-  }, [address, walletConnected, gameConnected, dispatch]);
-
-
-  // Window lifecycle events
-  window.onload = async () => {
-    console.log('onLoad');
-    // console.log(`gameStarted: ${gameStarted}`);
-    // console.log(`gameEnded: ${gameEnded}`);
-    // console.log(`opponentAddress: ${opponentAddress}`);
-    // console.log(`playerAddress: ${playerAddress}`);
-    // if (gameStarted && !gameEnded && isValidString(opponentAddress) && isValidString(playerAddress)) {
-    //   //const address = isPlayer ? opponentAddress : playerAddress;
-    //   await endGameFun({gameShortId: gameShortId, address: address});
-    //   //dispatch(endGame({gameShortId: gameShortId, address: address}));
-      
-    // }
-  };
-
-  // window.onbeforeunload = async () => {
-  //   console.log('onBeforeUnLoad');
-  //   // console.log(`gameStarted: ${gameStarted}`);
-  //   // console.log(`gameEnded: ${gameEnded}`);
-  //   // console.log(`opponentAddress: ${opponentAddress}`);
-  //   // console.log(`playerAddress: ${playerAddress}`);
-  //   // if (gameStarted && !gameEnded && isValidString(opponentAddress) && isValidString(playerAddress)) {
-  //   //   //const address = isPlayer ? opponentAddress : playerAddress;
-  //   //   await endGameFun({gameShortId: gameShortId, address: address});
-  //   //   //dispatch(endGame({gameShortId: gameShortId, address: address}));
-  //   //   return null;
-  //   // }
-  // };
-
-  window.onpagehide = () => {
-    console.log('onPageHide');
-  };
-
-  window.onpageshow = async () => {
-    console.log('onPageShow');
-  };
-
-  window.onunload = async () => {
-    console.log('onUnLoad');
-    // console.log(`gameStarted: ${gameStarted}`);
-    // console.log(`gameEnded: ${gameEnded}`);
-    // console.log(`opponentAddress: ${opponentAddress}`);
-    // console.log(`playerAddress: ${playerAddress}`);
-    // if (gameStarted && !gameEnded && isValidString(opponentAddress) && isValidString(playerAddress)) {
-    //   const address = isPlayer ? opponentAddress : playerAddress;
-    //   await endGameFun({gameShortId: gameShortId, address: address});
-    //   //dispatch(endGame({gameShortId: gameShortId, address: address}));
-    // }
-    alert("confirm exit is being called");
-    return false;
-  };
+  }, [loggedInAddress, walletConnected, gameConnected, dispatch]);
 
   function getLatestStatus() {
     let status = "";
@@ -216,7 +222,7 @@ function App() {
     // checkmate?
     if (gameBoard.in_checkmate()) {
       status = 'Game over, ' + moveColor + ' is in checkmate.';
-      dispatch(endGame({gameShortId: gameShortId, address: currentTurnAddress}));
+      dispatch(d.endGame({gameShortId: gameShortId, address: currentTurnAddress}));
     }
   
     // draw?
@@ -235,6 +241,16 @@ function App() {
     }
     //console.log('Game Status: ' + status);
     return status;
+  }
+
+  function getForfeitDialogTitle() {
+    return `The game was auto-forfeit because one of the player left the game. No one won, sorry :(`;
+  }
+
+  function reachedMaxMissedTurns() {
+    const result = missedTurnCount >= maxMissedTurnCount;
+    console.log(`Result: ${result}`);
+    return result;
   }
 
   // Chess game methods and constants
@@ -270,9 +286,8 @@ function App() {
       {renderHelpPopup()}
       {renderCreateGamePopup()}
       {renderJoinGamePopup()}
-      <s.Container jc={"center"} style={{marginTop: "50px"}}>
-        {gameCreated && !gameEnded ? renderGameBoard() : renderWelcomePage()}
-      </s.Container>
+      {renderEndGamePopup()}
+      {renderWelcomePageOrGameBoard()}
       {/* 
         If account connected or not-connected and no NFTs minted show the chessboard with start game button
         If account connected or not-connected and NFTs minted show minted NFTs with start game button
@@ -291,7 +306,7 @@ function App() {
         style={{width:'40px', height:'40px', marginLeft: '5px'}}
         onClick={(e) => {
           e.preventDefault();
-          dispatch(showInfoDialog());
+          dispatch(d.showInfoDialog());
         } 
       }>?</s.HelpButton>
       <s.TextPageTitle
@@ -315,13 +330,13 @@ function App() {
             src={(blockchain.identiconUrl != null ? blockchain.identiconUrl : logo)}
             onClick={(e) => {
               e.preventDefault();
-              dispatch(logout());
+              dispatch(b.logout());
             }} />
         ) : (
           <s.StyledButton
             onClick={(e) => {
               e.preventDefault();
-              dispatch(connectWallet({
+              dispatch(b.connectWallet({
                 lightSquareColor: lightSquareColor, 
                 darkSquareColor: darkSquareColor
               }));
@@ -337,7 +352,7 @@ function App() {
   // Dialogs
   function renderHelpPopup() {
     return(
-      <Dialog open={infoDialog} onClose={hideDialog}>  
+      <Dialog open={showInfoDialog} onClose={d.hideDialog}>  
         <DialogContent>
           <s.Container 
             ai={'center'} 
@@ -438,7 +453,7 @@ function App() {
               }} 
               onClick={(e)=> {
                 e.preventDefault();
-                dispatch(hideDialog());
+                dispatch(d.hideDialog());
               }}
             >
               Close
@@ -452,10 +467,10 @@ function App() {
   function renderCreateGamePopup() {
     return(
       <Dialog
-        open={createGameDialog}
+        open={showCreateGameDialog}
         onClose={(e) => {
           e.preventDefault();
-          dispatch(hideDialog());
+          dispatch(d.hideDialog());
         }}
       >
         <DialogContent>
@@ -512,7 +527,7 @@ function App() {
                     width: '200px'
                   }} onClick={(e) => {
                     e.preventDefault();
-                    dispatch(hideDialog());
+                    dispatch(d.hideDialog());
                   }}
                 >
                   Cancel
@@ -529,15 +544,15 @@ function App() {
                   onClick={(e) => {
                     e.preventDefault();
                     if (gameConnected) {
-                      dispatch(createGame({
+                      dispatch(d.createGame({
                         gameFee: gameFee,
-                        address: address,
+                        address: loggedInAddress,
                         lightSquareColor: lightSquareColor, 
                         darkSquareColor: darkSquareColor,
                         createGameRequest: true,
                       }));
                     } else {
-                      dispatch(connectWallet({
+                      dispatch(b.connectWallet({
                         gameFee: gameFee,
                         lightSquareColor: lightSquareColor, 
                         darkSquareColor: darkSquareColor,
@@ -558,10 +573,10 @@ function App() {
   function renderJoinGamePopup() {
     return(
       <Dialog 
-        open={joinGameDialog} 
+        open={showJoinGameDialog} 
         onClose={(e) => {
           e.preventDefault();
-          dispatch(hideDialog());
+          dispatch(d.hideDialog());
         }}
       >
         <DialogContent>
@@ -613,7 +628,7 @@ function App() {
                   width: '200px'
                 }} onClick={(e) => {
                   e.preventDefault();
-                  dispatch(hideDialog());
+                  dispatch(d.hideDialog());
                 }}
               >
                 Cancel
@@ -630,9 +645,9 @@ function App() {
                 onClick={(e) => {
                   e.preventDefault();
                   if (gameConnected) {
-                    dispatch(joinGame({gameId: gameCode, address: address}));
+                    dispatch(d.joinGame({gameId: gameCode, address: loggedInAddress}));
                   } else {
-                    dispatch(connectWallet({
+                    dispatch(b.connectWallet({
                       joinGameRequest: true,
                       gameId: gameCode, 
                       lightSquareColor: lightSquareColor, 
@@ -647,6 +662,45 @@ function App() {
           </s.Container>
         </DialogContent>
       </Dialog>
+    )
+  }
+
+  function renderEndGamePopup() {
+    return(
+      <Dialog
+        open={showEndGameDialog} 
+        onClose={(e) => {
+          e.preventDefault();
+          dispatch(d.hideDialog());
+        }}
+      >
+        <DialogContent>
+          <s.Container jc={'center'} ai={'center'}>
+            <s.TextDescription
+              style={{color: 'black', textAlign: 'center'}}
+            >
+              { getForfeitDialogTitle() }
+            </s.TextDescription>
+            <s.StyledButton
+              bc={'black'}
+              color={'white'}
+              style={{marginTop: '20px', marginBottom: '5px'}}
+              onClick={(e) => {
+                e.preventDefault();
+                dispatch(d.hideDialog());
+              }}
+            >Okay</s.StyledButton>
+          </s.Container>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
+  function renderWelcomePageOrGameBoard() {
+    return(
+      <s.Container jc={"center"} style={{marginTop: "50px"}}>
+        {gameCreated && !gameEnded ? renderGameBoard() : renderWelcomePage()}
+      </s.Container>
     )
   }
 
@@ -672,9 +726,9 @@ function App() {
               onClick={(e) => {
                 e.preventDefault();
                 if (gameConnected) {
-                  dispatch(showCreateGameDialog());
+                  dispatch(d.showCreateGameDialog());
                 } else {
-                  dispatch(connectWallet({
+                  dispatch(b.connectWallet({
                     createGameRequest: true, 
                     lightSquareColor: lightSquareColor, 
                     darkSquareColor: darkSquareColor
@@ -684,7 +738,7 @@ function App() {
             <s.SpacerMedium />
             <s.StyledButton style={{width:'130px', height:'40px'}}
               onClick={(e) => {
-                dispatch(showJoinGameDialog());
+                dispatch(d.showJoinGameDialog());
                 e.preventDefault();
               }}
             >
@@ -815,14 +869,13 @@ function App() {
 
   function addClock({showAnimation}) {
     const clockIndicators = []
-    const totalTimeInSeconds = 120;
-    const elapsedTime = getDateDifferenceInSeconds(new Date(), updatedAt);
+    const elapsedTime = h.getDateDifferenceInSeconds(new Date(), updatedAt);
     for (let i = 0; i < 90; i++) {
       const key = `clock-indicator-${i}`;
       clockIndicators[i] = <s.ClockContainer key={key} className='clock-indicator'/>
     }
-    const deg = showAnimation ? (elapsedTime / totalTimeInSeconds * 360) : 0;
-    const remainingTime = showAnimation ? (totalTimeInSeconds - elapsedTime) : 0;
+    const deg = showAnimation ? (elapsedTime / maxTurnTimeInSeconds * 360) : 0;
+    const remainingTime = showAnimation ? (maxTurnTimeInSeconds - elapsedTime) : 0;
     return(
       <s.ClockContainer className='clock-wrapper'>
         <s.ClockContainer className='clock-base'>
@@ -851,7 +904,7 @@ function App() {
     console.log('togglePlayer');
     if (!isCurrentTurn) return null;
     // If the total time of animation has ended that means the user has not played a move. Play a random move instead
-    if (missedTurnCount > 2) {
+    if (reachedMaxMissedTurns()) {
       _endGame();
     } else {
       playRandomMove()
@@ -871,8 +924,8 @@ function App() {
   }
 
   function updateGameState({address, missedCounts}) {
-    if (gameModel != null && gameBoard != null && isValidString(address)) {
-      dispatch(togglePlayerState({
+    if (gameModel != null && gameBoard != null && h.isValidString(address)) {
+      dispatch(d.togglePlayerState({
         gameModel: gameModel, 
         address: address, 
         fen: gameBoard.fen(),
@@ -882,9 +935,9 @@ function App() {
   }
 
   function _endGame() {
-    if (gameStarted && !gameEnded && isValidString(opponentAddress) && isValidString(playerAddress)) {
+    if (gameStarted && !gameEnded && h.isValidString(opponentAddress) && h.isValidString(playerAddress)) {
       const address = isPlayer ? opponentAddress : playerAddress;
-      dispatch(endGame({gameShortId: gameShortId, winnerAddress: address})); 
+      dispatch(d.endGame({gameShortId: gameShortId, winnerAddress: address})); 
     }
   }
 }

@@ -8,6 +8,7 @@ export const DialogType = {
   INFO: 'info',
   CREATE_GAME: 'create_game',
   JOIN_GAME: 'join_game',
+  ENG_GAME: 'end_game',
   NONE: 'none'
 };
 
@@ -44,6 +45,12 @@ const updateGame = (payload) => {
   return {
     type: "UPDATE_GAME",
     payload: payload
+  };
+};
+
+const endGameEvent = () => {
+  return {
+    type: 'END_GAME'
   };
 };
 
@@ -92,11 +99,8 @@ async function queryGameModel(shortId) {
   try {
     const query = getGameModelQuery();
     query.equalTo('shortId', shortId);
-    const gameModel = await query.first();
-    if (gameModel != null) {
-      console.table(gameModel);
-    }
-    return gameModel;
+    query.equalTo('gameEnded', false);
+    return await query.first();
   } catch (err) {
     console.log(err);
     return null;
@@ -159,18 +163,23 @@ async function addSubscription(dispatch, gameId) {
   subscriptionQuery.get(gameId);
   const subscription = await subscriptionQuery.subscribe();
   subscription.on('update', (gameModel) => {
-    dispatch(updateGame({gameModel: gameModel}));
+    if (gameModel.get('gameEnded')) {
+      dispatch(endGameEvent());
+      subscription.unsubscribe();
+    } else {
+      dispatch(updateGame({gameModel: gameModel}));
+    }
   });
 }
 
-async function removeSubscription(gameId) {
-  const subscriptionQuery = getGameModelQuery();
-  subscriptionQuery.get(gameId);
-  const subscription = await subscriptionQuery.subscribe();
-  subscription.unsubscribe();
-  // This will close the WebSocket connection to the LiveQuery server, cancel the auto-reconnect, and unsubscribe all subscriptions based on it.
-  // Moralis.LiveQuery.close();
-}
+// async function removeSubscription(gameId) {
+//   const subscriptionQuery = getGameModelQuery();
+//   subscriptionQuery.get(gameId);
+//   const subscription = await subscriptionQuery.subscribe();
+//   subscription.unsubscribe();
+//   // This will close the WebSocket connection to the LiveQuery server, cancel the auto-reconnect, and unsubscribe all subscriptions based on it.
+//   // Moralis.LiveQuery.close();
+// }
 
 export const togglePlayerState = (payload) => {
   return async (dispatch) => {
@@ -283,9 +292,8 @@ export const endGame = ({gameShortId, winnerAddress}) => {
     try {
       const gameModel = await queryGameModel(gameShortId);
       if (gameModel != null) {
-        const gameId = gameModel.id;
         const currentTime = new Date();
-        const gameTime = currentTime - gameModel.createdAt;
+        const gameTime = getDateDifferenceInSeconds(currentTime, gameModel.createdAt);
         const checkSumAddress = web3.utils.toChecksumAddress(winnerAddress);
         console.log(`winnerAddress: ${winnerAddress}`);
         console.log(`gameTime: ${gameTime}`);
@@ -294,10 +302,7 @@ export const endGame = ({gameShortId, winnerAddress}) => {
         gameModel.set('winnerAddress', winnerAddress);
         gameModel.set('gameTime', gameTime);
         gameModel.set('gameEnded', true);
-        await removeSubscription(gameId);
         await gameModel.save();
-        console.log(`clear game data`);
-        dispatch(clearGameData());
         // await store
         //   .getState()
         //   .blockchain.gameContract.methods.endGame(gameId, gameTime)
