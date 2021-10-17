@@ -1,12 +1,15 @@
 import { getDateDifferenceInSeconds, getShortGameId, isValidString } from "../../utils/Helpers";
+import { createCard, PieceType } from "../../utils/CanvasHelper";
 import store from "../store";
 
 const Moralis = require('moralis');
 const web3 = new Moralis.Web3();
+const fs = require('fs');
 
 export const GameModelDataType = {
   SHORT_ID: 'shortId',
   GAME_FEE: 'gameFee',
+  GAME_ENDED: 'gameEnded',
   PLAYER_ADDR: 'playerAddress',
   OPPONENT_ADDR: 'opponentAddress',
   WINNER_ADDR: 'winnerAddress',
@@ -22,6 +25,7 @@ export const DialogType = {
   CREATE_GAME: 'create_game',
   JOIN_GAME: 'join_game',
   ENG_GAME: 'end_game',
+  NFT_CREATED: 'nft_created',
   NONE: 'none'
 };
 
@@ -67,6 +71,7 @@ const endGameEvent = () => {
   };
 };
 
+
 const updateBaseGameFee = (payload) => {
   return {
     type: 'UPDATE_BASE_GAME_FEE',
@@ -104,6 +109,13 @@ export const hideDialog = () => {
   };
 };
 
+const showNFTCreated = (payload) => {
+  return {
+    type: 'SHOW_NFT_CREATED_DIALOG',
+    payload: payload
+  };
+};
+
 function getGameModelQuery() {
   return new Moralis.Query(GameModelInstance);
 }
@@ -112,7 +124,6 @@ async function queryGameModel(shortId) {
   try {
     const query = getGameModelQuery();
     query.equalTo(GameModelDataType.SHORT_ID, shortId);
-    // query.doesNotExist(GameModelDataType.OPPONENT_ADDR);
     query.doesNotExist(GameModelDataType.WINNER_ADDR);
     return await query.first();
   } catch (err) {
@@ -125,6 +136,7 @@ async function currentGameOrNull(address, dispatch) {
   try {
     const onGoingGameQuery = getGameModelQuery();
     onGoingGameQuery.doesNotExist(GameModelDataType.WINNER_ADDR);
+    onGoingGameQuery.equalTo(GameModelDataType.GAME_ENDED, false);
     const playerAddressMatchQuery = getGameModelQuery();
     playerAddressMatchQuery.equalTo(GameModelDataType.PLAYER_ADDR, address);
     const opponentAddressMatchQuery = getGameModelQuery();
@@ -139,7 +151,7 @@ async function currentGameOrNull(address, dispatch) {
     const gameModel = await mainQuery.first();
     if (gameModel != null) {
       dispatch(updateGame({gameModel: gameModel, missedTurnCount: 0}));
-      await addSubscription(dispatch, gameModel.id);
+      await addSubscription(dispatch, gameModel.get(GameModelDataType.SHORT_ID));
     }
   } catch (err) {
     console.log(err);
@@ -154,6 +166,7 @@ async function saveNewGameToDatabase(payload) {
     const darkSquareColor = payload.darkSquareColor;
     const gameModel = new GameModelInstance();
     gameModel.set(GameModelDataType.GAME_FEE, gameFee);
+    gameModel.set(GameModelDataType.GAME_ENDED, false);
     gameModel.set(GameModelDataType.PLAYER_ADDR, address);
     gameModel.set(GameModelDataType.FEN_STRING, 'start');
     gameModel.set(GameModelDataType.LIGHT_SQUARE_COLOR, lightSquareColor);
@@ -166,35 +179,46 @@ async function saveNewGameToDatabase(payload) {
   }
 }
 
-async function addSubscription(dispatch, gameId) {
-  const subscriptionQuery = getGameModelQuery();
-  subscriptionQuery.get(gameId);
-  const subscription = await subscriptionQuery.subscribe();
+async function addSubscription(dispatch, gameShortId) {
+  const gameModelQuery = getGameModelQuery();
+  gameModelQuery.equalTo(GameModelDataType.SHORT_ID, gameShortId);
+  const subscription = await gameModelQuery.subscribe();
   subscription.on('update', (gameModel) => {
     dispatch(updateGame({gameModel: gameModel}));
-    if (isValidString(gameModel.get(GameModelDataType.WINNER_ADDR))) {
+    if (gameModel.get(GameModelDataType.GAME_ENDED) && isValidString(gameModel.get(GameModelDataType.WINNER_ADDR))) {
       dispatch(endGameEvent());
       subscription.unsubscribe();
     }
   });
+  subscription.on('close', async (event) => {
+    console.log('subscription closed');
+    console.table(event);
+    await endGameFun({gameShortId: gameShortId});
+  });
 }
 
-// async function removeSubscription(gameId) {
-//   const subscriptionQuery = getGameModelQuery();
-//   subscriptionQuery.get(gameId);
-//   const subscription = await subscriptionQuery.subscribe();
-//   subscription.unsubscribe();
-//   // This will close the WebSocket connection to the LiveQuery server, cancel the auto-reconnect, and unsubscribe all subscriptions based on it.
-//   // Moralis.LiveQuery.close();
-// }
+export const createNFTImage = ({winnerAddress, otherAddress, chessboard}) => {
+  return async (dispatch) => {
+    try {
+      console.log('create NFT');
+      const fileName = await createCard({
+        winnerAddress: winnerAddress,
+        otherAddress: otherAddress,
+        pieceType: PieceType.KNIGHT,
+        chessboard: chessboard
+      });
+      // const image = fs.readFileSync(`${cardsFolderPath}/${fileName}`);
+      //console.log(`image: ${fileName}`);
+      dispatch(showNFTCreated({image: fileName}));
+    } catch (err) {
+      console.log(err);
+    }
+  };
+};
 
-export const togglePlayerState = (payload) => {
+export const togglePlayerState = ({gameModel, address, fenString, missedTurnCount}) => {
   return async (dispatch) => {
     // Update game data when turn switches to other player
-    const gameModel = payload.gameModel;
-    const address = payload.address;
-    const fenString = payload.fen;
-    const missedTurnCount = payload.missedTurnCount;
     console.log(`missedTurnCount: ${missedTurnCount}`);
     if (fenString != null && fenString !== "") {
       gameModel.set(GameModelDataType.FEN_STRING, fenString);
@@ -205,13 +229,9 @@ export const togglePlayerState = (payload) => {
   };
 };
 
-export const createGame = (payload) => {
+export const createGame = ({gameFee, address, lightSquareColor, darkSquareColor}) => {
   return async (dispatch) => {
     try {
-      const gameFee = payload.gameFee;
-      const address = payload.address;
-      const lightSquareColor = payload.lightSquareColor;
-      const darkSquareColor = payload.darkSquareColor;
       // Save new game to database
       const gameModel = await saveNewGameToDatabase({
         gameFee: gameFee,
@@ -233,10 +253,11 @@ export const createGame = (payload) => {
                 // Delete saved game model from database
                 await gameModel.destroy();
               }).then(async (receipt) => {
+                const gameShortId = getShortGameId(gameId);
                 gameModel.set(GameModelDataType.SHORT_ID, getShortGameId(gameId));
                 await gameModel.save();
                 dispatch(createNewGame({gameModel: gameModel})); 
-                await addSubscription(dispatch, gameId);
+                await addSubscription(dispatch, gameShortId);
               });
       } else {
         dispatch(fetchDataFailed('Error creating a new game'));
@@ -248,12 +269,10 @@ export const createGame = (payload) => {
   };
 };
 
-export const joinGame = (payload) => {
+export const joinGame = ({shortId, address}) => {
   return async (dispatch) => {
     try {
       // Query game from database
-      const shortId = payload.gameId;
-      const address = payload.address;
       const gameModel = await queryGameModel(shortId);
       if (gameModel != null) {
         const gameFee = gameModel.get(GameModelDataType.GAME_FEE);
@@ -276,7 +295,7 @@ export const joinGame = (payload) => {
               gameModel.set(GameModelDataType.CURRENT_TURN_ADDR, playerAddress);
               await gameModel.save();
               dispatch(joinNewGame({gameModel: gameModel})); 
-              await addSubscription(dispatch, gameId);
+              await addSubscription(dispatch, shortId);
             });
       } else {
         dispatch(showJoinGameDialog());
@@ -290,38 +309,29 @@ export const joinGame = (payload) => {
   };
 };
 
+export async function endGameFun({gameShortId, winnerAddress}) {
+  const gameModel = await queryGameModel(gameShortId);
+  if (gameModel != null) {
+    const currentTime = new Date();
+    const gameTime = getDateDifferenceInSeconds(currentTime, gameModel.createdAt);
+    //const checkSumAddress = web3.utils.toChecksumAddress(winnerAddress);
+    console.log(`gameTime: ${gameTime}`);
+    //console.log(`checkSumAddress: ${checkSumAddress}`);
+    
+    if (isValidString(winnerAddress)) {
+      console.log(`winnerAddress: ${winnerAddress}`);
+      gameModel.set(GameModelDataType.WINNER_ADDR, winnerAddress);
+    }
+    gameModel.set(GameModelDataType.GAME_TIME, gameTime);
+    gameModel.set(GameModelDataType.GAME_ENDED, true);
+    await gameModel.save();
+  }
+}
+
 export const endGame = ({gameShortId, winnerAddress}) => {
   return async (dispatch) => {
     try {
-      const gameModel = await queryGameModel(gameShortId);
-      if (gameModel != null) {
-        const currentTime = new Date();
-        const gameTime = getDateDifferenceInSeconds(currentTime, gameModel.createdAt);
-        const checkSumAddress = web3.utils.toChecksumAddress(winnerAddress);
-        console.log(`winnerAddress: ${winnerAddress}`);
-        console.log(`gameTime: ${gameTime}`);
-        console.log(`checkSumAddress: ${checkSumAddress}`);
-
-        gameModel.set(GameModelDataType.WINNER_ADDR, winnerAddress);
-        gameModel.set(GameModelDataType.GAME_TIME, gameTime);
-        await gameModel.save();
-        // await store
-        //   .getState()
-        //   .blockchain.gameContract.methods.endGame(gameId, gameTime)
-        //   .send({
-        //     from: checkSumAddress
-        //   })
-        //   .once('error', (err) => {
-        //     console.log(err);
-        //     // TODO: Handle error case
-        //   }).then(async (receipt) => {
-        //     console.table(gameModel);
-        //     gameModel.set('gameEnded', true);
-        //     await gameModel.save();
-        //     //dispatch(showNFTDialog());
-        //     await removeSubscription(gameShortId);
-        //   });
-      }
+      await endGameFun(gameShortId, winnerAddress);
     } catch (err) {
       console.log(err);
       // TODO: Handle error case

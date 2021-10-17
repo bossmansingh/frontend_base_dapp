@@ -1,5 +1,6 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, createRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useScreenshot } from 'use-react-screenshot';
 
 import Dialog from "@material-ui/core/Dialog";
 import DialogContent from "@material-ui/core/DialogContent";
@@ -15,12 +16,12 @@ import "./styles/clockStyle.css";
 
 // import styled from "styled-components";
 // import { create } from "ipfs-http-client";
-import logo from "./assets/chessboard_logo.jpg";
-import copyIcon from "./assets/copy_to_clipboard.png";
+import logo from "./assets/images/chessboard_logo.jpg";
+import copyIcon from "./assets/images/copy_to_clipboard.png";
 
 const gameBoard = new Chess();
 const defaultFenString = 'start';
-const maxTurnTimeInSeconds = 120;
+const maxTurnTimeInSeconds = 20;
 const maxMissedTurnCount = 2;
 const gameTitle = 'Welcome to CHKMATE!';
 const gameDescription = 'First ever chess game built on blockchain. Create a new game or join an existing game using a game code. To read more about the rules of the game press the help icon in the top left corner.';
@@ -81,33 +82,51 @@ window.onload = async () => {
 //   // }
 // };
 
-window.onpagehide = () => {
-  console.log('onPageHide');
-};
-
 window.onpageshow = async () => {
   console.log('onPageShow');
 };
 
-// window.onunload = async () => {
-//   console.log('onUnLoad');
-//   // console.log(`gameStarted: ${gameStarted}`);
-//   // console.log(`gameEnded: ${gameEnded}`);
-//   // console.log(`opponentAddress: ${opponentAddress}`);
-//   // console.log(`playerAddress: ${playerAddress}`);
-//   // if (gameStarted && !gameEnded && isValidString(opponentAddress) && isValidString(playerAddress)) {
-//   //   const address = isPlayer ? opponentAddress : playerAddress;
-//   //   await endGameFun({gameShortId: gameShortId, address: address});
-//   //   //dispatch(endGame({gameShortId: gameShortId, address: address}));
-//   // }
-//   alert("confirm exit is being called");
-//   return false;
-// };
+
 
 function App() {
+  const ref = createRef(null);
   const [gameCode, _setGameCode] = useState('');
   const [gameFee, _setGameFee] = useState('0.05');
+  const [image, takeScreenshot] = useScreenshot();
   
+  const createNFTCard = ({winnerAddress, otherAddress}) => {
+    try {
+      takeScreenshot(ref.current);
+      dispatch(d.createNFTImage({winnerAddress: winnerAddress, otherAddress: otherAddress, chessboard: image}));
+    } catch (ex) {
+      console.log(ex);
+    }
+  };
+
+  window.onpagehide = async () => {
+    console.log('onPageHide');
+    // if (gameInProgress) {
+    //   const address = isPlayer ? opponentAddress : playerAddress;
+    //   return await d.endGameFun({gameShortId: gameShortId, winnerAddress: address});
+    //   //dispatch(d.endGame({gameShortId: gameShortId, winnerAddress: address})); 
+    // }
+    return null;
+  };
+
+  window.onunload = async () => {
+    console.log('onUnLoad');
+    // console.log(`gameStarted: ${gameStarted}`);
+    // console.log(`gameEnded: ${gameEnded}`);
+    // console.log(`opponentAddress: ${opponentAddress}`);
+    // console.log(`playerAddress: ${playerAddress}`);
+    // if (gameStarted && !gameEnded && isValidString(opponentAddress) && isValidString(playerAddress)) {
+    //   const address = isPlayer ? opponentAddress : playerAddress;
+    //   await endGameFun({gameShortId: gameShortId, address: address});
+    //   //dispatch(endGame({gameShortId: gameShortId, address: address}));
+    // }
+    
+  };
+
   const gameCodeInputEvent = (event) => {
     event.preventDefault();
     _setGameCode(event.target.value);
@@ -137,13 +156,14 @@ function App() {
   const showJoinGameDialog = h.stringValueEqual(dialogType, d.DialogType.JOIN_GAME);
   const showEndGameDialog = h.stringValueEqual(dialogType, d.DialogType.ENG_GAME);
   const showInfoDialog = h.stringValueEqual(dialogType, d.DialogType.INFO);
+  const showNFTDialog = h.stringValueEqual(dialogType, d.DialogType.NFT_CREATED);
   const missedTurnCount = data.missedTurnCount;
   let lightSquareColor = data.lightSquareColor;
   let darkSquareColor = data.darkSquareColor;
 
   let baseGameFee = data.baseGameFee;
   let gameExists = gameModel != null;
-  let gameStarted = false;
+  let gameInProgress = false;
   let gameEnded = false;
   let playerAddress = null;
   let opponentAddress = null;
@@ -158,14 +178,15 @@ function App() {
     playerAddress = gameModel.get(d.GameModelDataType.PLAYER_ADDR);
     opponentAddress = gameModel.get(d.GameModelDataType.OPPONENT_ADDR);
     winnerAddress = gameModel.get(d.GameModelDataType.WINNER_ADDR);
-    gameStarted = h.isValidString(opponentAddress);
-    gameEnded = h.isValidString(winnerAddress);
     fenString = gameModel.get(d.GameModelDataType.FEN_STRING);
     currentTurnAddress = gameModel.get(d.GameModelDataType.CURRENT_TURN_ADDR);
     lightSquareColor = gameModel.get(d.GameModelDataType.LIGHT_SQUARE_COLOR);
     darkSquareColor = gameModel.get(d.GameModelDataType.DARK_SQUARE_COLOR);
     baseGameFee = gameModel.get(d.GameModelDataType.GAME_FEE);
     updatedAt = gameModel.updatedAt;
+    const gameStarted = h.isValidString(playerAddress) && h.isValidString(opponentAddress);
+    gameEnded = gameModel.get(d.GameModelDataType.GAME_ENDED);
+    gameInProgress = gameStarted && !gameEnded;
   }
   // Init chess board
   gameBoard.load(fenString);
@@ -276,6 +297,7 @@ function App() {
       {renderCreateGamePopup()}
       {renderJoinGamePopup()}
       {renderEndGamePopup()}
+      {renderNFTPopup()}
       {renderWelcomePageOrGameBoard()}
       {/* 
         If account connected or not-connected and no NFTs minted show the chessboard with start game button
@@ -685,10 +707,40 @@ function App() {
     );
   }
 
+  function renderNFTPopup() {
+    return(
+      <Dialog
+        open={showNFTDialog} 
+        onClose={(e) => {
+          e.preventDefault();
+          dispatch(d.hideDialog());
+        }}
+      >
+        <DialogContent>
+          <s.Container jc={'center'} ai={'center'}>
+            <s.Image
+              src={image}
+              style={{backgroundColor: 'red'}}
+            />
+            <s.StyledButton
+              bc={'black'}
+              color={'white'}
+              style={{marginTop: '20px', marginBottom: '5px'}}
+              onClick={(e) => {
+                e.preventDefault();
+                dispatch(d.hideDialog());
+              }}
+            >Okay</s.StyledButton>
+          </s.Container>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
   function renderWelcomePageOrGameBoard() {
     return(
       <s.Container jc={"center"} style={{marginTop: "50px"}}>
-        {gameExists ? renderGameBoard() : renderWelcomePage()}
+        {gameExists && !gameEnded ? renderGameBoard() : renderWelcomePage()}
       </s.Container>
     )
   }
@@ -715,7 +767,10 @@ function App() {
               onClick={(e) => {
                 e.preventDefault();
                 if (gameConnected) {
-                  dispatch(d.showCreateGameDialog());
+                  const winnerAddress = isPlayer ? opponentAddress : playerAddress;
+                  const otherAddress = !isPlayer ? opponentAddress : playerAddress;
+                  createNFTCard({winnerAddress: winnerAddress, otherAddress: otherAddress});
+                  //dispatch(d.showCreateGameDialog());
                 } else {
                   dispatch(b.connectWallet({
                     createGameRequest: true, 
@@ -746,11 +801,11 @@ function App() {
         jc={"center"}
         ai={'center'}
       >
-        {setChessboard(gameStarted && isCurrentTurn)}
+        {setChessboard(gameInProgress && isCurrentTurn)}
         <s.SpacerXXLarge/>
         <s.SpacerXXLarge/>
         <s.Container>
-          {!gameStarted ? (
+          {!gameInProgress ? (
               <s.Container ai={'center'}>
                 <s.TextDescription 
                   style={{
@@ -789,9 +844,9 @@ function App() {
             <s.Container
               ai={'center'}
               jd={'center'}
-              style={{opacity: gameStarted && !gameEnded ? '1' : '0.25'}}
+              style={{opacity: gameInProgress ? '1' : '0.25'}}
             >
-              {addClock({showAnimation: isPlayerTurn && !gameEnded})}
+              {addClock({showAnimation: gameInProgress && isPlayerTurn})}
               <s.SpacerMedium/>
               <s.TextSubTitle
                 style={{
@@ -806,9 +861,9 @@ function App() {
             <s.Container
               ai={"center"}
               jd={"center"}
-              style={{opacity: gameStarted && !gameEnded ? "1" : "0.25"}}
+              style={{opacity: gameInProgress ? "1" : "0.25"}}
             >
-              {addClock({showAnimation: isOpponentTurn && !gameEnded})}
+              {addClock({showAnimation: gameInProgress && isOpponentTurn})}
               <s.SpacerMedium/>
               <s.TextSubTitle
                 style={{
@@ -828,6 +883,7 @@ function App() {
   function setChessboard(isEnable) {
     return(
       <Chessboard
+        ref={ref}
         position={fenString}
         draggable={isEnable}
         orientation={!isOpponent ? 'white' : 'black'}
@@ -889,7 +945,7 @@ function App() {
     );
   }
 
-  async function togglePlayer() {
+  function togglePlayer() {
     console.log('togglePlayer');
     if (!isCurrentTurn) return null;
     // If the total time of animation has ended that means the user has not played a move. Play a random move instead
@@ -917,16 +973,16 @@ function App() {
       dispatch(d.togglePlayerState({
         gameModel: gameModel, 
         address: address, 
-        fen: gameBoard.fen(),
+        fenString: gameBoard.fen(),
         missedTurnCount: missedCounts
       }))
     }
   }
 
   function _endGame() {
-    if (gameStarted && !gameEnded && h.isValidString(opponentAddress) && h.isValidString(playerAddress)) {
-      const address = isPlayer ? opponentAddress : playerAddress;
-      dispatch(d.endGame({gameShortId: gameShortId, winnerAddress: address})); 
+    if (gameInProgress) {
+      const winnerAddress = isPlayer ? opponentAddress : playerAddress;
+      dispatch(d.endGame({gameShortId: gameShortId, winnerAddress: winnerAddress})); 
     }
   }
 }

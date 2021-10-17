@@ -1,7 +1,6 @@
 // constants
 import GameContract from "../../contracts/GameContract.json";
-import blockies from "../../utils/Blockies";
-import { isValidString } from "../../utils/Helpers";
+import { getIdenticonUrl, isValidString } from "../../utils/Helpers";
 import { showCreateGameDialog, joinGame, clearGameData, fetchDataFailed } from "../data/dataActions";
 
 const Moralis = require('moralis');
@@ -52,14 +51,6 @@ function addEventListener(dispatch) {
     window.location.reload();
   });
 }
-
-const getIdenticonUrl = (address) => {
-  return blockies.create({
-    seed: address,
-    size: 8,
-    scale: 5
-  }).toDataURL();
-};
 
 const connectGameAndListener = (payload) => {
   return async (dispatch) => {

@@ -177,6 +177,13 @@ export const Identicon = styled.img`
   border-radius: 20px;
 `;
 
+export const Image = styled.img`
+  width: 100%;
+  height: 100%;
+  transition: width 0.5s;
+  transition: height 0.5s;
+`;
+
 export const InputContainer = styled.input`
   display: flex;
   padding: 10px;

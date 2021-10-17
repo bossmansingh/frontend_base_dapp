@@ -1,6 +1,6 @@
+import blockies from './Blockies';
 
 // Helper methods
-
 export function isValidString(str) {
     return str != null && str !== '';
 }
@@ -46,3 +46,11 @@ export function stringValueEqual(str1, str2) {
 export function getDateDifferenceInSeconds(fromDate, toDate) {
   return (fromDate - toDate) / 1000;
 }
+
+export const getIdenticonUrl = (address) => {
+  return blockies.create({
+    seed: address,
+    size: 8,
+    scale: 5
+  }).toDataURL();
+};
