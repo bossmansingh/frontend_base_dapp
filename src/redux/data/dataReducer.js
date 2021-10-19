@@ -9,6 +9,7 @@ const initialState = {
   gameModel: null,
   baseGameFee: '0.05',
   missedTurnCount: 0,
+  nftImage: null,
   lightSquareColor: getLightSquareColor(),
   darkSquareColor: getDarkSquareColor()
 };
@@ -53,11 +54,12 @@ const dataReducer = (state = initialState, action) => {
         dialogType: DialogType.CREATE_GAME
       };
     case 'SHOW_NFT_CREATED_DIALOG':
+      const image = action.payload ? action.payload.image : null;
       return {
         ...state,
         errorMessage: '',
         dialogType: DialogType.NFT_CREATED,
-        nftImage: action.payload.image
+        nftImage: image
       };
     case 'HIDE_DIALOG':
       return {

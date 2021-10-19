@@ -86,46 +86,48 @@ window.onpageshow = async () => {
   console.log('onPageShow');
 };
 
-
-
 function App() {
-  const ref = createRef(null);
+  const chessboardRef = createRef(null);
   const [gameCode, _setGameCode] = useState('');
   const [gameFee, _setGameFee] = useState('0.05');
   const [image, takeScreenshot] = useScreenshot();
-  
+
   const createNFTCard = ({winnerAddress, otherAddress}) => {
     try {
-      takeScreenshot(ref.current);
-      dispatch(d.createNFTImage({winnerAddress: winnerAddress, otherAddress: otherAddress, chessboard: image}));
+      takeScreenshot(chessboardRef.current);
+      dispatch(d.createNFTImage({
+        winnerAddress: winnerAddress, 
+        otherAddress: otherAddress, 
+        chessboard: image
+      }));
     } catch (ex) {
       console.log(ex);
     }
   };
 
-  window.onpagehide = async () => {
-    console.log('onPageHide');
-    // if (gameInProgress) {
-    //   const address = isPlayer ? opponentAddress : playerAddress;
-    //   return await d.endGameFun({gameShortId: gameShortId, winnerAddress: address});
-    //   //dispatch(d.endGame({gameShortId: gameShortId, winnerAddress: address})); 
-    // }
-    return null;
-  };
+  // window.onpagehide = async () => {
+  //   console.log('onPageHide');
+  //   // if (gameInProgress) {
+  //   //   const address = isPlayer ? opponentAddress : playerAddress;
+  //   //   return await d.endGameFun({gameShortId: gameShortId, winnerAddress: address});
+  //   //   //dispatch(d.endGame({gameShortId: gameShortId, winnerAddress: address})); 
+  //   // }
+  //   return null;
+  // };
 
-  window.onunload = async () => {
-    console.log('onUnLoad');
-    // console.log(`gameStarted: ${gameStarted}`);
-    // console.log(`gameEnded: ${gameEnded}`);
-    // console.log(`opponentAddress: ${opponentAddress}`);
-    // console.log(`playerAddress: ${playerAddress}`);
-    // if (gameStarted && !gameEnded && isValidString(opponentAddress) && isValidString(playerAddress)) {
-    //   const address = isPlayer ? opponentAddress : playerAddress;
-    //   await endGameFun({gameShortId: gameShortId, address: address});
-    //   //dispatch(endGame({gameShortId: gameShortId, address: address}));
-    // }
+  // window.onunload = async () => {
+  //   console.log('onUnLoad');
+  //   // console.log(`gameStarted: ${gameStarted}`);
+  //   // console.log(`gameEnded: ${gameEnded}`);
+  //   // console.log(`opponentAddress: ${opponentAddress}`);
+  //   // console.log(`playerAddress: ${playerAddress}`);
+  //   // if (gameStarted && !gameEnded && isValidString(opponentAddress) && isValidString(playerAddress)) {
+  //   //   const address = isPlayer ? opponentAddress : playerAddress;
+  //   //   await endGameFun({gameShortId: gameShortId, address: address});
+  //   //   //dispatch(endGame({gameShortId: gameShortId, address: address}));
+  //   // }
     
-  };
+  // };
 
   const gameCodeInputEvent = (event) => {
     event.preventDefault();
@@ -214,11 +216,11 @@ function App() {
 
   useEffect(() => {
     console.log("................Use effect................");
+    // Init account from cache
     if (gameConnected) {
       // TODO: fetch NFT data
       dispatch(d.fetchData(loggedInAddress));
     }
-    // Init account from cache
     if (!walletConnected) {
       dispatch(b.fetchCachedAccount());
     }
@@ -719,8 +721,7 @@ function App() {
         <DialogContent>
           <s.Container jc={'center'} ai={'center'}>
             <s.Image
-              src={image}
-              style={{backgroundColor: 'red'}}
+              src={data.nftImage}
             />
             <s.StyledButton
               bc={'black'}
@@ -770,7 +771,7 @@ function App() {
                   const winnerAddress = isPlayer ? opponentAddress : playerAddress;
                   const otherAddress = !isPlayer ? opponentAddress : playerAddress;
                   createNFTCard({winnerAddress: winnerAddress, otherAddress: otherAddress});
-                  //dispatch(d.showCreateGameDialog());
+                  // dispatch(d.showCreateGameDialog());
                 } else {
                   dispatch(b.connectWallet({
                     createGameRequest: true, 
@@ -883,7 +884,7 @@ function App() {
   function setChessboard(isEnable) {
     return(
       <Chessboard
-        ref={ref}
+        ref={chessboardRef}
         position={fenString}
         draggable={isEnable}
         orientation={!isOpponent ? 'white' : 'black'}

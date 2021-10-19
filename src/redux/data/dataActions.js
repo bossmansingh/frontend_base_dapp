@@ -109,7 +109,7 @@ export const hideDialog = () => {
   };
 };
 
-const showNFTCreated = (payload) => {
+export const showNFTCreated = (payload) => {
   return {
     type: 'SHOW_NFT_CREATED_DIALOG',
     payload: payload
@@ -190,26 +190,26 @@ async function addSubscription(dispatch, gameShortId) {
       subscription.unsubscribe();
     }
   });
-  subscription.on('close', async (event) => {
+  subscription.on('close', async () => {
     console.log('subscription closed');
-    console.table(event);
     await endGameFun({gameShortId: gameShortId});
   });
 }
 
-export const createNFTImage = ({winnerAddress, otherAddress, chessboard}) => {
+export const createNFTImage = ({canvas, winnerAddress, otherAddress, chessboard}) => {
   return async (dispatch) => {
     try {
       console.log('create NFT');
-      const fileName = await createCard({
+      const nftImage = await createCard({
+        canvas: canvas,
         winnerAddress: winnerAddress,
         otherAddress: otherAddress,
         pieceType: PieceType.KNIGHT,
         chessboard: chessboard
       });
       // const image = fs.readFileSync(`${cardsFolderPath}/${fileName}`);
-      //console.log(`image: ${fileName}`);
-      dispatch(showNFTCreated({image: fileName}));
+      console.log(`NFT image created: ${nftImage}`);
+      dispatch(showNFTCreated({image: nftImage}));
     } catch (err) {
       console.log(err);
     }
