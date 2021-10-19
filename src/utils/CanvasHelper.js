@@ -6,15 +6,18 @@ import b2 from '../assets/images/pieces/Knight.png';
 // Dimensions
 const pieceWidth = 1716;
 const pieceHeight = 2083;
+const chessboardPadding = 20;
 const chessboardSize = pieceWidth;
 const winnerAvatarSize = 300;
-const avatarTopPadding = (pieceHeight - pieceWidth - winnerAvatarSize)/2;
+const otherAvatarSize = winnerAvatarSize / 2;
 const avatarHorizontalPadding = 100;
 
 const fs = require('fs');
 const { createCanvas, loadImage } = require('canvas');
-const canvas = createCanvas(pieceWidth + chessboardSize, pieceHeight, 'svg');
+const canvas = createCanvas((2 * pieceWidth) + (3 * chessboardPadding), pieceHeight + (2 * chessboardPadding), 'svg');
 const ctx = canvas.getContext('2d');
+
+const remainingHeight = canvas.height - (chessboardPadding + chessboardSize);
 
 const imageFolderPath = 'src/assets/images';
 const cardsFolderPath = `${imageFolderPath}/cards`;
@@ -38,48 +41,54 @@ const saveCard = async (_canvas, fileName) => {
 
 export const createCard = async ({winnerAddress, otherAddress, pieceType, chessboard}) => {
     console.log('create card');
-
-    ctx.strokeRect(0, 0, canvas.width, canvas.height);
     
-
+    ctx.fillRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+    
     // From a local file path:
     // const backgroundLayer = new Image();
     // backgroundLayer.onload = () => ctx.drawImage(backgroundLayer, 0, 0);
     // backgroundLayer.onerror = err => { throw err; };
     // backgroundLayer.src = b;
     const backgroundLayer = await loadImage(b);
-    ctx.drawImage(backgroundLayer, 0, 0);
+    ctx.drawImage(backgroundLayer, chessboardPadding, chessboardPadding);
     
     const borderLayer = await loadImage(b1);
-    ctx.drawImage(borderLayer, 0, 0);
+    ctx.drawImage(borderLayer, chessboardPadding, chessboardPadding);
 
     const pieceLayer = await loadImage(b2);
-    ctx.drawImage(pieceLayer, 0, 0);
+    ctx.drawImage(pieceLayer, chessboardPadding, chessboardPadding);
     
     if (chessboard != null) {
         const chessboardLayer = await loadImage(chessboard);
-        // const chessboardLayer = await loadImage(`${imageFolderPath}/chessboard_logo.jpg`);
-        ctx.drawImage(chessboardLayer, pieceWidth, 0, chessboardSize, chessboardSize);
+        ctx.drawImage(chessboardLayer, pieceWidth + (2 * chessboardPadding), chessboardPadding, chessboardSize, chessboardSize);
     }
-    
+
     const winnerAvatar = await loadImage(getIdenticonUrl(winnerAddress));
+    let avatarTopPadding = (remainingHeight - winnerAvatarSize) / 2;
+    console.log(`remainingHeight: ${remainingHeight}`);
+    console.log(`avatarTopPadding: ${avatarTopPadding}`);
     ctx.drawImage(
         winnerAvatar, 
         pieceWidth + avatarHorizontalPadding, 
-        chessboardSize + avatarTopPadding, 
+        chessboardSize + chessboardPadding + avatarTopPadding, 
         winnerAvatarSize, 
         winnerAvatarSize
     );
     
     const otherAvatar = await loadImage(getIdenticonUrl(otherAddress));
+    avatarTopPadding = (remainingHeight - otherAvatarSize) / 2;
     ctx.drawImage(
         otherAvatar, 
         pieceWidth + winnerAvatarSize + (avatarHorizontalPadding * 2), 
-        chessboardSize + avatarTopPadding + (winnerAvatarSize / 4), 
+        chessboardSize + chessboardPadding + avatarTopPadding, 
         winnerAvatarSize / 2, 
         winnerAvatarSize / 2
     );
-    
     
     // Asynchronous PNG
     // console.log(`buffer: ${x}`);

@@ -95,6 +95,7 @@ function App() {
   const createNFTCard = ({winnerAddress, otherAddress}) => {
     try {
       takeScreenshot(chessboardRef.current);
+      console.log(`image: ${image}`);
       dispatch(d.createNFTImage({
         winnerAddress: winnerAddress, 
         otherAddress: otherAddress, 
@@ -883,33 +884,34 @@ function App() {
 
   function setChessboard(isEnable) {
     return(
-      <Chessboard
-        ref={chessboardRef}
-        position={fenString}
-        draggable={isEnable}
-        orientation={!isOpponent ? 'white' : 'black'}
-        lightSquareStyle={{ backgroundColor: `rgb(${lightSquareColor})` }}
-        darkSquareStyle={{ backgroundColor: `rgb(${darkSquareColor})` }}
-        showNotation={false}
-        allowDrag={allowDrag}
-        onDrop={onDrop}
-        // pieces={{
-        //   wK: () => (
-        //     <img
-        //       style={{
-        //         alignItems: "center",
-        //         justifyContent: "center",
-        //         flexDirection: "center",
-        //         borderRadius: "35px",
-        //         width: "70px",
-        //         height: "70px"
-        //       }}
-        //       src={blockchain.identiconUrl}
-        //       alt={"player1"}
-        //     />
-        //   )
-        // }} 
-        />
+      <s.Container ref={chessboardRef}>
+        <Chessboard
+          position={fenString}
+          draggable={isEnable}
+          orientation={!isOpponent ? 'white' : 'black'}
+          lightSquareStyle={{ backgroundColor: `rgb(${lightSquareColor})` }}
+          darkSquareStyle={{ backgroundColor: `rgb(${darkSquareColor})` }}
+          showNotation={false}
+          allowDrag={allowDrag}
+          onDrop={onDrop}
+          // pieces={{
+          //   wK: () => (
+          //     <img
+          //       style={{
+          //         alignItems: "center",
+          //         justifyContent: "center",
+          //         flexDirection: "center",
+          //         borderRadius: "35px",
+          //         width: "70px",
+          //         height: "70px"
+          //       }}
+          //       src={blockchain.identiconUrl}
+          //       alt={"player1"}
+          //     />
+          //   )
+          // }} 
+          />
+      </s.Container>
     );
   }
 
