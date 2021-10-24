@@ -92,15 +92,9 @@ function App() {
   const [gameFee, _setGameFee] = useState('0.05');
   const [image, takeScreenshot] = useScreenshot();
 
-  const createNFTCard = ({winnerAddress, otherAddress}) => {
+  const captureChessboard = () => {
     try {
       takeScreenshot(chessboardRef.current);
-      console.log(`image: ${image}`);
-      dispatch(d.createNFTImage({
-        winnerAddress: winnerAddress, 
-        otherAddress: otherAddress, 
-        chessboard: image
-      }));
     } catch (ex) {
       console.log(ex);
     }
@@ -199,21 +193,32 @@ function App() {
   const isPlayerTurn = h.stringValueEqual(currentTurnAddress, playerAddress);
   const isOpponent = h.stringValueEqual(opponentAddress, loggedInAddress);
   const isOpponentTurn = h.stringValueEqual(currentTurnAddress, opponentAddress);
+  const isWinner = isPlayer ? h.stringValueEqual(playerAddress, winnerAddress) : h.stringValueEqual(opponentAddress, winnerAddress);
   
-  
-  console.log("App() | player: " + isPlayerTurn);
-  console.log("App() | opponent: " + isOpponentTurn);
-  console.log("App() | LoggedInAddress: " + loggedInAddress);
-  console.log("App() | walletConnected: " + walletConnected);
-  console.log("App() | contractFetched: " + contractFetched);
-  console.log("App() | gameConnected: " + gameConnected);
-  console.log("App() | dialogType: " + dialogType);
-  console.log("App() | showCreateGameDialog: " + showCreateGameDialog);
-  console.log("App() | showJoinGameDialog: " + showJoinGameDialog);
-  console.log("App() | showInfoDialog: " + showInfoDialog);
-  console.log("App() | baseGameFee: " + baseGameFee);
-  console.log("App() | endGameDialog: " + showEndGameDialog);
-  console.log("App() | missedTurnCount: " + missedTurnCount);
+  // console.log("App() | player: " + isPlayerTurn);
+  // console.log("App() | opponent: " + isOpponentTurn);
+  // console.log("App() | LoggedInAddress: " + loggedInAddress);
+  // console.log("App() | walletConnected: " + walletConnected);
+  // console.log("App() | contractFetched: " + contractFetched);
+  // console.log("App() | gameConnected: " + gameConnected);
+  // console.log("App() | dialogType: " + dialogType);
+  // console.log("App() | showCreateGameDialog: " + showCreateGameDialog);
+  // console.log("App() | showJoinGameDialog: " + showJoinGameDialog);
+  // console.log("App() | showInfoDialog: " + showInfoDialog);
+  // console.log("App() | baseGameFee: " + baseGameFee);
+  // console.log("App() | endGameDialog: " + showEndGameDialog);
+  // console.log("App() | missedTurnCount: " + missedTurnCount);
+  if (data.winnerAddress !== null && data.chessboardImage != null && data.nftImage == null) {
+    const otherAddress = h.stringValueEqual(playerAddress, winnerAddress) ? opponentAddress : playerAddress;
+    dispatch(d.createNFTImage({
+      winnerAddress: winnerAddress,
+      otherAddress: otherAddress, 
+      chessboard: data.chessboardImage
+    }));
+  }
+  if (data.chessboardImage == null && data.nftImage == null && image != null) {
+    dispatch(d.setChessboardImage({image: image}));
+  }
 
   useEffect(() => {
     console.log("................Use effect................");
@@ -562,8 +567,7 @@ function App() {
                         gameFee: gameFee,
                         address: loggedInAddress,
                         lightSquareColor: lightSquareColor, 
-                        darkSquareColor: darkSquareColor,
-                        createGameRequest: true,
+                        darkSquareColor: darkSquareColor
                       }));
                     } else {
                       dispatch(b.connectWallet({
@@ -659,11 +663,11 @@ function App() {
                 onClick={(e) => {
                   e.preventDefault();
                   if (gameConnected) {
-                    dispatch(d.joinGame({gameId: gameCode, address: loggedInAddress}));
+                    dispatch(d.joinGame({shortId: gameCode, address: loggedInAddress}));
                   } else {
                     dispatch(b.connectWallet({
                       joinGameRequest: true,
-                      gameId: gameCode, 
+                      shortId: gameCode, 
                       lightSquareColor: lightSquareColor, 
                       darkSquareColor: darkSquareColor
                     }));
@@ -685,7 +689,11 @@ function App() {
         open={showEndGameDialog} 
         onClose={(e) => {
           e.preventDefault();
-          dispatch(d.clearGameData());
+          if (isWinner) {
+            captureChessboard();
+          } else {
+            dispatch(d.clearGameData());
+          }
         }}
       >
         <DialogContent>
@@ -701,7 +709,11 @@ function App() {
               style={{marginTop: '20px', marginBottom: '5px'}}
               onClick={(e) => {
                 e.preventDefault();
-                dispatch(d.clearGameData());
+                if (isWinner) {
+                  captureChessboard();
+                } else {
+                  dispatch(d.clearGameData());
+                }
               }}
             >Okay</s.StyledButton>
           </s.Container>
@@ -769,10 +781,7 @@ function App() {
               onClick={(e) => {
                 e.preventDefault();
                 if (gameConnected) {
-                  const winnerAddress = isPlayer ? opponentAddress : playerAddress;
-                  const otherAddress = !isPlayer ? opponentAddress : playerAddress;
-                  createNFTCard({winnerAddress: winnerAddress, otherAddress: otherAddress});
-                  // dispatch(d.showCreateGameDialog());
+                  dispatch(d.showCreateGameDialog());
                 } else {
                   dispatch(b.connectWallet({
                     createGameRequest: true, 

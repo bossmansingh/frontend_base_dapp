@@ -10,6 +10,7 @@ const initialState = {
   baseGameFee: '0.05',
   missedTurnCount: 0,
   nftImage: null,
+  chessboardImage: null,
   lightSquareColor: getLightSquareColor(),
   darkSquareColor: getDarkSquareColor()
 };
@@ -59,7 +60,13 @@ const dataReducer = (state = initialState, action) => {
         ...state,
         errorMessage: '',
         dialogType: DialogType.NFT_CREATED,
-        nftImage: image
+        nftImage: image,
+        chessboardImage: null
+      };
+    case 'SET_CHESSBOARD_IMAGE':
+      return {
+        ...state,
+        chessboardImage: action.payload.image
       };
     case 'HIDE_DIALOG':
       return {

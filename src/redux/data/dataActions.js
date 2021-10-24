@@ -116,12 +116,20 @@ export const showNFTCreated = (payload) => {
   };
 };
 
+export const setChessboardImage = (payload) => {
+  return {
+    type: 'SET_CHESSBOARD_IMAGE',
+    payload: payload
+  };
+};
+
 function getGameModelQuery() {
   return new Moralis.Query(GameModelInstance);
 }
 
 async function queryGameModel(shortId) {
   try {
+    console.log('queryGameModel');
     const query = getGameModelQuery();
     query.equalTo(GameModelDataType.SHORT_ID, shortId);
     query.doesNotExist(GameModelDataType.WINNER_ADDR);
@@ -273,6 +281,7 @@ export const joinGame = ({shortId, address}) => {
   return async (dispatch) => {
     try {
       // Query game from database
+      console.log(`gameCode: ${shortId}`);
       const gameModel = await queryGameModel(shortId);
       if (gameModel != null) {
         const gameFee = gameModel.get(GameModelDataType.GAME_FEE);
@@ -315,11 +324,8 @@ export async function endGameFun({gameShortId, winnerAddress}) {
     const currentTime = new Date();
     const gameTime = getDateDifferenceInSeconds(currentTime, gameModel.createdAt);
     //const checkSumAddress = web3.utils.toChecksumAddress(winnerAddress);
-    console.log(`gameTime: ${gameTime}`);
     //console.log(`checkSumAddress: ${checkSumAddress}`);
-    
     if (isValidString(winnerAddress)) {
-      console.log(`winnerAddress: ${winnerAddress}`);
       gameModel.set(GameModelDataType.WINNER_ADDR, winnerAddress);
     }
     gameModel.set(GameModelDataType.GAME_TIME, gameTime);
@@ -331,7 +337,7 @@ export async function endGameFun({gameShortId, winnerAddress}) {
 export const endGame = ({gameShortId, winnerAddress}) => {
   return async (dispatch) => {
     try {
-      await endGameFun(gameShortId, winnerAddress);
+      await endGameFun({gameShortId: gameShortId, winnerAddress: winnerAddress});
     } catch (err) {
       console.log(err);
       // TODO: Handle error case

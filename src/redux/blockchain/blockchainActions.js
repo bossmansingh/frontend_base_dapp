@@ -52,12 +52,8 @@ function addEventListener(dispatch) {
   });
 }
 
-const connectGameAndListener = (payload) => {
+const connectGameAndListener = ({address, createGameRequest, joinGameRequest, shortId}) => {
   return async (dispatch) => {
-    const address = payload.address;
-    const createGameRequest = payload.createGameRequest;
-    const joinGameRequest = payload.joinGameRequest;
-    const gameId = payload.gameId;
     const identiconUrl = getIdenticonUrl(address);
     // Init Contract
     const web3 = await Moralis.Web3.enable();
@@ -81,8 +77,8 @@ const connectGameAndListener = (payload) => {
       );
       if (createGameRequest) {
         dispatch(showCreateGameDialog());
-      } else if (joinGameRequest && isValidString(gameId)) {
-        dispatch(joinGame({address: address, gameId: gameId}));
+      } else if (joinGameRequest && isValidString(shortId)) {
+        dispatch(joinGame({shortId: shortId, address: address}));
       }
     } else {
       dispatch(fetchDataFailed("Change network to CHKMATE."));
@@ -97,16 +93,10 @@ const connectGameAndListener = (payload) => {
   };
 };
 
-export const connectWallet = (payload) => {
+export const connectWallet = ({createGameRequest, joinGameRequest, shortId, gameFee, lightSquareColor, darkSquareColor}) => {
   return async (dispatch) => {
     if (isMetaMaskInstalled()) {
       try {
-        const createGameRequest = payload.createGameRequest;
-        const joinGameRequest = payload.joinGameRequest;
-        const gameId = payload.gameId;
-        const gameFee = payload.gameFee;
-        const lightSquareColor = payload.lightSquareColor;
-        const darkSquareColor = payload.darkSquareColor;
         dispatch(connectRequest());
         const userAccount = await Moralis.Web3.authenticate({signingMessage: signingMessage});
         if (userAccount != null) {
@@ -115,7 +105,7 @@ export const connectWallet = (payload) => {
           dispatch(connectGameAndListener({
             createGameRequest: createGameRequest,
             joinGameRequest: joinGameRequest,
-            gameId: gameId,
+            shortId: shortId,
             gameFee: gameFee,
             address: address,
             lightSquareColor: lightSquareColor,
