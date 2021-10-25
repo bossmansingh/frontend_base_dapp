@@ -26,7 +26,7 @@ import Rook from '../assets/images/pieces/Rook.png';
 // Dimensions
 const pieceWidth = 1716;
 const pieceHeight = 2083;
-const chessboardPadding = 20;
+const chessboardPadding = 10;
 const chessboardSize = pieceWidth;
 const winnerAvatarSize = 250;
 const otherAvatarSize = winnerAvatarSize * 0.65;
@@ -120,63 +120,54 @@ export const createCard = async ({playerAddress, opponentAddress, pieceType, che
     }
 
     if (isPlayerWinner) {
-        await addLargeAvatar(playerAddress);
-        await addSmallAvatar(opponentAddress);
+        await addLargeAvatar(playerAddress, 0);
+        await addSmallAvatar(opponentAddress, winnerAvatarSize + avatarHorizontalPadding);
     } else {
-        await addSmallAvatar(playerAddress);
-        await addLargeAvatar(opponentAddress);
+        await addSmallAvatar(playerAddress, 0);
+        await addLargeAvatar(opponentAddress, otherAvatarSize + avatarHorizontalPadding);
     }
     return canvas.toDataURL();
 };
 
 
-async function addLargeAvatar(address) {
-    const winnerAvatar = await loadImage(getIdenticonUrl(address));
-    const avatarTopPadding = (remainingHeight - winnerAvatarSize) / 2;
-    console.log(`remainingHeight: ${remainingHeight}`);
-    console.log(`avatarTopPadding: ${avatarTopPadding}`);
-    ctx.save();
-    ctx.beginPath();
-    ctx.arc(
-        pieceWidth + avatarHorizontalPadding + (winnerAvatarSize/2), 
-        chessboardSize + chessboardPadding + avatarTopPadding + (winnerAvatarSize/2), 
-        (winnerAvatarSize/2),
-        0, 
-        2*Math.PI, 
-        true
+async function addLargeAvatar(address, x) {
+    await addAvatar(
+        address, 
+        winnerAvatarSize,
+        pieceWidth + avatarHorizontalPadding + x, 
+        chessboardSize + chessboardPadding
     );
-    ctx.clip();
-    ctx.drawImage(
-        winnerAvatar, 
-        pieceWidth + avatarHorizontalPadding, 
-        chessboardSize + chessboardPadding + avatarTopPadding,
-        winnerAvatarSize, 
-        winnerAvatarSize
-    );
-    ctx.closePath();
-    ctx.restore();
 }
 
-async function addSmallAvatar(address) {
-    const otherAvatar = await loadImage(getIdenticonUrl(address));
-    const avatarTopPadding = (remainingHeight - otherAvatarSize) / 2;
+async function addSmallAvatar(address, x) {
+    await addAvatar(
+        address, 
+        otherAvatarSize,
+        pieceWidth + avatarHorizontalPadding + x, 
+        chessboardSize + chessboardPadding
+    );
+}
+
+async function addAvatar(address, avatarSize, x, y) {
+    const avatar = await loadImage(getIdenticonUrl(address));
+    const avatarTopPadding = (remainingHeight - avatarSize) / 2;
     ctx.save();
     ctx.beginPath();
     ctx.arc(
-        pieceWidth + winnerAvatarSize + (avatarHorizontalPadding * 2) + (otherAvatarSize/2), 
-        chessboardSize + chessboardPadding + avatarTopPadding + (otherAvatarSize/2), 
-        (otherAvatarSize/2),
+        x + (avatarSize/2),
+        y + (avatarSize/2) + avatarTopPadding, 
+        (avatarSize/2),
         0, 
         2*Math.PI, 
         true
     );
     ctx.clip();
     ctx.drawImage(
-        otherAvatar, 
-        pieceWidth + winnerAvatarSize + (avatarHorizontalPadding * 2), 
-        chessboardSize + chessboardPadding + avatarTopPadding, 
-        otherAvatarSize, 
-        otherAvatarSize
+        avatar, 
+        x, 
+        y + avatarTopPadding, 
+        avatarSize, 
+        avatarSize
     );
     ctx.closePath();
     ctx.restore();
