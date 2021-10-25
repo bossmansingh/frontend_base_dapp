@@ -1,4 +1,4 @@
-import { getIdenticonUrl } from './Helpers';
+import { convertRGBtoHex, getIdenticonUrl } from './Helpers';
 import { createCanvas, loadImage } from 'canvas';
 
 // Import Border
@@ -28,8 +28,8 @@ const pieceWidth = 1716;
 const pieceHeight = 2083;
 const chessboardPadding = 20;
 const chessboardSize = pieceWidth;
-const winnerAvatarSize = 300;
-const otherAvatarSize = winnerAvatarSize / 2;
+const winnerAvatarSize = 250;
+const otherAvatarSize = winnerAvatarSize * 0.65;
 const avatarHorizontalPadding = 100;
 
 const canvas = createCanvas((2 * pieceWidth) + (3 * chessboardPadding), pieceHeight + (2 * chessboardPadding), 'svg');
@@ -46,15 +46,19 @@ export const PieceType = {
     ROOK: 'Rook'
 };
 
-export const createCard = async ({winnerAddress, otherAddress, pieceType, chessboard}) => {
+export const createCard = async ({playerAddress, opponentAddress, pieceType, chessboard, backgroundColor, isPlayerWinner}) => {
     console.log('create card');
-    
+    console.log(`backgroundColor: ${backgroundColor}`);
+    const hexColor = convertRGBtoHex(backgroundColor);
+    console.log(`hexColor: ${hexColor}`);
+    ctx.fillStyle = hexColor;
     ctx.fillRect(
         0,
         0,
         canvas.width,
         canvas.height
     );
+
     const backgroundLayer = await loadImage(PlainBackground);
     ctx.drawImage(backgroundLayer, chessboardPadding, chessboardPadding);
     
@@ -94,8 +98,20 @@ export const createCard = async ({winnerAddress, otherAddress, pieceType, chessb
         ctx.drawImage(chessboardLayer, pieceWidth + (2 * chessboardPadding), chessboardPadding, chessboardSize, chessboardSize);
     }
 
-    const winnerAvatar = await loadImage(getIdenticonUrl(winnerAddress));
-    let avatarTopPadding = (remainingHeight - winnerAvatarSize) / 2;
+    if (isPlayerWinner) {
+        await addLargeAvatar(playerAddress);
+        await addSmallAvatar(opponentAddress);
+    } else {
+        await addSmallAvatar(playerAddress);
+        await addLargeAvatar(opponentAddress);
+    }
+    return canvas.toDataURL();
+};
+
+
+async function addLargeAvatar(address) {
+    const winnerAvatar = await loadImage(getIdenticonUrl(address));
+    const avatarTopPadding = (remainingHeight - winnerAvatarSize) / 2;
     console.log(`remainingHeight: ${remainingHeight}`);
     console.log(`avatarTopPadding: ${avatarTopPadding}`);
     ctx.save();
@@ -118,15 +134,17 @@ export const createCard = async ({winnerAddress, otherAddress, pieceType, chessb
     );
     ctx.closePath();
     ctx.restore();
-    
-    const otherAvatar = await loadImage(getIdenticonUrl(otherAddress));
-    avatarTopPadding = (remainingHeight - otherAvatarSize) / 2;
+}
+
+async function addSmallAvatar(address) {
+    const otherAvatar = await loadImage(getIdenticonUrl(address));
+    const avatarTopPadding = (remainingHeight - otherAvatarSize) / 2;
     ctx.save();
     ctx.beginPath();
     ctx.arc(
-        pieceWidth + winnerAvatarSize + (avatarHorizontalPadding * 2) + (winnerAvatarSize/4), 
-        chessboardSize + chessboardPadding + avatarTopPadding + (winnerAvatarSize/4), 
-        (winnerAvatarSize/4),
+        pieceWidth + winnerAvatarSize + (avatarHorizontalPadding * 2) + (otherAvatarSize/2), 
+        chessboardSize + chessboardPadding + avatarTopPadding + (otherAvatarSize/2), 
+        (otherAvatarSize/2),
         0, 
         2*Math.PI, 
         true
@@ -136,10 +154,9 @@ export const createCard = async ({winnerAddress, otherAddress, pieceType, chessb
         otherAvatar, 
         pieceWidth + winnerAvatarSize + (avatarHorizontalPadding * 2), 
         chessboardSize + chessboardPadding + avatarTopPadding, 
-        winnerAvatarSize / 2, 
-        winnerAvatarSize / 2
+        otherAvatarSize, 
+        otherAvatarSize
     );
     ctx.closePath();
     ctx.restore();
-    return canvas.toDataURL();
-};
+}

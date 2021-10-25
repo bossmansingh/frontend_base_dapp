@@ -54,3 +54,13 @@ export const getIdenticonUrl = (address) => {
     scale: 5
   }).toDataURL();
 };
+
+export function convertRGBtoHex(color) {
+  const a = color.split(',');
+  let hexString = '#';
+  a.forEach(element => {
+    const x = parseInt(element).toString(16);
+    hexString += (x.length === 1) ? `0${x}` : x;
+  });
+  return hexString;
+}

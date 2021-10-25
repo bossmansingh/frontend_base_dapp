@@ -138,7 +138,7 @@ export const StyledButton = styled.button`
   background-color: ${({ bc }) => (bc ? bc : "#ffffff")};
   font-weight: bold;
   color: ${({ color }) => (color ? color : "#000000")}};
-  width: 100px;
+  min-width: 120px;
   cursor: pointer;
   box-shadow: 0px 6px 0px -2px rgba(250, 250, 250, 0.3);
   -webkit-box-shadow: 0px 6px 0px -2px rgba(250, 250, 250, 0.3);

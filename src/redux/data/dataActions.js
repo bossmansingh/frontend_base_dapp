@@ -204,19 +204,20 @@ async function addSubscription(dispatch, gameShortId) {
   });
 }
 
-export const createNFTImage = ({canvas, winnerAddress, otherAddress, chessboard, pieceType}) => {
+export const createNFTImage = ({canvas, playerAddress, opponentAddress, chessboard, pieceType, backgroundColor, isPlayerWinner}) => {
   return async (dispatch) => {
     try {
       console.log('create NFT');
       const nftImage = await createCard({
         canvas: canvas,
-        winnerAddress: winnerAddress,
-        otherAddress: otherAddress,
+        playerAddress: playerAddress,
+        opponentAddress: opponentAddress,
         pieceType: pieceType,
-        chessboard: chessboard
+        chessboard: chessboard,
+        backgroundColor: backgroundColor,
+        isPlayerWinner: isPlayerWinner
       });
-      // const image = fs.readFileSync(`${cardsFolderPath}/${fileName}`);
-      console.log(`NFT image created: ${nftImage}`);
+      console.log(`NFT image created`);
       dispatch(showNFTCreated({image: nftImage}));
     } catch (err) {
       console.log(err);

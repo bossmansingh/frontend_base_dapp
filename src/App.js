@@ -20,9 +20,9 @@ import logo from "./assets/images/chessboard_logo.jpg";
 import copyIcon from "./assets/images/copy_to_clipboard.png";
 import { PieceType } from "./utils/CanvasHelper";
 
-const gameBoard = new Chess();
+let gameBoard = new Chess();
 const defaultFenString = 'start';
-const maxTurnTimeInSeconds = 20;
+const maxTurnTimeInSeconds = 120;
 const maxMissedTurnCount = 2;
 const gameTitle = 'Welcome to CHKMATE!';
 const gameDescription = 'First ever chess game built on blockchain. Create a new game or join an existing game using a game code. To read more about the rules of the game press the help icon in the top left corner.';
@@ -209,15 +209,17 @@ function App() {
   // console.log("App() | endGameDialog: " + showEndGameDialog);
   // console.log("App() | missedTurnCount: " + missedTurnCount);
   if (data.winnerAddress !== null && data.chessboardImage != null && data.nftImage == null) {
-    const otherAddress = h.stringValueEqual(playerAddress, winnerAddress) ? opponentAddress : playerAddress;
+    const backgroundColor = h.stringValueEqual(playerAddress, winnerAddress) ? lightSquareColor : darkSquareColor;
     dispatch(d.createNFTImage({
-      winnerAddress: winnerAddress,
-      otherAddress: otherAddress, 
+      playerAddress: playerAddress,
+      opponentAddress: opponentAddress, 
       chessboard: data.chessboardImage,
-      pieceType: PieceType.KNIGHT
+      pieceType: PieceType.KNIGHT,
+      backgroundColor: backgroundColor,
+      isPlayerWinner: h.stringValueEqual(playerAddress, winnerAddress)
     }));
   }
-  if (data.chessboardImage == null && data.nftImage == null && image != null) {
+  if (gameEnded && data.chessboardImage == null && data.nftImage == null && image != null) {
     dispatch(d.setChessboardImage({image: image}));
   }
 
@@ -730,7 +732,16 @@ function App() {
         open={showNFTDialog} 
         onClose={(e) => {
           e.preventDefault();
-          dispatch(d.hideDialog());
+          try {
+            takeScreenshot(null);
+          } catch (ex) {
+            console.log(ex);
+          }
+          // Reset data
+          _setGameCode(null);
+          _setGameFee('0.05');
+          gameBoard = new Chess();
+          dispatch(d.clearGameData());
         }}
       >
         <DialogContent>
@@ -784,6 +795,7 @@ function App() {
                 e.preventDefault();
                 if (gameConnected) {
                   dispatch(d.showCreateGameDialog());
+                  // captureChessboard();
                 } else {
                   dispatch(b.connectWallet({
                     createGameRequest: true, 
