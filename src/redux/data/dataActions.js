@@ -204,7 +204,7 @@ async function addSubscription(dispatch, gameShortId) {
   });
 }
 
-export const createNFTImage = ({canvas, winnerAddress, otherAddress, chessboard}) => {
+export const createNFTImage = ({canvas, winnerAddress, otherAddress, chessboard, pieceType}) => {
   return async (dispatch) => {
     try {
       console.log('create NFT');
@@ -212,7 +212,7 @@ export const createNFTImage = ({canvas, winnerAddress, otherAddress, chessboard}
         canvas: canvas,
         winnerAddress: winnerAddress,
         otherAddress: otherAddress,
-        pieceType: PieceType.KNIGHT,
+        pieceType: pieceType,
         chessboard: chessboard
       });
       // const image = fs.readFileSync(`${cardsFolderPath}/${fileName}`);

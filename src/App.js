@@ -18,6 +18,7 @@ import "./styles/clockStyle.css";
 // import { create } from "ipfs-http-client";
 import logo from "./assets/images/chessboard_logo.jpg";
 import copyIcon from "./assets/images/copy_to_clipboard.png";
+import { PieceType } from "./utils/CanvasHelper";
 
 const gameBoard = new Chess();
 const defaultFenString = 'start';
@@ -86,6 +87,29 @@ window.onpageshow = async () => {
   console.log('onPageShow');
 };
 
+window.onpagehide = async () => {
+  console.log('onPageHide');
+  // if (gameInProgress) {
+  //   const address = isPlayer ? opponentAddress : playerAddress;
+  //   return await d.endGameFun({gameShortId: gameShortId, winnerAddress: address});
+  //   //dispatch(d.endGame({gameShortId: gameShortId, winnerAddress: address})); 
+  // }
+  return null;
+};
+
+window.onunload = async () => {
+  console.log('onUnLoad');
+  // console.log(`gameStarted: ${gameStarted}`);
+  // console.log(`gameEnded: ${gameEnded}`);
+  // console.log(`opponentAddress: ${opponentAddress}`);
+  // console.log(`playerAddress: ${playerAddress}`);
+  // if (gameStarted && !gameEnded && isValidString(opponentAddress) && isValidString(playerAddress)) {
+  //   const address = isPlayer ? opponentAddress : playerAddress;
+  //   await endGameFun({gameShortId: gameShortId, address: address});
+  //   //dispatch(endGame({gameShortId: gameShortId, address: address}));
+  // }
+};
+
 function App() {
   const chessboardRef = createRef(null);
   const [gameCode, _setGameCode] = useState('');
@@ -99,30 +123,6 @@ function App() {
       console.log(ex);
     }
   };
-
-  // window.onpagehide = async () => {
-  //   console.log('onPageHide');
-  //   // if (gameInProgress) {
-  //   //   const address = isPlayer ? opponentAddress : playerAddress;
-  //   //   return await d.endGameFun({gameShortId: gameShortId, winnerAddress: address});
-  //   //   //dispatch(d.endGame({gameShortId: gameShortId, winnerAddress: address})); 
-  //   // }
-  //   return null;
-  // };
-
-  // window.onunload = async () => {
-  //   console.log('onUnLoad');
-  //   // console.log(`gameStarted: ${gameStarted}`);
-  //   // console.log(`gameEnded: ${gameEnded}`);
-  //   // console.log(`opponentAddress: ${opponentAddress}`);
-  //   // console.log(`playerAddress: ${playerAddress}`);
-  //   // if (gameStarted && !gameEnded && isValidString(opponentAddress) && isValidString(playerAddress)) {
-  //   //   const address = isPlayer ? opponentAddress : playerAddress;
-  //   //   await endGameFun({gameShortId: gameShortId, address: address});
-  //   //   //dispatch(endGame({gameShortId: gameShortId, address: address}));
-  //   // }
-    
-  // };
 
   const gameCodeInputEvent = (event) => {
     event.preventDefault();
@@ -195,7 +195,7 @@ function App() {
   const isOpponentTurn = h.stringValueEqual(currentTurnAddress, opponentAddress);
   const isWinner = isPlayer ? h.stringValueEqual(playerAddress, winnerAddress) : h.stringValueEqual(opponentAddress, winnerAddress);
   
-  // console.log("App() | player: " + isPlayerTurn);
+  console.log("App() | player: " + isPlayerTurn);
   // console.log("App() | opponent: " + isOpponentTurn);
   // console.log("App() | LoggedInAddress: " + loggedInAddress);
   // console.log("App() | walletConnected: " + walletConnected);
@@ -213,7 +213,8 @@ function App() {
     dispatch(d.createNFTImage({
       winnerAddress: winnerAddress,
       otherAddress: otherAddress, 
-      chessboard: data.chessboardImage
+      chessboard: data.chessboardImage,
+      pieceType: PieceType.KNIGHT
     }));
   }
   if (data.chessboardImage == null && data.nftImage == null && image != null) {
@@ -684,6 +685,7 @@ function App() {
   }
 
   function renderEndGamePopup() {
+    const buttonTitle = isWinner ? 'Show Game Card' : 'Okay';
     return(
       <Dialog
         open={showEndGameDialog} 
@@ -715,7 +717,7 @@ function App() {
                   dispatch(d.clearGameData());
                 }
               }}
-            >Okay</s.StyledButton>
+            >{buttonTitle}</s.StyledButton>
           </s.Container>
         </DialogContent>
       </Dialog>
@@ -742,7 +744,7 @@ function App() {
               style={{marginTop: '20px', marginBottom: '5px'}}
               onClick={(e) => {
                 e.preventDefault();
-                dispatch(d.hideDialog());
+                dispatch(d.clearGameData());
               }}
             >Okay</s.StyledButton>
           </s.Container>
