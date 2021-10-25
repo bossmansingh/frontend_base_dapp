@@ -219,7 +219,7 @@ function App() {
       isPlayerWinner: h.stringValueEqual(playerAddress, winnerAddress)
     }));
   }
-  if (gameEnded && data.chessboardImage == null && data.nftImage == null && image != null) {
+  if (isWinner && gameEnded && data.chessboardImage == null && data.nftImage == null && image != null) {
     dispatch(d.setChessboardImage({image: image}));
   }
 
@@ -696,7 +696,7 @@ function App() {
           if (isWinner) {
             captureChessboard();
           } else {
-            dispatch(d.clearGameData());
+            resetGameData();
           }
         }}
       >
@@ -716,7 +716,7 @@ function App() {
                 if (isWinner) {
                   captureChessboard();
                 } else {
-                  dispatch(d.clearGameData());
+                  resetGameData();
                 }
               }}
             >{buttonTitle}</s.StyledButton>
@@ -737,11 +737,7 @@ function App() {
           } catch (ex) {
             console.log(ex);
           }
-          // Reset data
-          _setGameCode(null);
-          _setGameFee('0.05');
-          gameBoard = new Chess();
-          dispatch(d.clearGameData());
+          resetGameData();
         }}
       >
         <DialogContent>
@@ -755,13 +751,17 @@ function App() {
               style={{marginTop: '20px', marginBottom: '5px'}}
               onClick={(e) => {
                 e.preventDefault();
-                dispatch(d.clearGameData());
+                resetGameData();
               }}
             >Okay</s.StyledButton>
           </s.Container>
         </DialogContent>
       </Dialog>
     );
+  }
+
+  function resetGameData() {
+    window.location.reload();
   }
 
   function renderWelcomePageOrGameBoard() {

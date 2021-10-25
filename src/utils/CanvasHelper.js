@@ -1,4 +1,4 @@
-import { convertRGBtoHex, getIdenticonUrl } from './Helpers';
+import { convertRGBtoHex, getIdenticonUrl, getRandomNumber } from './Helpers';
 import { createCanvas, loadImage } from 'canvas';
 
 // Import Border
@@ -59,7 +59,28 @@ export const createCard = async ({playerAddress, opponentAddress, pieceType, che
         canvas.height
     );
 
-    const backgroundLayer = await loadImage(PlainBackground);
+    const randomNumber = getRandomNumber(0, 100);
+    let backgroundImage;
+    if (randomNumber % 11 === 0) {
+        backgroundImage = TextureBackground1;
+    } else if (randomNumber % 12 === 0) {
+        backgroundImage = TextureBackground2;
+    } else if (randomNumber % 13 === 0) {
+        backgroundImage = TextureBackground3;
+    } else if (randomNumber % 14 === 0) {
+        backgroundImage = TextureBackground4;
+    } else if (randomNumber % 15 === 0) {
+        backgroundImage = TextureBackground5;
+    } else if (randomNumber % 16 === 0) {
+        backgroundImage = TextureBackground6;
+    } else if (randomNumber % 17 === 0) {
+        backgroundImage = TextureBackground7;
+    } else if (randomNumber % 18 === 0) {
+        backgroundImage = TextureBackground8;
+    } else {
+        backgroundImage = PlainBackground;
+    }
+    const backgroundLayer = await loadImage(backgroundImage);
     ctx.drawImage(backgroundLayer, chessboardPadding, chessboardPadding);
     
     const borderLayer = await loadImage(Border);
