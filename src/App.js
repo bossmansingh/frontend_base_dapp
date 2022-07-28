@@ -238,7 +238,7 @@ function App() {
       setInterval(() => {
         console.log("................game does not exist................");
         dispatch(d.toggleBoardColor());
-      }, 1500);
+      }, 1000);
     }
   }, [loggedInAddress, walletConnected, gameConnected, dispatch]);
 

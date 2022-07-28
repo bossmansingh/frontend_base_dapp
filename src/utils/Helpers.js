@@ -11,7 +11,7 @@ export function getShortGameId(gameId) {
 
 // Function to generate and return light square color
 export function getLightSquareColor() {
-    const min = 160;
+    const min = 150;
     const max = 255;
     const r = getRandomNumber(min, max);
     const g = getRandomNumber(min, max);
@@ -31,7 +31,7 @@ export function getDarkSquareColor() {
   
   // Function to generate random number 
 export function getRandomNumber(min, max) { 
-    return Math.floor(Math.random() * (max - min) + min);
+    return Math.floor((Math.random() * (max - min)) + min);
 }
   
 export function stringValueEqual(str1, str2) {
