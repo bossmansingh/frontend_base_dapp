@@ -118,6 +118,12 @@ const dataReducer = (state = initialState, action) => {
         lightSquareColor: getLightSquareColor(),
         darkSquareColor: getDarkSquareColor()
       };
+    case 'TOGGLE_BOARD_COLOR':
+      return {
+        ...state,
+        lightSquareColor: getLightSquareColor(),
+        darkSquareColor: getDarkSquareColor()
+      };
     default:
       return state;
   }

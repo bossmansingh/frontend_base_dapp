@@ -45,6 +45,7 @@ const handleCopyClick = async (text) => {
   }
 };
 
+var gameExists = false;
 // This is the function we wrote earlier
 async function copyTextToClipboard(text) {
   if ('clipboard' in navigator) {
@@ -159,7 +160,7 @@ function App() {
   let darkSquareColor = data.darkSquareColor;
 
   let baseGameFee = data.baseGameFee;
-  let gameExists = gameModel != null;
+  gameExists = gameModel != null;
   let gameInProgress = false;
   let gameEnded = false;
   let playerAddress = null;
@@ -232,6 +233,12 @@ function App() {
     }
     if (!walletConnected) {
       dispatch(b.fetchCachedAccount());
+    }
+    if (!gameExists) {
+      setInterval(() => {
+        console.log("................game does not exist................");
+        dispatch(d.toggleBoardColor());
+      }, 1500);
     }
   }, [loggedInAddress, walletConnected, gameConnected, dispatch]);
 

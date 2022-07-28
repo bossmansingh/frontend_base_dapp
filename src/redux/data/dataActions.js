@@ -123,6 +123,13 @@ export const setChessboardImage = (payload) => {
   };
 };
 
+export const toggleBoardColor = (payload) => {
+  return {
+    type: 'TOGGLE_BOARD_COLOR',
+    payload: payload
+  };
+};
+
 function getGameModelQuery() {
   return new Moralis.Query(GameModelInstance);
 }
